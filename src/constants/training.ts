@@ -1,0 +1,505 @@
+export type TrainingCategory = 'fuerza' | 'tactico' | 'resistencia' | 'pliometria' | 'prevencion';
+
+export interface Exercise {
+  name: string;
+  description: string;
+  duration: string;
+  benefit: string;
+}
+
+export const EXERCISES: Record<TrainingCategory, Exercise[]> = {
+  fuerza: [
+    {
+      name: 'Sentadillas con peso',
+      description: 'Fortalece cuádriceps, glúteos e isquiotibiales. Fundamental para potencia de salto y sprint.',
+      duration: '3 series de 10-12 reps',
+      benefit: 'Aumenta fuerza de piernas y potencia explosiva',
+    },
+    {
+      name: 'Core con balón medicinal',
+      description: 'Rotaciones, lanzamientos y ejercicios de estabilidad con balón medicinal.',
+      duration: '4 series de 15 reps',
+      benefit: 'Fortalece el core para mejor equilibrio y protección de espalda',
+    },
+    {
+      name: 'Trabajo de aductores',
+      description: 'Fortalecimiento específico de aductores con máquina o bandas elásticas.',
+      duration: '3 series de 12 reps',
+      benefit: 'Previene pubalgias y mejora cambios de dirección',
+    },
+    {
+      name: 'Peso muerto rumano',
+      description: 'Fortalecimiento de cadena posterior: isquiotibiales, glúteos y espalda baja.',
+      duration: '4 series de 8-10 reps',
+      benefit: 'Aumenta potencia de sprint y previene lesiones isquiotibiales',
+    },
+    {
+      name: 'Estocadas con salto',
+      description: 'Estocadas explosivas alternando piernas con impulso hacia arriba.',
+      duration: '3 series de 12 reps por pierna',
+      benefit: 'Desarrolla potencia unilateral y equilibrio dinámico',
+    },
+    {
+      name: 'Plancha isométrica con variantes',
+      description: 'Planchas frontales, laterales y con elevación de extremidades.',
+      duration: '4 series de 45-60 segundos',
+      benefit: 'Estabilidad del core y resistencia muscular',
+    },
+    {
+      name: 'Press de banca',
+      description: 'Fortalecimiento del tren superior: pecho, hombros y tríceps.',
+      duration: '3 series de 10 reps',
+      benefit: 'Mejora fuerza en disputas y protección del balón',
+    },
+    {
+      name: 'Trabajo con TRX',
+      description: 'Ejercicios de suspensión para fuerza funcional y estabilidad.',
+      duration: '3 series de 12-15 reps',
+      benefit: 'Fortalece músculos estabilizadores y mejora propiocepción',
+    },
+    {
+      name: 'Escaladores con velocidad',
+      description: 'Mountain climbers a alta velocidad manteniendo técnica correcta.',
+      duration: '4 series de 30 segundos',
+      benefit: 'Combina fuerza de core con acondicionamiento',
+    },
+    {
+      name: 'Hip Thrust con barra',
+      description: 'Empuje de cadera con barra sobre banco. Activa glúteos máximos de forma específica replicando el patrón de extensión de cadera del sprint.',
+      duration: '4 series de 10-12 reps',
+      benefit: 'Máxima activación de glúteos para mejorar aceleración y potencia de sprint',
+    },
+    {
+      name: 'Sentadilla búlgara',
+      description: 'Sentadilla unilateral con pie trasero elevado en banco. Exige mayor estabilidad y equilibrio que la sentadilla bilateral, replicando el apoyo monopodal del fútbol.',
+      duration: '3 series de 10 reps por pierna',
+      benefit: 'Fuerza unilateral para cambios de dirección y prevención de asimetrías',
+    },
+    {
+      name: 'Curl nórdico de isquiotibiales',
+      description: 'Ejercicio excéntrico de isquiotibiales: de rodillas, bajar el cuerpo controladamente usando solo la musculatura posterior. Método validado científicamente (Arnason, Mjølsnes).',
+      duration: '3 series de 6-8 reps',
+      benefit: 'Gold standard de prevención de roturas musculares de isquiotibiales',
+    },
+    {
+      name: 'Press militar',
+      description: 'Empuje vertical de barra o mancuernas desde hombros hasta extensión completa. Fortalece deltoides, trapecios y tríceps.',
+      duration: '3 series de 10-12 reps',
+      benefit: 'Fuerza de tren superior para disputas aéreas y rechaces',
+    },
+    {
+      name: 'Remo con barra',
+      description: 'Tirón horizontal desde posición inclinada. Trabaja la cadena posterior superior: dorsales, romboides y bíceps. Mejora la postura bajo presión.',
+      duration: '4 series de 10 reps',
+      benefit: 'Equilibrio muscular tren superior y mejora de postura en carrera',
+    },
+    {
+      name: 'Puente de glúteo a una pierna',
+      description: 'Desde posición supina con una pierna elevada, empuje de cadera con la pierna de apoyo. Activa glúteo medio y mayor de forma aislada.',
+      duration: '3 series de 15 reps por pierna',
+      benefit: 'Estabilidad pélvica y activación de glúteo para prevenir valgo de rodilla',
+    },
+    {
+      name: 'Extensión de cadera con cable',
+      description: 'De pie, extensión de cadera contra resistencia de cable en polea baja. Replica el patrón motor del sprint con resistencia externa progresiva.',
+      duration: '3 series de 12-15 reps por pierna',
+      benefit: 'Fortalece el patrón neuromotor específico del sprint y la aceleración',
+    },
+    {
+      name: 'Flexiones explosivas con palmada',
+      description: 'Flexiones con impulso explosivo suficiente para separar las manos del suelo y dar una palmada. Desarrolla potencia del tren superior.',
+      duration: '4 series de 8-10 reps',
+      benefit: 'Potencia explosiva del tren superior para disputas, faltas y protección del balón',
+    },
+    {
+      name: 'Sentadilla con salto',
+      description: 'Sentadilla hasta paralelo seguida de salto explosivo máximo. Combina fuerza y velocidad en un movimiento compuesto (Bosco, 1994).',
+      duration: '3 series de 10 saltos',
+      benefit: 'Desarrolla potencia reactiva y capacidad elástica del músculo',
+    },
+  ],
+
+  tactico: [
+    {
+      name: 'Rondo de posesión',
+      description: 'Círculo de jugadores manteniendo posesión contra defensores en el centro.',
+      duration: '15-20 minutos',
+      benefit: 'Mejora toma de decisiones bajo presión y trabajo en equipo',
+    },
+    {
+      name: 'Juego de posición',
+      description: 'Ejercicio de posesión en espacios reducidos con superioridad numérica.',
+      duration: '20 minutos',
+      benefit: 'Desarrolla automatismos de juego y movimientos colectivos',
+    },
+    {
+      name: 'Situaciones de 2v1 y 3v2',
+      description: 'Superioridades numéricas en espacios reducidos para finalización.',
+      duration: '15 minutos',
+      benefit: 'Mejora asociación ofensiva y definición',
+    },
+    {
+      name: 'Transiciones defensa-ataque',
+      description: 'Recuperación de balón y ataque rápido en diferentes zonas del campo.',
+      duration: '20 minutos',
+      benefit: 'Desarrolla rapidez mental y cambio de chip',
+    },
+    {
+      name: 'Salida de presión desde atrás',
+      description: 'Práctica de construcción de juego contra pressing rival organizado.',
+      duration: '25 minutos',
+      benefit: 'Mejora circulación bajo presión y toma de decisiones',
+    },
+    {
+      name: 'Defensas de línea y fuera de juego',
+      description: 'Sincronización de línea defensiva con activación de fuera de juego.',
+      duration: '20 minutos',
+      benefit: 'Coordinación defensiva y comunicación entre líneas',
+    },
+    {
+      name: 'Juego de bandas y centros',
+      description: 'Progresión por banda, desmarques y remate de centros al área.',
+      duration: '25 minutos',
+      benefit: 'Perfecciona juego exterior y movimientos en área',
+    },
+    {
+      name: 'Finalización tras robo',
+      description: 'Presión alta, recuperación y remate inmediato con superioridad.',
+      duration: '20 minutos',
+      benefit: 'Desarrolla mentalidad de contragolpe rápido',
+    },
+    {
+      name: 'Balones divididos y segundas jugadas',
+      description: 'Disputas aéreas y llegada a rechaces en zona de finalización.',
+      duration: '15 minutos',
+      benefit: 'Mejora agresividad ofensiva y anticipación',
+    },
+    {
+      name: 'Organización en defensa de córneres',
+      description: 'Marcaje zonal y mixto en jugadas de estrategia defensiva.',
+      duration: '15 minutos',
+      benefit: 'Reduce goles en contra por jugadas a balón parado',
+    },
+    {
+      name: 'Circulación y cambio de orientación',
+      description: 'Ejercicio de posesión con cambios de banda para desestabilizar.',
+      duration: '20 minutos',
+      benefit: 'Amplía visión de juego y genera espacios',
+    },
+    {
+      name: 'Repliegue intensivo organizado',
+      description: 'Retroceso ordenado tras pérdida con basculación y coberturas.',
+      duration: '20 minutos',
+      benefit: 'Organización defensiva y prevención de contragolpes',
+    },
+    {
+      name: 'Small-Sided Game 3v3 con porteros neutros',
+      description: 'Partido reducido 3 contra 3 en espacio de 20×30m con dos porteros neutrales que juegan siempre con el equipo en posesión. Genera superioridad permanente y obliga a la toma de decisiones rápida (SSG — Small-Sided Games, Grupo Campus).',
+      duration: '4 series de 5 minutos con 2 min descanso',
+      benefit: 'Intensidad máxima de toma de decisiones y automatismos colectivos de posesión',
+    },
+    {
+      name: 'Pressing organizado con triggers',
+      description: 'Definir señales de pressing (trigger: pase hacia atrás, mal control, portero con balón). El equipo sin balón activa pressing inmediato al darse el trigger. Ejercicio progresivo 6v6 en medio campo.',
+      duration: '25 minutos',
+      benefit: 'Crea pressing automático y coordinado, reduciendo espacios de construcción rival',
+    },
+    {
+      name: 'Posesión con líneas de pase prohibidas',
+      description: 'Juego de posesión 5v2 o 6v3 donde se prohíbe el pase atrás o el pase lateral según la zona. Obliga a buscar siempre la línea de pase progresiva.',
+      duration: '20 minutos',
+      benefit: 'Desarrolla verticalidad y visión de pase progresivo bajo presión',
+    },
+    {
+      name: 'Transición 4v4 con portero',
+      description: 'Dos equipos de 4 jugadores más portero en medio campo. Tras robo, ataque inmediato al arco contrario. La velocidad de transición es el objetivo principal.',
+      duration: '4 series de 6 minutos',
+      benefit: 'Automatiza cambio de rol defensa-ataque y mejora velocidad de transición',
+    },
+    {
+      name: 'Pérdida y presión inmediata (6 segundos)',
+      description: 'Ejercicio de posesión donde el equipo que pierde el balón tiene 6 segundos para recuperarlo. Basado en el principio de Gegenpressing (Klopp/Rangnick). Si no lo recupera, se reinicia.',
+      duration: '20 minutos',
+      benefit: 'Desarrolla respuesta agresiva e inmediata ante la pérdida del balón',
+    },
+    {
+      name: 'Construcción con superioridad atrás (GK+3 vs 2)',
+      description: 'El equipo en posesión sale desde el portero con tres defensas contra dos presionadores. Obliga a encontrar soluciones de circulación y progresión de forma organizada.',
+      duration: '20 minutos',
+      benefit: 'Mejora construcción desde atrás y confianza de la línea defensiva con balón',
+    },
+    {
+      name: 'Timing en córner atacante',
+      description: 'Práctica específica de córners ofensivos: señales de movimiento, bloques, arrastres y llegadas a zona de remate. Se trabajan 4-5 variantes codificadas.',
+      duration: '15 minutos (series de repeticiones)',
+      benefit: 'Incrementa efectividad en jugadas de estrategia ofensiva y goles a balón parado',
+    },
+    {
+      name: 'Cobertura y vigilancia defensiva',
+      description: 'Ejercicio defensivo 4v4 en espacio cerrado donde se trabajan las posiciones de cobertura (detrás del compañero) y vigilancia (orientado para ver balón y rival simultáneamente).',
+      duration: '20 minutos',
+      benefit: 'Solidez defensiva colectiva y comunicación entre líneas',
+    },
+  ],
+
+  resistencia: [
+    {
+      name: 'Intervalos de alta intensidad',
+      description: 'Sprints de 30 segundos alternados con 30 segundos de trote.',
+      duration: '10-12 repeticiones',
+      benefit: 'Mejora capacidad aeróbica y recuperación entre esfuerzos',
+    },
+    {
+      name: 'Fartlek con balón',
+      description: 'Cambios de ritmo conduciendo el balón en diferentes intensidades.',
+      duration: '20-25 minutos',
+      benefit: 'Combina resistencia con habilidad técnica',
+    },
+    {
+      name: 'Circuito de estaciones',
+      description: 'Rotación por diferentes ejercicios: sprints, saltos, conducción, tiro.',
+      duration: '25-30 minutos',
+      benefit: 'Resistencia muscular y cardiovascular específica',
+    },
+    {
+      name: 'Partido reducido continuo',
+      description: 'Partido en espacio reducido sin paradas prolongadas.',
+      duration: '20 minutos',
+      benefit: 'Resistencia en situación real de juego',
+    },
+    {
+      name: 'Carreras en escalera (Yoyo Test)',
+      description: 'Carreras de ida y vuelta con incremento progresivo de velocidad.',
+      duration: '15-20 minutos',
+      benefit: 'Evalúa y mejora resistencia anaeróbica láctica',
+    },
+    {
+      name: 'Cambios de ritmo en campo completo',
+      description: 'Sprint diagonal, trote lateral, sprint frontal en secuencia continua.',
+      duration: '8-10 repeticiones',
+      benefit: 'Simula esfuerzos variables del partido real',
+    },
+    {
+      name: 'Carrera continua 70-75% FCmax',
+      description: 'Trote sostenido a ritmo moderado para base aeróbica.',
+      duration: '30-40 minutos',
+      benefit: 'Desarrolla capacidad aeróbica de fondo',
+    },
+    {
+      name: 'Series de 400m',
+      description: 'Carreras de 400 metros a ritmo alto con recuperación activa.',
+      duration: '6-8 repeticiones',
+      benefit: 'Potencia resistencia específica de medio fondo',
+    },
+    {
+      name: 'Juego reducido con zonas',
+      description: 'Partido con restricción de que jugadores deben cambiar de zona.',
+      duration: '4 series de 5 minutos',
+      benefit: 'Resistencia con alta demanda cognitiva',
+    },
+    {
+      name: 'Tabata de ejercicios mixtos',
+      description: '20 segundos trabajo intenso, 10 segundos descanso con burpees, sprints, etc.',
+      duration: '8 rounds (4 minutos)',
+      benefit: 'Máxima mejora de VO2max en corto tiempo',
+    },
+    {
+      name: 'Recuperaciones activas post-sprint',
+      description: 'Sprint máximo seguido de trote suave inmediato para recuperación.',
+      duration: '10-12 repeticiones',
+      benefit: 'Mejora capacidad de recuperación durante el partido',
+    },
+    {
+      name: 'Entrenamiento en umbrales',
+      description: 'Carreras a ritmo de umbral anaeróbico mantenido.',
+      duration: '3-4 series de 8-10 minutos',
+      benefit: 'Aumenta umbral láctico y resistencia a alta intensidad',
+    },
+    {
+      name: 'Protocolo intermitente 10-10 (Bangsbo)',
+      description: 'Método científico validado por Jens Bangsbo (Univ. Copenhague): 10 segundos de sprint al 100% seguidos de 10 segundos de trote suave. Optimiza la resíntesis de fosfocreatina y la remoción de lactato específica del fútbol.',
+      duration: '3 series de 12 repeticiones con 3 min descanso',
+      benefit: 'Replica con exactitud la demanda metabólica del partido real y mejora recuperación entre sprints',
+    },
+    {
+      name: 'Resistencia intermitente con balón 4 m/s',
+      description: 'Protocolo de Kirka Athletic: conducción técnica del balón a velocidad controlada de 4 m/s en circuito de 40 metros. Estructura 10×10 con 12 repeticiones por serie. Volumen total por sesión: 1440 metros. Integra habilidad técnica con demanda cardiovascular.',
+      duration: '3 series de 12 reps (40m c/u) con 90s recuperación',
+      benefit: 'Resistencia específica con balón que replica esfuerzos reales del partido',
+    },
+    {
+      name: 'Método 30-15 IFT (Buchheit)',
+      description: 'Intermittent Fitness Test de Martin Buchheit: 30 segundos de carrera con velocidad incremental cada ciclo, 15 segundos de recuperación pasiva. Permite calcular la Velocidad Máxima Aeróbica (VMA) y prescribir intensidades individualizadas.',
+      duration: 'Hasta el agotamiento voluntario (15-25 minutos)',
+      benefit: 'Evaluación y desarrollo preciso de la capacidad aeróbica intermitente específica del fútbol',
+    },
+    {
+      name: 'Series de 200m con recuperación técnica',
+      description: 'Sprint de 200 metros al 90-95% seguido de trote de recuperación de 200 metros con conducción de balón. Combina estímulo anaeróbico con trabajo técnico en fatiga.',
+      duration: '6-8 repeticiones (descanso entre series: 2 min)',
+      benefit: 'Mejora resistencia anaeróbica y mantenimiento técnico en fatiga',
+    },
+    {
+      name: 'Hill Sprints (sprints en cuesta)',
+      description: 'Sprints explosivos de 20-30 metros en pendiente del 8-12%. La inclinación reduce el impacto en articulaciones y aumenta la demanda muscular, especialmente de glúteos e isquiotibiales. Método utilizado por Adolfo Madrid (AM Health & Performance).',
+      duration: '8-10 repeticiones con 90 segundos recuperación',
+      benefit: 'Desarrolla potencia-resistencia con bajo impacto articular y activación máxima de cadena posterior',
+    },
+    {
+      name: 'Aerobic Power Interval (API)',
+      description: 'Método noruego de alta intensidad: 4 minutos al 90-95% FCmax seguidos de 3 minutos al 65-70% FCmax. Protocolo 4×4 que maximiza el tiempo en zona de VO2max con recuperación activa.',
+      duration: '4 series alternadas (28 minutos total)',
+      benefit: 'Mayor mejora documentada de VO2max en futbolistas en 8 semanas',
+    },
+    {
+      name: 'Circuito 5×5 integrado',
+      description: 'Bloque de 5 minutos de Small-Sided Game (partido reducido) + 5 minutos de trabajo físico específico (sprints, agilidad, pliometría). Se alternan bloques sin descanso entre ellos. Basado en metodología de Grupo Ekipo.',
+      duration: '4 bloques (40 minutos total)',
+      benefit: 'Resistencia específica combinando demanda física y cognitiva en un estímulo continuo',
+    },
+    {
+      name: 'Umbral anaeróbico con cambios de dirección',
+      description: 'Carrera al 80-85% FCmax con cambios de dirección de 45° y 90° cada 40 metros. Mantiene la intensidad cerca del umbral anaeróbico incorporando el patrón de movimiento real del fútbol.',
+      duration: '3-4 series de 8 minutos con 3 min recuperación',
+      benefit: 'Aumenta umbral láctico replicando el patrón locomotor real del partido',
+    },
+  ],
+
+  pliometria: [
+    {
+      name: 'Saltos continuos sobre vallas bajas (Hurdles)',
+      description: 'Saltos biapodales continuos sobre serie de 8-10 vallas bajas (30-40 cm) con mínimo tiempo de contacto en suelo. La clave es la reactividad y rigidez del tobillo. Herramienta analizada por Armando Altamirano (Living4Football).',
+      duration: '4 series de 8-10 vallas con 2 min descanso',
+      benefit: 'Mejora la elasticidad del complejo tobillo-tendón y la reactividad para cambios de ritmo',
+    },
+    {
+      name: 'Depth Jump',
+      description: 'Caída desde cajón (60-80 cm) → amortiguación inmediata con mínimo tiempo de contacto → salto vertical máximo. Trabaja el ciclo estiramiento-acortamiento (CEA) en su máxima expresión. Fundamento de Carmelo Bosco.',
+      duration: '4 series de 6 repeticiones con 3 min descanso',
+      benefit: 'Máximo desarrollo del ciclo estiramiento-acortamiento y potencia explosiva de salto',
+    },
+    {
+      name: 'Saltos laterales alternos con vallas',
+      description: 'Saltos laterales alternando lados sobre vallas de 40-50 cm. Replica el patrón lateral de cambio de dirección. Progresión: velocidad → reactividad → vallas más altas.',
+      duration: '3 series de 10 saltos (5 cada lado) con 90s descanso',
+      benefit: 'Potencia lateral y agilidad reactiva para cambios de dirección',
+    },
+    {
+      name: 'Triple salto horizontal',
+      description: 'Secuencia: salto desde dos piernas → aterrizaje una pierna → salto → aterrizaje otra pierna → salto de longitud. Trabaja la transferencia de energía y el equilibrio dinámico en máxima potencia.',
+      duration: '4 series de 5 repeticiones con 2 min descanso',
+      benefit: 'Potencia horizontal explosiva y coordinación de transferencia de energía entre apoyos',
+    },
+    {
+      name: 'Drop Jump + Sprint de 10m',
+      description: 'Caída desde cajón → contacto mínimo → sprint explosivo de 10 metros. Conecta la potencia pliométrica con la aceleración específica del sprint en fútbol.',
+      duration: '5 series de 4 repeticiones con 2 min descanso',
+      benefit: 'Transferencia directa de potencia pliométrica a la aceleración inicial de sprint',
+    },
+    {
+      name: 'Skipping de alta frecuencia',
+      description: 'Carrera en el sitio con elevación de rodillas al máximo y máxima frecuencia de pisada. Trabaja la velocidad de movimiento de piernas y la coordinación neuromuscular.',
+      duration: '4 series de 20 segundos con 40s descanso',
+      benefit: 'Aumenta la frecuencia de zancada y la velocidad de movimiento de piernas',
+    },
+    {
+      name: 'Bounds alternos (zancadas explosivas)',
+      description: 'Zancadas horizontales máximas alternando piernas, buscando la mayor distancia por impulsión. Cada aterrizaje se convierte inmediatamente en el siguiente impulso. Analizado por Armando Altamirano para fase de vuelo.',
+      duration: '4 series de 20 metros con 2 min descanso',
+      benefit: 'Potencia de impulsión horizontal y longitud de zancada en sprint',
+    },
+    {
+      name: 'CMJ — Counter Movement Jump',
+      description: 'Salto vertical con contra-movimiento: semiflexión rápida de rodillas seguida de salto máximo. Herramienta de evaluación y entrenamiento de potencia de Bosco (1983). Se puede medir con app o plataforma de fuerza.',
+      duration: '3 series de 8 saltos con 2 min descanso',
+      benefit: 'Desarrolla y evalúa la potencia muscular de piernas y el aprovechamiento del CEA',
+    },
+    {
+      name: 'Reactive Agility Drill con señal visual',
+      description: 'El atleta parte en posición de espera. Al recibir señal visual (luz, gesto del entrenador) debe reaccionar y cambiar de dirección hacia el punto indicado. Integra tiempo de reacción con potencia explosiva.',
+      duration: '4 series de 6 repeticiones con 90s descanso',
+      benefit: 'Mejora el tiempo de reacción y la agilidad reactiva ante estímulos imprevistos del juego',
+    },
+    {
+      name: 'Saltos en escalera de agilidad',
+      description: 'Progresiones en escalera de coordinación: dos pies dentro-fuera, pies alternos, lateral shuffle, Ickey shuffle. Progresión de velocidad en cada serie.',
+      duration: '4 series de 3 longitudes de escalera con 60s descanso',
+      benefit: 'Coordinación de pies, velocidad de movimiento y patrones de carrera específicos del fútbol',
+    },
+    {
+      name: 'Salto en largo desde parado',
+      description: 'Impulso biapodal buscando la máxima distancia horizontal desde posición estática. Mide y entrena la potencia explosiva horizontal sin componente de carrera previa.',
+      duration: '4 series de 6 saltos con 90s descanso',
+      benefit: 'Potencia explosiva horizontal y fuerza de impulsión para aceleración inicial',
+    },
+  ],
+
+  prevencion: [
+    {
+      name: 'Entrenamiento con BOSU — Propiocepción',
+      description: 'Ejercicios sobre plataforma BOSU (semiesfera inestable) para activar el sistema neuromuscular del tobillo y rodilla: equilibrio estático, sentadilla, lanzamientos de balón. Validado por Forum Sport para prevención de osteopatía de pubis.',
+      duration: '3 series de 12-15 reps por ejercicio',
+      benefit: 'Mejora la propiocepción de tobillo y rodilla, reduciendo el riesgo de esguinces y lesiones articulares',
+    },
+    {
+      name: 'Nordic Hamstring Curl',
+      description: 'De rodillas con los pies sujetos, descender el cuerpo hacia adelante usando solo los isquiotibiales como freno. Ejercicio excéntrico de máxima evidencia científica para prevención de distensiones musculares (revisión sistemática Petersen, 2011).',
+      duration: '3 series de 6-8 repeticiones con 2 min descanso',
+      benefit: 'Reduce hasta un 51% la incidencia de lesiones de isquiotibiales (nivel de evidencia A)',
+    },
+    {
+      name: 'Estiramientos dinámicos pre-partido',
+      description: 'Secuencia de estiramientos dinámicos específicos del fútbol: balanceos de pierna frontal y lateral, skipping, shuffles, rotaciones de cadera, lunges con rotación. Reemplaza los estiramientos estáticos en el calentamiento según literatura actual.',
+      duration: '10-12 minutos antes del entrenamiento o partido',
+      benefit: 'Prepara el sistema neuromuscular sin inhibir la fuerza, reduciendo el riesgo de lesión en los primeros minutos',
+    },
+    {
+      name: 'Activación glúteo medio con banda',
+      description: 'Con banda elástica en tobillos o rodillas: marcha lateral, clamshells, monster walk, fire hydrant. Activa el glúteo medio para estabilizar cadera y rodilla en los apoyos.',
+      duration: '3 series de 15 reps por ejercicio con banda',
+      benefit: 'Previene el valgo de rodilla, la tendinopatía rotuliana y las lesiones de cadera',
+    },
+    {
+      name: 'Equilibrio monopodal con perturbación',
+      description: 'Equilibrio sobre una pierna con ojos abiertos (1 min) y cerrados (30s). Añadir perturbaciones: recibir/lanzar balón, compañero empuja suavemente. Progression: base firme → BOSU → ojos cerrados.',
+      duration: '3 series de 60 segundos por pierna',
+      benefit: 'Sistema propioceptivo del tobillo y rodilla para prevención de esguinces y mejora del control motor',
+    },
+    {
+      name: 'Fortalecimiento de aductores (prevención pubalgia)',
+      description: 'Ejercicios específicos de aductores: Copenhagen Adductor Exercise (pierna apoyada en banco, elevar cadera desde el suelo), aducción con polea o máquina. Específico para reducir pubalgias en futbolistas (Hölmich, 1999).',
+      duration: '3 series de 10-12 reps con 90s descanso',
+      benefit: 'Reduce significativamente la incidencia de pubalgia, la lesión crónica más prevalente en futbolistas',
+    },
+    {
+      name: 'Foam Rolling — Protocolo de recuperación',
+      description: 'Automasaje con rodillo de espuma sobre: cuádriceps (2 min), isquiotibiales (2 min), banda iliotibial (1 min por lado), gemelos (1 min), glúteos (1 min). Preferiblemente post-entrenamiento. Adolfo Madrid incluye esto en el "entrenamiento invisible".',
+      duration: '10-15 minutos post-entrenamiento',
+      benefit: 'Reducción de DOMS (dolor muscular tardío), mejora de la recuperación y mantenimiento de rango de movimiento',
+    },
+    {
+      name: 'Movilidad de cadera funcional',
+      description: 'Secuencia de movilidad de cadera: 90/90 stretch, pigeon pose dinámico, rotación interna y externa de cadera en suelo, world\'s greatest stretch. Mejora el rango de movimiento necesario para los gestos técnicos del fútbol.',
+      duration: '10-12 minutos (2 min por ejercicio)',
+      benefit: 'Previene lesiones de cadera e ingle, mejora la fluidez de movimiento en cambios de dirección',
+    },
+    {
+      name: 'Activación del pie y tobillo',
+      description: 'Ejercicios específicos: elevaciones de talón con una pierna, escritura del abecedario con el pie, caminar sobre talones y puntillas, recogida de objetos con los dedos del pie. Activa la musculatura intrínseca del pie.',
+      duration: '2 series de 15-20 reps por ejercicio',
+      benefit: 'Previene esguinces de tobillo y la fascitis plantar, mejora la estabilidad dinámica del pie',
+    },
+    {
+      name: 'Calentamiento FIFA 11+',
+      description: 'Protocolo completo de prevención de lesiones desarrollado por el Centro de Evaluación e Investigación de la FIFA (F-MARC). 3 partes: (1) Carrera con ejercicios (8 min), (2) Fuerza, pliometría y equilibrio (10 min), (3) Carrera con sprints (2 min). Se debe realizar al inicio de cada entrenamiento.',
+      duration: '20 minutos completos al inicio del entrenamiento',
+      benefit: 'Reduce hasta un 50% el riesgo de lesión general y un 71% las lesiones graves según estudios en 2000+ jugadores',
+    },
+    {
+      name: 'Crioterapia y recuperación post-esfuerzo',
+      description: 'Protocolo de recuperación biológica de élite (Adolfo Madrid / AM Health & Performance): baño de contraste (1 min frío 12°C + 1 min caliente, 6 ciclos) o inmersión en agua fría 12-15°C durante 10-12 min. Alternativa: crioterapia localizada en zonas de alta carga.',
+      duration: '10-15 minutos post-partido o entrenamiento intenso',
+      benefit: 'Acelera la eliminación de lactato y reduce la inflamación para recuperación más rápida entre sesiones',
+    },
+  ],
+};
