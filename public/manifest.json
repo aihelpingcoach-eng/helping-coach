@@ -1,0 +1,20 @@
+{
+  "name": "Helpin Coach - Entrenador de Fútbol IA",
+  "short_name": "Helpin Coach",
+  "description": "Tu asistente personal de entrenamiento de fútbol con inteligencia artificial",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#9333EA",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["sports", "productivity", "utilities"],
+  "prefer_related_applications": false
+}
