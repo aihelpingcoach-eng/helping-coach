@@ -5,6 +5,7 @@ import { useCoachProfile } from '../hooks/useCoachProfile';
 import { useXP } from '../hooks/useXP';
 import RankUpModal from './RankUpModal';
 import { EXERCISES, TrainingCategory } from '../constants/training';
+import ExerciseIllustration from './ExerciseIllustration';
 
 export default function TrainingMode() {
   const [selectedCategory, setSelectedCategory] = useState<TrainingCategory>('fuerza');
@@ -50,18 +51,25 @@ export default function TrainingMode() {
           {EXERCISES[selectedCategory].map((exercise, index) => (
             <div
               key={index}
-              className="bg-gradient-to-br from-orange-900/20 to-black border-2 border-orange-800/50 rounded-xl p-6 hover:border-orange-600 transition-all"
+              className="bg-gradient-to-br from-orange-900/20 to-black border-2 border-orange-800/50 rounded-xl overflow-hidden hover:border-orange-600 transition-all"
             >
-              <h3 className="text-2xl font-bold text-white mb-3">{exercise.name}</h3>
-              <p className="text-gray-300 mb-4">{exercise.description}</p>
-              <div className="space-y-2">
-                <div className="flex items-start gap-2">
-                  <span className="text-orange-400 font-semibold">Duración:</span>
-                  <span className="text-gray-200">{exercise.duration}</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-green-400 font-semibold">Beneficio:</span>
-                  <span className="text-gray-200">{exercise.benefit}</span>
+              {/* Illustration */}
+              <div className="w-full" style={{ height: '140px' }}>
+                <ExerciseIllustration type={exercise.illustration} />
+              </div>
+              {/* Content */}
+              <div className="p-6">
+                <h3 className="text-2xl font-bold text-white mb-3">{exercise.name}</h3>
+                <p className="text-gray-300 mb-4">{exercise.description}</p>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2">
+                    <span className="text-orange-400 font-semibold">Duración:</span>
+                    <span className="text-gray-200">{exercise.duration}</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-green-400 font-semibold">Beneficio:</span>
+                    <span className="text-gray-200">{exercise.benefit}</span>
+                  </div>
                 </div>
               </div>
             </div>
