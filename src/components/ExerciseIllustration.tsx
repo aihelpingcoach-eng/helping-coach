@@ -1,5 +1,43 @@
 import type { IllustrationType } from '../constants/training';
 
+// ─── PNG illustrations (add a new import + entry in PNG_MAP as images are generated) ─
+import sentadilla_png from '../assets/exercises/sentadilla.png';
+
+const PNG_MAP: Partial<Record<IllustrationType, string>> = {
+  squat: sentadilla_png,
+  // hip_thrust:        hip_thrust_png,
+  // hip_hinge:         bisagra_cadera_png,
+  // plank:             plancha_png,
+  // bench_press:       press_banca_png,
+  // shoulder_press:    press_hombros_png,
+  // row:               remo_png,
+  // lunge:             zancada_png,
+  // pushup:            flexiones_png,
+  // mountain_climber:  escalador_png,
+  // nordic_curl:       curl_nordico_png,
+  // cable_extension:   extension_cable_png,
+  // squat_jump:        sentadilla_salto_png,
+  // run:               carrera_png,
+  // sprint:            sprint_png,
+  // jump_vertical:     salto_vertical_png,
+  // depth_jump:        salto_profundidad_png,
+  // jump_lateral:      salto_lateral_png,
+  // bounds:            zancadas_amplias_png,
+  // skipping:          skipping_png,
+  // hurdle_jump:       salto_vallas_png,
+  // agility_ladder:    escalera_agilidad_png,
+  // triple_jump:       triple_salto_png,
+  // balance_single:    equilibrio_monopodal_png,
+  // stretch_dynamic:   estiramiento_dinamico_png,
+  // foam_roll:         foam_roll_png,
+  // band_walk:         caminata_banda_png,
+  // hip_mobility:      movilidad_cadera_png,
+  // foot_activation:   activacion_pie_png,
+  // warmup_run:        trote_calentamiento_png,
+  // ice_bath:          bano_hielo_png,
+  // copenhagen:        copenhagen_png,
+};
+
 const O = '#F97316';
 const BLK = '#0f0f0f';
 
@@ -1084,7 +1122,7 @@ const FA = ({ x1, y1, x2, y2, c = O, dashed = false }: {
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 
-export default function ExerciseIllustration({ type }: { type: IllustrationType }) {
+function SvgFallback({ type }: { type: IllustrationType }) {
   const sv = { viewBox: '0 0 300 140', width: '100%', height: '100%' as const };
 
   const W = (a: React.ReactNode, b: React.ReactNode, la?: string, lb?: string) => (
@@ -1351,4 +1389,12 @@ export default function ExerciseIllustration({ type }: { type: IllustrationType 
     default:
       return W(<FStand x={70} />, <FStand x={230} />);
   }
+}
+
+export default function ExerciseIllustration({ type }: { type: IllustrationType }) {
+  const png = PNG_MAP[type];
+  if (png) {
+    return <img src={png} alt={type} className="w-full h-full object-contain" />;
+  }
+  return <SvgFallback type={type} />;
 }
