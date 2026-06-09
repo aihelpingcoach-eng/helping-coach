@@ -17,6 +17,9 @@ interface CoachProfile {
   team_objective: string;
   language: string;
   theme: string;
+  plan: 'free' | 'pro';
+  stripe_customer_id: string | null;
+  plan_expires_at: string | null;
 }
 
 export function useCoachProfile() {
@@ -72,5 +75,16 @@ export function useCoachProfile() {
     }
   };
 
-  return { profile, loading };
+  const updateProfile = async (updates: Partial<CoachProfile>) => {
+    if (!user || !profile) return;
+    const { data, error } = await supabase
+      .from('coach_profiles')
+      .update(updates)
+      .eq('user_id', user.id)
+      .select()
+      .maybeSingle();
+    if (!error && data) setProfile(data);
+  };
+
+  return { profile, loading, updateProfile };
 }

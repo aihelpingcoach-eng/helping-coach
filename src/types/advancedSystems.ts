@@ -68,19 +68,9 @@ export interface CoachCareer {
   coach_id: string;
   coaching_style: string;
   reputation: number;
-  total_xp: number;
-  current_rank: string;
   matches_managed: number;
   tactical_decisions: number;
   missions_completed: number;
   created_at: string;
   updated_at: string;
 }
-
-export const COACH_RANKS = [
-  { id: 'amateur', name: 'Entrenador Amateur', minXP: 0, color: 'from-gray-500 to-gray-600' },
-  { id: 'regional', name: 'Entrenador Regional', minXP: 1000, color: 'from-green-500 to-green-600' },
-  { id: 'professional', name: 'Entrenador Profesional', minXP: 3000, color: 'from-blue-500 to-blue-600' },
-  { id: 'elite', name: 'Entrenador Élite', minXP: 7000, color: 'from-purple-500 to-purple-600' },
-  { id: 'legendary', name: 'Entrenador Legendario', minXP: 15000, color: 'from-yellow-500 to-orange-600' },
-];

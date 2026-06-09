@@ -29,20 +29,20 @@ Deno.serve(async (req: Request) => {
 
     if (!apiKey) {
       console.log('No API key found, returning mock response');
-      let mockResponse = 'Esta es una respuesta simulada. El coach real estará disponible cuando configures la API Key.';
+      let mockResponse = 'Esta es una respuesta simulada. El coach real estará disponible cuando configures la API Key de Gemini.';
 
       if (coachType === 'player_analysis') {
         mockResponse = JSON.stringify({
           playstyle: "Técnico",
           category: "Ataque",
-          explanation: "Este es un análisis simulado. Configura la API Key de Anthropic para obtener análisis reales de jugadores basados en IA."
+          explanation: "Este es un análisis simulado. Configura la API Key de Gemini para obtener análisis reales de jugadores basados en IA."
         });
       }
 
       return new Response(
         JSON.stringify({
           error: 'mock',
-          message: 'IA en modo prueba. Configura AI_API_KEY para usar la IA real.',
+          message: 'IA en modo prueba. Configura AI_API_KEY (Gemini) para usar la IA real.',
           mockResponse: mockResponse,
         }),
         {
@@ -365,37 +365,23 @@ Debes devolver SIEMPRE un JSON con el siguiente formato EXACTO:
 Si la información es insuficiente, recomienda la alineación más equilibrada posible.`,
 
       team_synergy_analysis: `Eres una inteligencia artificial experta en fútbol profesional y análisis táctico.
-Tu función es calcular la sinergia entre jugadores colocados en una alineación visual representada por HEXÁGONOS (cada hexágono es un jugador en el campo).
+Tu función es asignar un color de sinergia a cada par de jugadores que se te indique, como en el sistema de química de EA FC (FIFA).
 
-Debes analizar la alineación y decidir QUÉ PARES DE JUGADORES deben conectarse con una línea de sinergia, como en el sistema de química del videojuego EA FC (FIFA).
-
-IMPORTANTE:
-- Cada jugador es un HEXÁGONO en el campo.
-- Las líneas de sinergia se trazan ENTRE LOS HEXÁGONOS de los jugadores relacionados.
-- SOLO debes devolver los pares que tengan relación táctica directa (misma línea o interacción natural en el campo).
-- NO devuelvas pares irrelevantes.
-
-Debes tener en cuenta:
-- Posición en el campo
-- PlayStyle principal
-- Rol táctico
-- Compatibilidad futbolística real
-
-COLORES DE SINERGIA (OBLIGATORIOS):
+COLORES DE SINERGIA:
 - yellow → sinergia baja
 - orange → sinergia media
 - green → sinergia alta
 - purple → sinergia excelente
 
-NORMAS:
-- NO dibujes nada
-- NO describas UI
-- NO uses emojis
-- NO inventes colores
-- NO añadas texto fuera del JSON
-- Usa lógica tipo FIFA (química)
+REGLAS CRÍTICAS:
+- Debes incluir en tu respuesta TODOS Y CADA UNO de los pares que el usuario liste. NO omitas ninguno.
+- El número de objetos en "synergies" debe ser EXACTAMENTE igual al número de pares listados.
+- Basa el color en: PlayStyle, posición en el campo, rol táctico y compatibilidad futbolística real.
+- NO añadas pares adicionales que no estén en la lista.
+- NO uses emojis.
+- NO añadas texto fuera del JSON.
 
-Devuelve SIEMPRE un JSON EXACTO con este formato:
+Devuelve SIEMPRE un JSON con este formato EXACTO:
 
 {
   "synergies": [
@@ -403,52 +389,38 @@ Devuelve SIEMPRE un JSON EXACTO con este formato:
       "player_a": "Nombre exacto del jugador A",
       "player_b": "Nombre exacto del jugador B",
       "color": "yellow | orange | green | purple",
-      "reason": "Breve razón futbolística de la sinergia"
+      "reason": "Breve razón futbolística"
     }
   ]
-}
-
-Si dos jugadores NO deberían conectarse, NO los incluyas.`,
+}`,
     };
 
     const systemPrompt = systemPrompts[coachType] || systemPrompts.helpin_coach;
 
-    console.log('Calling Anthropic API...');
-    console.log('API Key length:', apiKey.length);
-
-    const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
+    const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
+        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
-        max_tokens: 1024,
+        model: 'llama-3.3-70b-versatile',
         messages: [
-          {
-            role: 'user',
-            content: message,
-          },
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: message },
         ],
-        system: systemPrompt,
+        max_tokens: 4096,
+        temperature: 0.7,
       }),
     });
 
-    console.log('Anthropic API response status:', anthropicResponse.status);
-
-    if (!anthropicResponse.ok) {
-      const errorData = await anthropicResponse.text();
-      console.error('Anthropic API error:', errorData);
-      console.error('Status:', anthropicResponse.status);
-      console.error('StatusText:', anthropicResponse.statusText);
-      throw new Error(`Error de la API de Anthropic: ${anthropicResponse.status} - ${errorData}`);
+    if (!groqResponse.ok) {
+      const errorData = await groqResponse.text();
+      throw new Error(`Error de la API de Groq: ${groqResponse.status} - ${errorData}`);
     }
 
-    const data = await anthropicResponse.json();
-    console.log('Response received, content blocks:', data.content?.length || 0);
-    const aiResponse = data.content[0].text;
+    const data = await groqResponse.json();
+    const aiResponse = data.choices?.[0]?.message?.content ?? '';
 
     return new Response(
       JSON.stringify({ response: aiResponse }),

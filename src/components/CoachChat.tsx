@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Send, Sparkles } from 'lucide-react';
 import { chatWithCoach } from '../utils/ai';
+import AdGate from './AdGate';
+import { useAdGate } from '../hooks/useAdGate';
 import helpinImg from '../assets/erasebg-transformed_(3).png';
 import nursingImg from '../assets/erasebg-transformed_(7).png';
 import trainingImg from '../assets/erasebg-transformed_(6).png';
@@ -38,6 +40,8 @@ export default function CoachChat({ coachType, onClose, context, onXPEarned }: C
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [adUnlocked, setAdUnlocked] = useState(false); // true after first ad shown
+  const { withAdGate, showAdGate, featureName, handleAdComplete, handleAdCancel, isPro } = useAdGate();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -72,10 +76,21 @@ export default function CoachChat({ coachType, onClose, context, onXPEarned }: C
     }
   };
 
+  const handleSendGated = () => {
+    if (isPro || adUnlocked) {
+      handleSend();
+    } else {
+      withAdGate(() => {
+        setAdUnlocked(true);
+        handleSend();
+      }, 'chat con IA');
+    }
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      handleSendGated();
     }
   };
 
@@ -153,7 +168,7 @@ export default function CoachChat({ coachType, onClose, context, onXPEarned }: C
               disabled={isLoading}
             />
             <button
-              onClick={handleSend}
+              onClick={handleSendGated}
               disabled={!input.trim() || isLoading}
               className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white px-6 py-3 rounded-xl transition-all transform hover:scale-105 active:scale-95 shadow-lg"
             >
@@ -162,6 +177,14 @@ export default function CoachChat({ coachType, onClose, context, onXPEarned }: C
           </div>
         </div>
       </div>
+
+      {showAdGate && (
+        <AdGate
+          featureName={featureName}
+          onComplete={handleAdComplete}
+          onCancel={handleAdCancel}
+        />
+      )}
     </div>
   );
 }

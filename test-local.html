@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Helping Coach — Test Local</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0a0a;
+      color: #e5e5e5;
+      font-family: system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 24px;
+      background: #111;
+      border-bottom: 1px solid #222;
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #9333ea;
+      white-space: nowrap;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      flex-shrink: 0;
+    }
+    .dot.online { background: #22c55e; }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      cursor: pointer;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: #1a1a1a;
+      color: #ccc;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    button:hover { background: #252525; color: #fff; }
+    button.active { background: #7c3aed; color: #fff; border-color: #7c3aed; }
+
+    .btn-open {
+      background: #9333ea;
+      color: #fff;
+      border-color: #9333ea;
+    }
+    .btn-open:hover { background: #7c3aed; }
+
+    .btn-refresh {
+      background: #1a1a1a;
+      color: #9ca3af;
+    }
+
+    /* Main layout */
+    .workspace {
+      display: flex;
+      gap: 20px;
+      padding: 20px 24px;
+      overflow-x: auto;
+      min-height: calc(100vh - 64px);
+      align-items: flex-start;
+    }
+
+    /* Device frame */
+    .device {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .device-label {
+      font-size: 0.72rem;
+      color: #6b7280;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .device-size {
+      font-size: 0.68rem;
+      color: #4b5563;
+    }
+
+    .frame {
+      border: 2px solid #2d2d2d;
+      border-radius: 28px;
+      overflow: hidden;
+      background: #000;
+      position: relative;
+      box-shadow: 0 0 0 1px #111, 0 8px 32px rgba(0,0,0,0.6);
+    }
+
+    .frame::before {
+      content: '';
+      display: block;
+      width: 60px; height: 6px;
+      background: #2d2d2d;
+      border-radius: 3px;
+      margin: 10px auto 0;
+    }
+
+    .frame iframe {
+      display: block;
+      border: none;
+      background: #000;
+    }
+
+    .frame-bottom {
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .frame-bottom::after {
+      content: '';
+      display: block;
+      width: 40px; height: 4px;
+      background: #2d2d2d;
+      border-radius: 2px;
+    }
+
+    /* Error banner */
+    #error-banner {
+      display: none;
+      background: #7f1d1d;
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+      padding: 12px 24px;
+      font-size: 0.82rem;
+      text-align: center;
+    }
+
+    /* Info sidebar */
+    .sidebar {
+      flex-shrink: 0;
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .card h3 {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #9333ea;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }
+
+    .card p, .card li {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      line-height: 1.5;
+    }
+
+    .card ul { padding-left: 14px; }
+
+    .card code {
+      display: block;
+      background: #1a1a1a;
+      border: 1px solid #2d2d2d;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.72rem;
+      color: #86efac;
+      margin-top: 6px;
+      word-break: break-all;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 0.65rem;
+      color: #9ca3af;
+      margin: 2px;
+    }
+
+    .url-input {
+      width: 100%;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 6px;
+      padding: 6px 8px;
+      color: #e5e5e5;
+      font-size: 0.75rem;
+      font-family: 'Courier New', monospace;
+      outline: none;
+    }
+    .url-input:focus { border-color: #7c3aed; }
+
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .workspace { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="error-banner">
+  No se puede conectar al servidor. Asegúrate de haber ejecutado <strong>npm run dev</strong> en la terminal.
+</div>
+
+<header>
+  <h1>⚽ Helping Coach — Test Local</h1>
+
+  <div class="status">
+    <div class="dot" id="status-dot"></div>
+    <span id="status-text">Verificando servidor...</span>
+  </div>
+
+  <div class="controls">
+    <span style="font-size:0.75rem; color:#6b7280">URL:</span>
+    <input class="url-input" id="app-url" value="http://localhost:5173" style="width:180px" />
+    <button onclick="reloadAll()">↺ Recargar</button>
+    <button class="btn-open" onclick="openTab()">Abrir en pestaña →</button>
+  </div>
+</header>
+
+<div class="workspace" id="workspace">
+
+  <!-- iPhone SE -->
+  <div class="device">
+    <div class="device-label">iPhone SE</div>
+    <div class="device-size">375 × 667</div>
+    <div class="frame">
+      <iframe id="f1" width="375" height="667" src="http://localhost:5173" title="iPhone SE"></iframe>
+      <div class="frame-bottom"></div>
+    </div>
+  </div>
+
+  <!-- iPhone 14 Pro -->
+  <div class="device">
+    <div class="device-label">iPhone 14 Pro</div>
+    <div class="device-size">393 × 852</div>
+    <div class="frame">
+      <iframe id="f2" width="393" height="852" src="http://localhost:5173" title="iPhone 14 Pro"></iframe>
+      <div class="frame-bottom"></div>
+    </div>
+  </div>
+
+  <!-- Android M -->
+  <div class="device">
+    <div class="device-label">Android (360p)</div>
+    <div class="device-size">360 × 800</div>
+    <div class="frame">
+      <iframe id="f3" width="360" height="800" src="http://localhost:5173" title="Android"></iframe>
+      <div class="frame-bottom"></div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="card">
+      <h3>Iniciar servidor</h3>
+      <p>Ejecuta en la terminal desde la carpeta del proyecto:</p>
+      <code>npm run dev</code>
+      <p style="margin-top:8px">Luego recarga esta página.</p>
+    </div>
+
+    <div class="card">
+      <h3>Acceso admin</h3>
+      <p>Inicia sesión con el email configurado en:</p>
+      <code>VITE_ADMIN_EMAIL</code>
+      <p style="margin-top:6px">El icono ⚙ aparecerá en el nav inferior.</p>
+    </div>
+
+    <div class="card">
+      <h3>Música</h3>
+      <p>Coloca tu MP3 aquí para activar el botón de música:</p>
+      <code>public/music/background.mp3</code>
+    </div>
+
+    <div class="card">
+      <h3>Stack</h3>
+      <span class="tag">React 18</span>
+      <span class="tag">TypeScript</span>
+      <span class="tag">Vite</span>
+      <span class="tag">Tailwind</span>
+      <span class="tag">Supabase</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let appUrl = 'http://localhost:5173';
+
+  // Sync URL input
+  document.getElementById('app-url').addEventListener('change', function() {
+    appUrl = this.value.trim();
+  });
+
+  function reloadAll() {
+    appUrl = document.getElementById('app-url').value.trim();
+    ['f1','f2','f3'].forEach(id => {
+      const f = document.getElementById(id);
+      f.src = appUrl;
+    });
+    checkServer();
+  }
+
+  function openTab() {
+    appUrl = document.getElementById('app-url').value.trim();
+    window.open(appUrl, '_blank');
+  }
+
+  // Check server status
+  async function checkServer() {
+    const dot = document.getElementById('status-dot');
+    const text = document.getElementById('status-text');
+    const banner = document.getElementById('error-banner');
+
+    try {
+      const url = document.getElementById('app-url').value.trim();
+      await fetch(url, { mode: 'no-cors', cache: 'no-cache' });
+      dot.classList.add('online');
+      text.textContent = 'Servidor activo';
+      banner.style.display = 'none';
+    } catch {
+      dot.classList.remove('online');
+      text.textContent = 'Servidor no disponible';
+      banner.style.display = 'block';
+    }
+  }
+
+  checkServer();
+  setInterval(checkServer, 5000);
+</script>
+</body>
+</html>

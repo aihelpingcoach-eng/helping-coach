@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="100" fill="#1a0033"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#9333EA" stroke-width="16"/>
+  <circle cx="256" cy="256" r="140" fill="#2d0060"/>
+  <!-- Football pentagon pattern -->
+  <polygon points="256,116 296,148 280,196 232,196 216,148" fill="#9333EA" opacity="0.9"/>
+  <polygon points="360,188 376,236 340,264 304,244 304,196" fill="#7c3aed" opacity="0.7"/>
+  <polygon points="344,316 308,344 268,324 268,276 316,260" fill="#9333EA" opacity="0.8"/>
+  <polygon points="244,276 244,324 204,344 168,316 184,268" fill="#7c3aed" opacity="0.7"/>
+  <polygon points="152,196 208,196 208,244 172,264 136,236" fill="#9333EA" opacity="0.8"/>
+  <!-- Lines connecting pentagons -->
+  <line x1="256" y1="116" x2="216" y2="148" stroke="#c084fc" stroke-width="8" stroke-linecap="round"/>
+  <line x1="296" y1="148" x2="304" y2="196" stroke="#c084fc" stroke-width="8" stroke-linecap="round"/>
+  <line x1="280" y1="196" x2="316" y2="260" stroke="#c084fc" stroke-width="8" stroke-linecap="round"/>
+  <line x1="232" y1="196" x2="208" y2="244" stroke="#c084fc" stroke-width="8" stroke-linecap="round"/>
+  <line x1="184" y1="268" x2="168" y2="316" stroke="#c084fc" stroke-width="8" stroke-linecap="round"/>
+  <line x1="172" y1="264" x2="204" y2="344" stroke="#c084fc" stroke-width="8" stroke-linecap="round"/>
+  <line x1="340" y1="264" x2="308" y2="344" stroke="#c084fc" stroke-width="8" stroke-linecap="round"/>
+  <line x1="376" y1="236" x2="344" y2="316" stroke="#c084fc" stroke-width="8" stroke-linecap="round"/>
+  <line x1="268" y1="324" x2="244" y2="324" stroke="#c084fc" stroke-width="8" stroke-linecap="round"/>
+  <!-- Center star / whistle -->
+  <circle cx="256" cy="256" r="28" fill="#c084fc"/>
+  <circle cx="256" cy="256" r="16" fill="#1a0033"/>
+</svg>

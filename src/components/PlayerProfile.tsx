@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { X, Dumbbell, Shield, AlertCircle, ArrowRight, Star, Zap } from 'lucide-react';
 import { Player, PLAYSTYLE_CATEGORIES } from '../constants/playstyles';
 
@@ -62,15 +62,19 @@ export default function PlayerProfile({ player, isOpen, onClose, allPlayers }: P
     .filter(p => p.id !== player.id && p.playstyle_category === player.playstyle_category)
     .slice(0, 3);
 
-  const stats = {
-    overall: Math.min(99, player.level * 8 + 40),
-    pace: Math.random() * 30 + 60,
-    shooting: Math.random() * 30 + 60,
-    passing: Math.random() * 30 + 60,
-    dribbling: Math.random() * 30 + 60,
-    defense: Math.random() * 30 + 60,
-    physical: Math.random() * 30 + 60,
-  };
+  const stats = useMemo(() => {
+    const seed = player.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    const pseudo = (offset: number) => ((seed * 9301 + offset * 49297 + 233) % 233280) / 233280;
+    return {
+      overall: Math.min(99, player.level * 8 + 40),
+      pace: Math.round(pseudo(1) * 30 + 60),
+      shooting: Math.round(pseudo(2) * 30 + 60),
+      passing: Math.round(pseudo(3) * 30 + 60),
+      dribbling: Math.round(pseudo(4) * 30 + 60),
+      defense: Math.round(pseudo(5) * 30 + 60),
+      physical: Math.round(pseudo(6) * 30 + 60),
+    };
+  }, [player.id, player.level]);
 
   return (
     <div

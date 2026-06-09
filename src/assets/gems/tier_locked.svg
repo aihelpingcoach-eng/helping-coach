@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="lockedCore" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#4B5563"/>
+      <stop offset="45%" stop-color="#374151"/>
+      <stop offset="100%" stop-color="#1F2937"/>
+    </radialGradient>
+    <radialGradient id="lockedGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#374151" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#374151" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="lockedFacetL" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6B7280"/>
+      <stop offset="100%" stop-color="#374151"/>
+    </linearGradient>
+    <linearGradient id="lockedFacetD" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#374151"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <radialGradient id="shadow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#000" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="10"/></filter>
+  </defs>
+
+  <!-- Subtle glow (very muted) -->
+  <circle cx="256" cy="260" r="180" fill="url(#lockedGlow)" filter="url(#blur)"/>
+
+  <!-- Drop shadow (very subtle) -->
+  <ellipse cx="256" cy="445" rx="100" ry="16" fill="url(#shadow)" filter="url(#blur)" opacity="0.5"/>
+
+  <!-- Hexagonal diamond gem shape — no brilliance -->
+  <!-- Bottom pavilion -->
+  <polygon points="256,380 136,290 376,290" fill="url(#lockedFacetD)" opacity="0.5"/>
+  <polygon points="256,380 136,290 176,380" fill="#1F2937" opacity="0.4"/>
+  <polygon points="256,380 376,290 316,380" fill="#1F2937" opacity="0.35"/>
+
+  <!-- Crown (upper hexagonal sections) -->
+  <!-- Star facets -->
+  <polygon points="256,150 136,240 196,240 256,170" fill="url(#lockedFacetD)" opacity="0.6"/>
+  <polygon points="256,150 376,240 316,240 256,170" fill="url(#lockedFacetD)" opacity="0.5"/>
+  <polygon points="136,240 136,290 196,265 196,240" fill="url(#lockedFacetD)" opacity="0.45"/>
+  <polygon points="376,240 376,290 316,265 316,240" fill="url(#lockedFacetD)" opacity="0.4"/>
+  <polygon points="196,240 316,240 316,265 196,265" fill="url(#lockedFacetL)" opacity="0.3"/>
+
+  <!-- Table (central flat surface) -->
+  <polygon points="196,210 222,150 290,150 316,210 290,265 222,265"
+           fill="url(#lockedCore)" opacity="0.85"/>
+
+  <!-- Very dim facet line overlay — no specular glints -->
+  <polygon points="222,150 256,165 290,150" fill="#6B7280" opacity="0.15"/>
+  <polygon points="196,210 222,150 205,205" fill="#4B5563" opacity="0.2"/>
+  <polygon points="316,210 290,150 308,205" fill="#4B5563" opacity="0.15"/>
+
+  <!-- Girdle line (barely visible) -->
+  <polygon points="136,240 196,240 196,265 136,290"
+           fill="none" stroke="#4B5563" stroke-width="1" opacity="0.4"/>
+  <polygon points="376,240 316,240 316,265 376,290"
+           fill="none" stroke="#4B5563" stroke-width="1" opacity="0.3"/>
+
+  <!-- Top edge (very faint) -->
+  <line x1="222" y1="150" x2="290" y2="150" stroke="#6B7280" stroke-width="1.5" opacity="0.3"/>
+
+  <!-- Lock icon in center -->
+  <g opacity="0.45" transform="translate(229, 210)">
+    <!-- Lock body -->
+    <rect x="0" y="22" width="54" height="40" rx="6" fill="#6B7280"/>
+    <!-- Lock shackle -->
+    <path d="M10,22 L10,12 Q10,0 27,0 Q44,0 44,12 L44,22" fill="none" stroke="#6B7280" stroke-width="8" stroke-linecap="round"/>
+    <!-- Keyhole -->
+    <circle cx="27" cy="40" r="7" fill="#374151"/>
+    <rect x="23" y="40" width="8" height="10" rx="2" fill="#374151"/>
+  </g>
+</svg>

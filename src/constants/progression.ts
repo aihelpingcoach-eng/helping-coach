@@ -130,6 +130,16 @@ export const XP_REWARDS: { [key: string]: XPReward } = {
     xp: 20,
     description: 'Actualizar formación',
   },
+  REGISTER_MATCH: {
+    action: 'register_match',
+    xp: 30,
+    description: 'Registrar resultado de partido',
+  },
+  EVALUATE_PLAYER: {
+    action: 'evaluate_player',
+    xp: 10,
+    description: 'Evaluar progreso de jugador',
+  },
 };
 
 export function getRankByXP(totalXP: number): Rank {
@@ -176,3 +186,7 @@ export function getXPProgress(totalXP: number): {
     progress,
   };
 }
+
+// Re-exports for the 20-level system
+export type { Level } from './levels';
+export { LEVELS, LEVEL_THRESHOLDS, getLevelByXP, getNextLevel, getLevelProgress, getTierForLevel } from './levels';

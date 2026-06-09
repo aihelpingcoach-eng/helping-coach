@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Lightbulb, Loader, Shield, TrendingUp, AlertTriangle, Target } from 'lucide-react';
 import { recommendFormation } from '../utils/ai';
+import AdGate from './AdGate';
+import { useAdGate } from '../hooks/useAdGate';
 
 interface Player {
   id: string;
@@ -28,6 +30,7 @@ export default function FormationAdvisor({ currentFormation, players, onFormatio
   const [loading, setLoading] = useState(false);
   const [recommendation, setRecommendation] = useState<FormationRecommendation | null>(null);
   const [error, setError] = useState('');
+  const { withAdGate, showAdGate, featureName, handleAdComplete, handleAdCancel } = useAdGate();
 
   const [tacticalObjective, setTacticalObjective] = useState('Equilibrado');
   const [physicalState, setPhysicalState] = useState('Óptimo');
@@ -118,7 +121,7 @@ export default function FormationAdvisor({ currentFormation, players, onFormatio
 
       {!recommendation && (
         <button
-          onClick={generateRecommendations}
+          onClick={() => withAdGate(generateRecommendations, 'asesor de formaciones')}
           disabled={loading || players.length === 0}
           className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
@@ -214,6 +217,14 @@ export default function FormationAdvisor({ currentFormation, players, onFormatio
         <p className="text-blue-200/50 text-sm text-center mt-4">
           Agrega jugadores para recibir recomendaciones
         </p>
+      )}
+
+      {showAdGate && (
+        <AdGate
+          featureName={featureName}
+          onComplete={handleAdComplete}
+          onCancel={handleAdCancel}
+        />
       )}
     </div>
   );

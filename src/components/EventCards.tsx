@@ -2,6 +2,17 @@ import { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, AlertCircle, Users, Heart, Zap, CloudSnow, X } from 'lucide-react';
 import { EventCard, CardType } from '../types/advancedSystems';
 import { supabase } from '../lib/supabase';
+import { useXP } from '../hooks/useXP';
+
+const CARD_XP: Record<CardType, number> = {
+  improvement:      40,
+  streak:           60,
+  decline:          30,
+  tactical_conflict: 25,
+  chemistry:        35,
+  medical_alert:    20,
+  demotivated:      25,
+};
 
 interface EventCardsProps {
   coachId: string;
@@ -12,6 +23,8 @@ export default function EventCards({ coachId, onCardResolved }: EventCardsProps)
   const [cards, setCards] = useState<EventCard[]>([]);
   const [selectedCard, setSelectedCard] = useState<EventCard | null>(null);
   const [loading, setLoading] = useState(true);
+  const [xpGained, setXpGained] = useState<number | null>(null);
+  const { giveXP } = useXP();
 
   useEffect(() => {
     loadCards();
@@ -35,15 +48,24 @@ export default function EventCards({ coachId, onCardResolved }: EventCardsProps)
     }
   };
 
-  const resolveCard = async (cardId: string) => {
+  const resolveCard = async (cardId: string, accept = true) => {
     try {
+      const card = cards.find(c => c.id === cardId);
       const { error } = await supabase
         .from('event_cards')
         .update({ is_resolved: true })
         .eq('id', cardId);
 
       if (error) throw error;
-      setCards(cards.filter(card => card.id !== cardId));
+
+      if (accept && card) {
+        const xp = CARD_XP[card.card_type] ?? 20;
+        await giveXP('EVALUATE_PLAYER'); // reutiliza acción genérica
+        setXpGained(xp);
+        setTimeout(() => setXpGained(null), 2500);
+      }
+
+      setCards(cards.filter(c => c.id !== cardId));
       setSelectedCard(null);
       onCardResolved?.();
     } catch (error) {
@@ -124,6 +146,13 @@ export default function EventCards({ coachId, onCardResolved }: EventCardsProps)
 
   return (
     <>
+      {/* XP toast */}
+      {xpGained !== null && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[60] bg-yellow-500 text-black font-bold px-5 py-2.5 rounded-full shadow-lg animate-bounce text-sm">
+          +{xpGained} XP ⚡
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {cards.length === 0 ? (
           <div className="col-span-full bg-gray-900/50 border border-gray-700 rounded-lg p-6 text-center">
@@ -184,16 +213,26 @@ export default function EventCards({ coachId, onCardResolved }: EventCardsProps)
                 <p className="font-medium">{selectedCard.effect}</p>
               </div>
 
+              {/* XP reward preview */}
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg px-4 py-2 flex items-center gap-2">
+                <Zap size={14} className="text-yellow-400 flex-shrink-0" />
+                <span className="text-yellow-300 text-xs font-semibold">
+                  {selectedCard.requires_decision
+                    ? `Aceptar: +${CARD_XP[selectedCard.card_type] ?? 20} XP · Rechazar: sin recompensa`
+                    : `+${CARD_XP[selectedCard.card_type] ?? 20} XP al confirmar`}
+                </span>
+              </div>
+
               {selectedCard.requires_decision ? (
-                <div className="grid grid-cols-2 gap-3 mt-6">
+                <div className="grid grid-cols-2 gap-3 mt-2">
                   <button
-                    onClick={() => resolveCard(selectedCard.id)}
-                    className="bg-white text-gray-900 font-bold py-3 px-6 rounded-lg hover:bg-gray-100 transition-colors"
+                    onClick={() => resolveCard(selectedCard.id, true)}
+                    className="bg-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors"
                   >
                     Aceptar
                   </button>
                   <button
-                    onClick={() => setSelectedCard(null)}
+                    onClick={() => resolveCard(selectedCard.id, false)}
                     className="bg-black/40 text-white font-bold py-3 px-6 rounded-lg hover:bg-black/60 transition-colors"
                   >
                     Rechazar
@@ -201,8 +240,8 @@ export default function EventCards({ coachId, onCardResolved }: EventCardsProps)
                 </div>
               ) : (
                 <button
-                  onClick={() => resolveCard(selectedCard.id)}
-                  className="w-full bg-white text-gray-900 font-bold py-3 px-6 rounded-lg hover:bg-gray-100 transition-colors mt-6"
+                  onClick={() => resolveCard(selectedCard.id, true)}
+                  className="w-full bg-gray-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors mt-2"
                 >
                   Entendido
                 </button>

@@ -72,27 +72,20 @@ Descripción: ${description}
 
 Asigna el PlayStyle más adecuado y explica tu elección.`;
 
-    console.log('Calling AI service for player analysis...');
     const response = await callAIService(
       'player_analysis',
       userPrompt,
       { playerName, description }
     );
 
-    console.log('AI service response:', response);
-
     const jsonMatch = response.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error('No JSON found in response:', response);
       throw new Error('No JSON found in response');
     }
 
-    console.log('JSON match found:', jsonMatch[0]);
     const result = JSON.parse(jsonMatch[0]);
-    console.log('Parsed result:', result);
 
     if (!result.playstyle || !result.category || !result.explanation) {
-      console.error('Invalid result structure:', result);
       throw new Error('Invalid response structure from AI');
     }
 
@@ -390,30 +383,60 @@ interface TeamSynergyResult {
 
 export async function analyzeTeamSynergies(
   formation: string,
-  players: Array<{ name: string; position: string; playstyle: string; position_index: number }>
+  players: Array<{ name: string; position: string; playstyle: string; position_index: number; x: number; y: number }>
 ): Promise<TeamSynergyResult> {
   try {
+    // Calcular todos los pares de jugadores cercanos en el campo (distancia < 40 unidades)
+    const nearbyPairs: Array<[string, string]> = [];
+    for (let i = 0; i < players.length; i++) {
+      for (let j = i + 1; j < players.length; j++) {
+        const dx = players[i].x - players[j].x;
+        const dy = players[i].y - players[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 40) {
+          nearbyPairs.push([players[i].name, players[j].name]);
+        }
+      }
+    }
+
+    // Si no hay pares cercanos, usar todos los pares posibles
+    const pairs = nearbyPairs.length > 0 ? nearbyPairs :
+      players.flatMap((p, i) => players.slice(i + 1).map(q => [p.name, q.name] as [string, string]));
+
     const playersText = players
-      .map(p => `- ${p.name} (Posición ${p.position_index}): PlayStyle "${p.playstyle}"`)
+      .map(p => `- ${p.name} (Pos ${p.position_index}): PlayStyle "${p.playstyle}"`)
       .join('\n');
 
-    const userPrompt = `Analiza las sinergias entre estos jugadores en formación ${formation}:
+    const pairsText = pairs
+      .map(([a, b]) => `${a} ↔ ${b}`)
+      .join('\n');
 
+    const userPrompt = `Formación: ${formation}
+
+Jugadores:
 ${playersText}
 
-Devuelve los pares de jugadores que tienen sinergia táctica directa.`;
+Asigna color (yellow/orange/green/purple) a CADA par. Reason muy breve (max 5 palabras). NO omitas ninguno:
+${pairsText}`;
 
     const response = await callAIService('team_synergy_analysis', userPrompt, {
       formation,
       players,
     });
 
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No JSON found in response');
+    // Extraer JSON robusto: buscar el primer { y parsear con balance de llaves
+    let jsonStr = '';
+    const start = response.indexOf('{');
+    if (start === -1) throw new Error('No JSON in response');
+    let depth = 0;
+    for (let i = start; i < response.length; i++) {
+      if (response[i] === '{') depth++;
+      else if (response[i] === '}') depth--;
+      jsonStr += response[i];
+      if (depth === 0) break;
     }
 
-    const result = JSON.parse(jsonMatch[0]);
+    const result = JSON.parse(jsonStr);
     return result;
   } catch (error) {
     console.error('Error analyzing team synergies:', error);

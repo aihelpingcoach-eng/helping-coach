@@ -17,6 +17,7 @@ export default function Tutorial() {
   const step = steps[currentStep];
   const isLastStep = currentStep === steps.length - 1;
   const isWelcomeStep = currentStep === 0;
+  const isCenteredStep = !step?.element || !elementPosition;
 
   useEffect(() => {
     if (!isOpen || !step?.element) return;
@@ -106,6 +107,62 @@ export default function Tutorial() {
             <ArrowRight size={20} />
           </button>
         </div>
+      </div>
+    );
+  }
+
+  if (isCenteredStep) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4" onClick={handleBackdropClick}>
+        <div className="animate-scale-in bg-gradient-to-br from-slate-900/95 to-black border-2 border-purple-500/50 rounded-3xl p-7 w-full max-w-sm shadow-2xl flex flex-col gap-5">
+          <div>
+            <h3 className="text-2xl font-black text-white mb-3 leading-tight bg-gradient-to-r from-purple-400 to-purple-300 bg-clip-text text-transparent">{step.title}</h3>
+            <div className="h-0.5 w-10 bg-gradient-to-r from-purple-500 to-purple-400 rounded-full mb-4" />
+            <p className="text-slate-300 text-sm leading-relaxed">{step.description}</p>
+          </div>
+
+          <div className="space-y-3 pt-1 border-t border-slate-700/50">
+            <div className="flex gap-1.5">
+              {steps.map((_, idx) => (
+                <div
+                  key={idx}
+                  className={`rounded-full transition-all duration-300 ${
+                    idx <= currentStep
+                      ? 'bg-gradient-to-r from-purple-500 to-purple-400 w-8 h-2'
+                      : 'bg-slate-700 w-2 h-2'
+                  }`}
+                />
+              ))}
+            </div>
+            <div className="flex items-center justify-between px-1">
+              <span className="text-xs text-slate-400 font-semibold uppercase tracking-wide">Paso {currentStep + 1}/{steps.length}</span>
+              <span className="text-xs text-purple-400 font-bold">{Math.round((currentStep + 1) / steps.length * 100)}%</span>
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <button
+              onClick={skipTutorial}
+              className="flex-1 px-4 py-2.5 text-xs text-slate-300 hover:text-white hover:bg-white/10 transition-all rounded-xl font-semibold uppercase tracking-wide"
+            >
+              Saltar
+            </button>
+            <button
+              onClick={handleNext}
+              className="flex-1 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white text-xs font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5 shadow-lg"
+            >
+              Siguiente
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
+
+        <button
+          onClick={skipTutorial}
+          className="fixed top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors pointer-events-auto"
+        >
+          <X size={20} className="text-white" />
+        </button>
       </div>
     );
   }

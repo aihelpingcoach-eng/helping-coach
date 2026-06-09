@@ -3,8 +3,8 @@ import { MessageCircle, ChevronRight, ArrowLeft, Activity, AlertCircle, Shield, 
 import CoachChat from './CoachChat';
 import { useCoachProfile } from '../hooks/useCoachProfile';
 import { useXP } from '../hooks/useXP';
-import RankUpModal from './RankUpModal';
-import { INJURY_CATEGORIES, InjuryCategory, InjuryDetail } from '../constants/injuries';
+import LevelUpModal from './LevelUpModal';
+import { useInjuryCategories, InjuryCategoryRow, InjuryRow } from '../hooks/useInjuries';
 
 type ViewLevel = 'categories' | 'injuries' | 'detail';
 
@@ -20,18 +20,19 @@ const iconMap = {
 
 export default function InjuriesMode() {
   const [currentView, setCurrentView] = useState<ViewLevel>('categories');
-  const [selectedCategory, setSelectedCategory] = useState<InjuryCategory | null>(null);
-  const [selectedInjury, setSelectedInjury] = useState<InjuryDetail | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<InjuryCategoryRow | null>(null);
+  const [selectedInjury, setSelectedInjury] = useState<InjuryRow | null>(null);
   const [showCoachChat, setShowCoachChat] = useState(false);
   const { profile: coachProfile } = useCoachProfile();
-  const { giveXP, showRankUpModal, newRank, closeRankUpModal } = useXP();
+  const { giveXP, showLevelUpModal, newLevel, closeLevelUpModal } = useXP();
+  const { categories, loading } = useInjuryCategories();
 
-  const handleCategoryClick = (category: InjuryCategory) => {
+  const handleCategoryClick = (category: InjuryCategoryRow) => {
     setSelectedCategory(category);
     setCurrentView('injuries');
   };
 
-  const handleInjuryClick = (injury: InjuryDetail) => {
+  const handleInjuryClick = (injury: InjuryRow) => {
     setSelectedInjury(injury);
     setCurrentView('detail');
   };
@@ -47,7 +48,7 @@ export default function InjuriesMode() {
   };
 
   return (
-    <div className="relative w-full h-full min-h-screen pb-32 p-4 sm:p-8 animate-fade-in">
+    <div className="relative w-full p-4 sm:p-8 animate-fade-in">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
           {currentView !== 'categories' && (
@@ -74,37 +75,47 @@ export default function InjuriesMode() {
 
         {currentView === 'categories' && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {INJURY_CATEGORIES.map((category, index) => {
-              const IconComponent = iconMap[category.icon as keyof typeof iconMap];
-              return (
-                <div
-                  key={category.id}
-                  onClick={() => handleCategoryClick(category)}
-                  className="group relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 cursor-pointer hover:bg-white/10 transition-all duration-300 hover:border-red-500/50 active:scale-95 animate-scale-in overflow-hidden"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-500/10 to-transparent rounded-full blur-3xl group-hover:scale-150 transition-transform duration-500" />
+            {loading ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="bg-white/5 border border-white/10 rounded-3xl p-6 animate-pulse">
+                  <div className="w-16 h-16 bg-gray-700 rounded-2xl mb-6" />
+                  <div className="h-5 bg-gray-700 rounded w-2/3 mb-3" />
+                  <div className="h-4 bg-gray-700 rounded w-1/3" />
+                </div>
+              ))
+            ) : (
+              categories.map((category, index) => {
+                const IconComponent = iconMap[category.icon as keyof typeof iconMap] ?? Activity;
+                return (
+                  <div
+                    key={category.id}
+                    onClick={() => handleCategoryClick(category)}
+                    className="group relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 cursor-pointer hover:bg-white/10 transition-all duration-300 hover:border-red-500/50 active:scale-95 animate-scale-in overflow-hidden"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-500/10 to-transparent rounded-full blur-3xl group-hover:scale-150 transition-transform duration-500" />
 
-                  <div className="relative">
-                    <div className="flex items-start justify-between mb-6">
-                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500/20 to-red-600/20 flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
-                        <IconComponent className="text-red-400" size={32} />
+                    <div className="relative">
+                      <div className="flex items-start justify-between mb-6">
+                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500/20 to-red-600/20 flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
+                          <IconComponent className="text-red-400" size={32} />
+                        </div>
+                        <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
+                          <ChevronRight className="text-red-400" size={20} />
+                        </div>
                       </div>
-                      <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
-                        <ChevronRight className="text-red-400" size={20} />
+
+                      <h3 className="text-xl font-bold text-white mb-2">{category.name}</h3>
+
+                      <div className="flex items-center gap-2 text-gray-400 text-sm">
+                        <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                        <span>{category.injuries.length} lesiones</span>
                       </div>
-                    </div>
-
-                    <h3 className="text-xl font-bold text-white mb-2">{category.name}</h3>
-
-                    <div className="flex items-center gap-2 text-gray-400 text-sm">
-                      <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                      <span>{category.injuries.length} lesiones</span>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         )}
 
@@ -125,7 +136,7 @@ export default function InjuriesMode() {
                       {injury.name}
                     </h3>
                     <p className="text-gray-400 text-sm line-clamp-2 leading-relaxed">
-                      {injury.whatIs}
+                      {injury.what_is}
                     </p>
                   </div>
 
@@ -147,7 +158,7 @@ export default function InjuriesMode() {
                 </div>
                 <h3 className="text-xl font-bold text-white">Definición</h3>
               </div>
-              <p className="text-gray-300 leading-relaxed pl-15">{selectedInjury.whatIs}</p>
+              <p className="text-gray-300 leading-relaxed pl-15">{selectedInjury.what_is}</p>
             </div>
 
             <div className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-all duration-300">
@@ -157,7 +168,7 @@ export default function InjuriesMode() {
                 </div>
                 <h3 className="text-xl font-bold text-white">Causa</h3>
               </div>
-              <p className="text-gray-300 leading-relaxed pl-15">{selectedInjury.howItHappens}</p>
+              <p className="text-gray-300 leading-relaxed pl-15">{selectedInjury.how_it_happens}</p>
             </div>
 
             <div className="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition-all duration-300">
@@ -202,8 +213,8 @@ export default function InjuriesMode() {
           />
         )}
 
-        {showRankUpModal && newRank && (
-          <RankUpModal rank={newRank} onClose={closeRankUpModal} />
+        {showLevelUpModal && (
+          <LevelUpModal visible={showLevelUpModal} newLevel={newLevel} onClose={closeLevelUpModal} />
         )}
       </div>
     </div>

@@ -1,63 +1,72 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { awardXP } from '../utils/progression';
-import { XP_REWARDS, Rank, getRankByXP } from '../constants/progression';
+import { XP_REWARDS, Rank } from '../constants/progression';
+import { getLevelByXP, getLevelProgress, Level } from '../constants/levels';
 import { supabase } from '../lib/supabase';
 
 export function useXP() {
   const { user } = useAuth();
-  const [showRankUpModal, setShowRankUpModal] = useState(false);
-  const [newRank, setNewRank] = useState<Rank | null>(null);
   const [totalXP, setTotalXP] = useState(0);
 
+  // Legacy — kept so existing components don't break
+  const [showRankUpModal] = useState(false);
+  const [newRank] = useState<Rank | null>(null);
+
+  // New level-up state
+  const [showLevelUpModal, setShowLevelUpModal] = useState(false);
+  const [newLevel, setNewLevel] = useState(1);
+
   useEffect(() => {
-    if (user) {
-      loadTotalXP();
-    }
+    if (user) loadTotalXP();
   }, [user]);
 
   const loadTotalXP = async () => {
     if (!user) return;
-
     try {
       const { data, error } = await supabase
         .from('coach_profiles')
         .select('total_xp')
         .eq('user_id', user.id)
         .maybeSingle();
-
-      if (!error && data) {
-        setTotalXP(data.total_xp || 0);
-      }
-    } catch (error) {
-      console.error('Error loading total XP:', error);
+      if (!error && data) setTotalXP(data.total_xp || 0);
+    } catch {
+      // silent
     }
   };
 
   const giveXP = async (actionKey: keyof typeof XP_REWARDS) => {
     if (!user) return;
-
+    const oldXP = totalXP; // capture BEFORE await to avoid stale comparison
     const result = await awardXP(user.id, actionKey);
-
-    if (result.success && result.rankUp && result.newRank) {
-      const rankData = getRankByXP(result.newTotalXP);
-      setNewRank(rankData);
-      setShowRankUpModal(true);
+    if (result.success) {
+      const oldLvl = getLevelByXP(oldXP).level;
+      const newLvl = getLevelByXP(result.newTotalXP).level;
+      if (newLvl > oldLvl) {
+        setNewLevel(newLvl);
+        setShowLevelUpModal(true);
+      }
+      await loadTotalXP();
     }
-
-    await loadTotalXP();
   };
 
-  const closeRankUpModal = () => {
-    setShowRankUpModal(false);
-    setNewRank(null);
-  };
+  const closeLevelUpModal = () => setShowLevelUpModal(false);
+
+  const currentLevel: Level = getLevelByXP(totalXP);
+  const levelProgress = getLevelProgress(totalXP);
 
   return {
     giveXP,
+    totalXP,
+    // legacy
     showRankUpModal,
     newRank,
-    closeRankUpModal,
-    totalXP,
+    closeRankUpModal: closeLevelUpModal,
+    // new
+    showLevelUpModal,
+    newLevel,
+    closeLevelUpModal,
+    currentLevel,
+    levelProgress,
   };
 }

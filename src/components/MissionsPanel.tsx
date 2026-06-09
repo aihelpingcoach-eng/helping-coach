@@ -88,36 +88,23 @@ export default function MissionsPanel({ coachId, onMissionComplete }: MissionsPa
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col gap-3 mb-4">
         <div className="flex items-center gap-2">
           <Target className="text-yellow-400" size={24} />
           <h3 className="text-xl font-bold text-white">Misiones del Coach</h3>
         </div>
         <div className="flex gap-2">
-          <button
-            onClick={() => setFilter('all')}
-            className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-              filter === 'all' ? 'bg-yellow-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-            }`}
-          >
-            Todas
-          </button>
-          <button
-            onClick={() => setFilter('daily')}
-            className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-              filter === 'daily' ? 'bg-yellow-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-            }`}
-          >
-            Diarias
-          </button>
-          <button
-            onClick={() => setFilter('weekly')}
-            className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
-              filter === 'weekly' ? 'bg-yellow-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-            }`}
-          >
-            Semanales
-          </button>
+          {(['all', 'daily', 'weekly'] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`flex-1 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                filter === f ? 'bg-yellow-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+              }`}
+            >
+              {f === 'all' ? 'Todas' : f === 'daily' ? 'Diarias' : 'Semanales'}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -161,7 +148,7 @@ export default function MissionsPanel({ coachId, onMissionComplete }: MissionsPa
                   </div>
                   <div className="w-full bg-black/30 rounded-full h-2 overflow-hidden">
                     <div
-                      className="bg-white h-full rounded-full transition-all duration-500"
+                      className="bg-purple-400 h-full rounded-full transition-all duration-500"
                       style={{ width: `${getProgressPercentage(mission)}%` }}
                     />
                   </div>

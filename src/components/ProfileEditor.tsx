@@ -99,7 +99,6 @@ export default function ProfileEditor({ onClose }: ProfileEditorProps) {
   };
 
   const handleDeleteAccount = async () => {
-    console.log('Delete account functionality to be implemented');
     setShowDeleteConfirm(false);
   };
 

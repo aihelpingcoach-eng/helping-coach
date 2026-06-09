@@ -13,6 +13,9 @@ import { useCoachProfile } from '../hooks/useCoachProfile';
 import { useXP } from '../hooks/useXP';
 import RankUpModal from './RankUpModal';
 import { analyzeTeamSynergies } from '../utils/ai';
+import AdGate from './AdGate';
+import { useAdGate } from '../hooks/useAdGate';
+import LevelUpModal from './LevelUpModal';
 
 interface Synergy {
   player_a: string;
@@ -34,7 +37,8 @@ export default function TacticsMode() {
   const [showFormationAdvisor, setShowFormationAdvisor] = useState(false);
   const fieldRef = useRef<HTMLDivElement>(null);
   const { profile: coachProfile } = useCoachProfile();
-  const { giveXP, showRankUpModal, newRank, closeRankUpModal } = useXP();
+  const { giveXP, showLevelUpModal, newLevel, closeLevelUpModal } = useXP();
+  const { withAdGate, showAdGate, featureName, handleAdComplete, handleAdCancel } = useAdGate();
 
   useEffect(() => {
     loadFormationPlayers();
@@ -44,14 +48,14 @@ export default function TacticsMode() {
   const loadFormationPlayers = async () => {
     const { data, error } = await supabase
       .from('formation_players')
-      .select(`
-        *,
-        player:players(*)
-      `)
+      .select('*, player:players(*), formation:formations(formation_type)')
       .order('position_index');
 
     if (!error && data) {
-      setFormationPlayers(data as FormationPlayer[]);
+      const filtered = (data as any[]).filter(
+        fp => fp.formation?.formation_type === selectedFormation
+      );
+      setFormationPlayers(filtered as FormationPlayer[]);
     }
   };
 
@@ -75,15 +79,17 @@ export default function TacticsMode() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const formation = await supabase
+    const { data: formationRows, error: fErr } = await supabase
       .from('formations')
       .select('*')
       .eq('formation_type', selectedFormation)
-      .eq('is_active', true)
-      .maybeSingle();
+      .eq('user_id', user.id)
+      .limit(1);
 
-    if (!formation.data) {
-      const { data: newFormation } = await supabase
+    const formation = formationRows?.[0] ?? null;
+
+    if (!formation) {
+      const { data: newFormation, error: nfErr } = await supabase
         .from('formations')
         .insert({
           name: selectedFormation,
@@ -95,7 +101,7 @@ export default function TacticsMode() {
         .single();
 
       if (newFormation && selectedPosition !== null) {
-        await supabase
+        const { error: fpErr } = await supabase
           .from('formation_players')
           .insert({
             formation_id: newFormation.id,
@@ -116,7 +122,7 @@ export default function TacticsMode() {
         await supabase
           .from('formation_players')
           .insert({
-            formation_id: formation.data.id,
+            formation_id: formation.id,
             player_id: player.id,
             position_index: selectedPosition,
             user_id: user.id,
@@ -145,12 +151,17 @@ export default function TacticsMode() {
     try {
       const playersWithPositions = formationPlayers
         .filter(fp => fp.player)
-        .map(fp => ({
-          name: (fp.player as Player).name,
-          position: `Pos ${fp.position_index}`,
-          playstyle: (fp.player as Player).playstyle || 'Sin PlayStyle',
-          position_index: fp.position_index,
-        }));
+        .map(fp => {
+          const pos = positions[fp.position_index] ?? { x: 50, y: 50 };
+          return {
+            name: (fp.player as Player).name,
+            position: `Pos ${fp.position_index}`,
+            playstyle: (fp.player as Player).playstyle || 'Sin PlayStyle',
+            position_index: fp.position_index,
+            x: pos.x,
+            y: pos.y,
+          };
+        });
 
       const result = await analyzeTeamSynergies(selectedFormation, playersWithPositions);
       setSynergies(result.synergies || []);
@@ -203,7 +214,7 @@ export default function TacticsMode() {
           </button>
 
           <button
-            onClick={analyzeSynergies}
+            onClick={() => withAdGate(analyzeSynergies, 'análisis de sinergias')}
             disabled={isAnalyzingSynergies || playersInFormation.length < 2}
             className="bg-green-600 active:bg-green-700 text-white p-2 sm:p-3 rounded-full transition-all active:scale-95 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation h-[44px] w-[44px] sm:h-[52px] sm:w-[52px] flex items-center justify-center"
             title="Analizar sinergias con IA"
@@ -301,8 +312,16 @@ export default function TacticsMode() {
         />
       )}
 
-      {showRankUpModal && newRank && (
-        <RankUpModal rank={newRank} onClose={closeRankUpModal} />
+      {showLevelUpModal && (
+        <LevelUpModal visible={showLevelUpModal} newLevel={newLevel} onClose={closeLevelUpModal} />
+      )}
+
+      {showAdGate && (
+        <AdGate
+          featureName={featureName}
+          onComplete={handleAdComplete}
+          onCancel={handleAdCancel}
+        />
       )}
 
       {selectedPlayer && (

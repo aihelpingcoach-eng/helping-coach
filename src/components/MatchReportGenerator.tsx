@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { FileText, Loader, Users, AlertCircle, CheckCircle, TrendingUp } from 'lucide-react';
+import { FileText, Loader, Users, AlertCircle, CheckCircle, TrendingUp, Download } from 'lucide-react';
 import { generateMatchReport } from '../utils/ai';
+import { downloadTextFile, buildMatchReportText } from '../utils/exportReport';
+import AdGate from './AdGate';
+import { useAdGate } from '../hooks/useAdGate';
 
 interface MatchReportGeneratorProps {
   teamPlaystyles: string[];
@@ -17,6 +20,7 @@ export default function MatchReportGenerator({ teamPlaystyles }: MatchReportGene
   const [generating, setGenerating] = useState(false);
   const [report, setReport] = useState<MatchReport | null>(null);
   const [error, setError] = useState('');
+  const { withAdGate, showAdGate, featureName, handleAdComplete, handleAdCancel } = useAdGate();
 
   const [matchData, setMatchData] = useState({
     result: '',
@@ -116,7 +120,7 @@ export default function MatchReportGenerator({ teamPlaystyles }: MatchReportGene
 
       {!report && (
         <button
-          onClick={handleGenerate}
+          onClick={() => withAdGate(handleGenerate, 'informe de partido')}
           disabled={generating || !matchData.result}
           className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
@@ -186,13 +190,33 @@ export default function MatchReportGenerator({ teamPlaystyles }: MatchReportGene
             </ul>
           </div>
 
-          <button
-            onClick={() => setReport(null)}
-            className="w-full px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors text-sm"
-          >
-            Generar nuevo informe
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                const text = buildMatchReportText({ ...matchData, ...report });
+                downloadTextFile(text, `informe-partido-${new Date().toISOString().slice(0, 10)}.txt`);
+              }}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm"
+            >
+              <Download className="w-4 h-4" />
+              Descargar informe
+            </button>
+            <button
+              onClick={() => setReport(null)}
+              className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors text-sm"
+            >
+              Nuevo informe
+            </button>
+          </div>
         </div>
+      )}
+
+      {showAdGate && (
+        <AdGate
+          featureName={featureName}
+          onComplete={handleAdComplete}
+          onCancel={handleAdCancel}
+        />
       )}
     </div>
   );

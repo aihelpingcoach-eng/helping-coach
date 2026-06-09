@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Trophy, TrendingUp, Target, Award, Users, BarChart3 } from 'lucide-react';
-import { CoachCareer, COACH_RANKS } from '../types/advancedSystems';
+import { CoachCareer } from '../types/advancedSystems';
+import { RANKS, getXPProgress } from '../constants/progression';
+import { useXP } from '../hooks/useXP';
 import { supabase } from '../lib/supabase';
 
 interface CareerModeProps {
@@ -10,6 +12,7 @@ interface CareerModeProps {
 export default function CareerMode({ coachId }: CareerModeProps) {
   const [career, setCareer] = useState<CoachCareer | null>(null);
   const [loading, setLoading] = useState(true);
+  const { totalXP } = useXP();
 
   useEffect(() => {
     loadCareer();
@@ -45,8 +48,6 @@ export default function CareerMode({ coachId }: CareerModeProps) {
           coach_id: coachId,
           coaching_style: 'balanced',
           reputation: 0,
-          total_xp: 0,
-          current_rank: 'amateur',
           matches_managed: 0,
           tactical_decisions: 0,
           missions_completed: 0,
@@ -59,30 +60,6 @@ export default function CareerMode({ coachId }: CareerModeProps) {
     } catch (error) {
       console.error('Error creating career:', error);
     }
-  };
-
-  const getCurrentRank = () => {
-    if (!career) return COACH_RANKS[0];
-    return COACH_RANKS.find(rank => rank.id === career.current_rank) || COACH_RANKS[0];
-  };
-
-  const getNextRank = () => {
-    const currentRankIndex = COACH_RANKS.findIndex(rank => rank.id === career?.current_rank);
-    if (currentRankIndex === -1 || currentRankIndex >= COACH_RANKS.length - 1) return null;
-    return COACH_RANKS[currentRankIndex + 1];
-  };
-
-  const getXPProgress = () => {
-    if (!career) return 0;
-    const currentRank = getCurrentRank();
-    const nextRank = getNextRank();
-
-    if (!nextRank) return 100;
-
-    const xpInCurrentRank = career.total_xp - currentRank.minXP;
-    const xpNeededForNext = nextRank.minXP - currentRank.minXP;
-
-    return Math.min((xpInCurrentRank / xpNeededForNext) * 100, 100);
   };
 
   if (loading) {
@@ -101,9 +78,7 @@ export default function CareerMode({ coachId }: CareerModeProps) {
     );
   }
 
-  const currentRank = getCurrentRank();
-  const nextRank = getNextRank();
-  const xpProgress = getXPProgress();
+  const { currentRank, nextRank, progress: xpProgress, currentRankXP, xpForNextRank } = getXPProgress(totalXP);
 
   return (
     <div className="space-y-6">
@@ -114,7 +89,7 @@ export default function CareerMode({ coachId }: CareerModeProps) {
 
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-4">
-            <Trophy className="text-white" size={32} />
+            <span className="text-4xl">{currentRank.icon}</span>
             <div>
               <p className="text-white/70 text-sm font-medium">Rango Actual</p>
               <h2 className="text-3xl font-bold text-white">{currentRank.name}</h2>
@@ -124,7 +99,7 @@ export default function CareerMode({ coachId }: CareerModeProps) {
           <div className="grid grid-cols-3 gap-4 mb-6">
             <div className="bg-black/20 rounded-lg p-3">
               <p className="text-white/70 text-xs mb-1">Experiencia Total</p>
-              <p className="text-2xl font-bold text-white">{career.total_xp} XP</p>
+              <p className="text-2xl font-bold text-white">{totalXP} XP</p>
             </div>
             <div className="bg-black/20 rounded-lg p-3">
               <p className="text-white/70 text-xs mb-1">Reputación</p>
@@ -136,7 +111,7 @@ export default function CareerMode({ coachId }: CareerModeProps) {
             </div>
           </div>
 
-          {nextRank && (
+          {nextRank ? (
             <div>
               <div className="flex items-center justify-between text-sm text-white/80 mb-2">
                 <span>Progreso al siguiente rango</span>
@@ -144,17 +119,16 @@ export default function CareerMode({ coachId }: CareerModeProps) {
               </div>
               <div className="w-full bg-black/30 rounded-full h-3 overflow-hidden mb-2">
                 <div
-                  className="bg-white h-full rounded-full transition-all duration-500"
+                  className="bg-white/60 h-full rounded-full transition-all duration-500"
                   style={{ width: `${xpProgress}%` }}
                 />
               </div>
               <p className="text-white/70 text-xs">
-                Próximo rango: <span className="font-bold">{nextRank.name}</span> ({nextRank.minXP} XP)
+                {currentRankXP} / {xpForNextRank} XP — Próximo:{' '}
+                <span className="font-bold">{nextRank.name}</span> {nextRank.icon}
               </p>
             </div>
-          )}
-
-          {!nextRank && (
+          ) : (
             <div className="bg-yellow-500/20 border border-yellow-500 rounded-lg p-3">
               <p className="text-yellow-200 text-sm font-bold">¡Máximo rango alcanzado!</p>
               <p className="text-yellow-200/70 text-xs">Eres un Entrenador Legendario</p>
@@ -200,13 +174,13 @@ export default function CareerMode({ coachId }: CareerModeProps) {
         <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="text-green-400" size={24} />
-            <h3 className="text-lg font-bold text-white">Rangos Disponibles</h3>
+            <h3 className="text-lg font-bold text-white">Todos los Rangos</h3>
           </div>
 
           <div className="space-y-2">
-            {COACH_RANKS.map((rank, index) => {
-              const isUnlocked = career.total_xp >= rank.minXP;
-              const isCurrent = rank.id === career.current_rank;
+            {RANKS.map((rank) => {
+              const isUnlocked = totalXP >= rank.xpRequired;
+              const isCurrent = rank.id === currentRank.id;
 
               return (
                 <div
@@ -216,16 +190,14 @@ export default function CareerMode({ coachId }: CareerModeProps) {
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    {isUnlocked ? (
-                      <Trophy className="text-yellow-400" size={16} />
-                    ) : (
-                      <div className="w-4 h-4 rounded-full border-2 border-gray-600" />
-                    )}
+                    <span className={`text-base ${isUnlocked ? 'opacity-100' : 'opacity-30'}`}>
+                      {rank.icon}
+                    </span>
                     <span className={`text-sm ${isUnlocked ? 'text-white font-medium' : 'text-gray-500'}`}>
                       {rank.name}
                     </span>
                   </div>
-                  <span className="text-xs text-gray-400">{rank.minXP} XP</span>
+                  <span className="text-xs text-gray-400">{rank.xpRequired} XP</span>
                 </div>
               );
             })}

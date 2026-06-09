@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Target, Zap, Activity, Trophy, Sparkles, FileText } from 'lucide-react';
+import { Target, Zap, Activity, Trophy, Sparkles, FileText, BarChart3 } from 'lucide-react';
 import TacticalAlerts from './TacticalAlerts';
 import EventCards from './EventCards';
 import WorkloadManager from './WorkloadManager';
@@ -7,10 +7,15 @@ import MissionsPanel from './MissionsPanel';
 import CareerMode from './CareerMode';
 import TeamDNAAnalysis from './TeamDNAAnalysis';
 import MatchReportGenerator from './MatchReportGenerator';
+import TeamStatsPanel from './TeamStatsPanel';
 import { useCoachProfile } from '../hooks/useCoachProfile';
+import { useAuth } from '../contexts/AuthContext';
+import { useMatches } from '../hooks/useMatches';
+import { useTrainingSessions } from '../hooks/useTrainingSessions';
+import { useEventGenerator } from '../hooks/useEventGenerator';
 import { supabase } from '../lib/supabase';
 
-type AdvancedTab = 'overview' | 'alerts' | 'events' | 'workload' | 'missions' | 'career' | 'report';
+type AdvancedTab = 'overview' | 'alerts' | 'events' | 'workload' | 'missions' | 'career' | 'report' | 'stats';
 
 interface Player {
   id: string;
@@ -22,6 +27,10 @@ interface Player {
 export default function AdvancedMode() {
   const [activeTab, setActiveTab] = useState<AdvancedTab>('overview');
   const { profile } = useCoachProfile();
+  const { user } = useAuth();
+  const { matches } = useMatches(user?.id);
+  const { sessions } = useTrainingSessions(user?.id);
+  useEventGenerator(profile?.id ?? '', matches, sessions);
   const [players, setPlayers] = useState<Player[]>([]);
   const [activeFormation, setActiveFormation] = useState('4-3-3');
 
@@ -59,12 +68,13 @@ export default function AdvancedMode() {
     { id: 'missions' as AdvancedTab, label: 'Misiones', icon: Target },
     { id: 'career' as AdvancedTab, label: 'Carrera', icon: Trophy },
     { id: 'report' as AdvancedTab, label: 'Informe', icon: FileText },
+    { id: 'stats' as AdvancedTab, label: 'Estadísticas', icon: BarChart3 },
   ];
 
   const teamPlaystyles = players.map(p => p.playstyle).filter(Boolean);
 
   return (
-    <div className="w-full h-full min-h-screen pb-32 p-4 sm:p-8">
+    <div className="w-full p-4 sm:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Sistemas Avanzados</h1>
@@ -163,6 +173,10 @@ export default function AdvancedMode() {
             <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
               <MatchReportGenerator teamPlaystyles={teamPlaystyles} />
             </div>
+          )}
+
+          {activeTab === 'stats' && (
+            <TeamStatsPanel userId={user?.id ?? ''} />
           )}
         </div>
       </div>

@@ -13,6 +13,23 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function fireWebhook(event: 'signup' | 'login', email: string, coachName: string) {
+  const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL;
+  if (!webhookUrl) return;
+  fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      event,
+      email,
+      coachName,
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+    }),
+  }).catch(() => {});
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -34,10 +51,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+      if (!error && data.user) {
+        fireWebhook('login', email, data.user.user_metadata?.coach_name ?? '');
+      }
       return { error: error || null };
     } catch (error) {
       return { error: error as Error };
@@ -71,6 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (profileError) {
           console.error('Error creating coach profile:', profileError);
         }
+        fireWebhook('signup', email, coachName);
       }
 
       return { error: null };
