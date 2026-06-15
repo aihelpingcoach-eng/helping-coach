@@ -4,6 +4,7 @@ import { Music, Pause } from 'lucide-react';
 export default function MusicPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [audioAvailable, setAudioAvailable] = useState(true);
 
   // Intentar autoplay; si el navegador lo bloquea, arrancar al primer toque del usuario
   useEffect(() => {
@@ -36,9 +37,17 @@ export default function MusicPlayer() {
     }
   };
 
+  if (!audioAvailable) return null;
+
   return (
     <>
-      <audio ref={audioRef} loop preload="auto" src="/music/background.mp3" />
+      <audio
+        ref={audioRef}
+        loop
+        preload="auto"
+        src="/music/background.mp3"
+        onError={() => setAudioAvailable(false)}
+      />
       <button
         onClick={toggle}
         title={isPlaying ? 'Pausar música' : 'Reproducir música'}

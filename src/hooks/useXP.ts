@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { awardXP } from '../utils/progression';
-import { XP_REWARDS, Rank } from '../constants/progression';
+import { XP_REWARDS } from '../constants/progression';
 import { getLevelByXP, getLevelProgress, Level } from '../constants/levels';
 import { supabase } from '../lib/supabase';
 
@@ -9,11 +9,7 @@ export function useXP() {
   const { user } = useAuth();
   const [totalXP, setTotalXP] = useState(0);
 
-  // Legacy — kept so existing components don't break
-  const [showRankUpModal] = useState(false);
-  const [newRank] = useState<Rank | null>(null);
-
-  // New level-up state
+  // Level-up state
   const [showLevelUpModal, setShowLevelUpModal] = useState(false);
   const [newLevel, setNewLevel] = useState(1);
 
@@ -58,11 +54,6 @@ export function useXP() {
   return {
     giveXP,
     totalXP,
-    // legacy
-    showRankUpModal,
-    newRank,
-    closeRankUpModal: closeLevelUpModal,
-    // new
     showLevelUpModal,
     newLevel,
     closeLevelUpModal,

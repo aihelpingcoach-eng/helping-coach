@@ -79,6 +79,7 @@ export default function CareerMode({ coachId }: CareerModeProps) {
   }
 
   const { currentRank, nextRank, progress: xpProgress, currentRankXP, xpForNextRank } = getXPProgress(totalXP);
+  const isNewCareer = career.matches_managed === 0 && career.tactical_decisions === 0 && career.missions_completed === 0;
 
   return (
     <div className="space-y-6">
@@ -136,6 +137,19 @@ export default function CareerMode({ coachId }: CareerModeProps) {
           )}
         </div>
       </div>
+
+      {isNewCareer && (
+        <div className="bg-purple-900/30 border border-purple-500/40 rounded-xl p-5 flex items-start gap-4">
+          <span className="text-3xl">🚀</span>
+          <div>
+            <p className="text-purple-200 font-bold text-sm">¡Carrera recién iniciada!</p>
+            <p className="text-purple-300/70 text-xs mt-1 leading-relaxed">
+              Añade jugadores, analiza tácticas y completa misiones para ganar XP y subir de rango.
+              Cada acción en la app suma puntos a tu carrera.
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">

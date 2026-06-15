@@ -11,7 +11,6 @@ import PlayerProfile from './PlayerProfile';
 import FormationAdvisor from './FormationAdvisor';
 import { useCoachProfile } from '../hooks/useCoachProfile';
 import { useXP } from '../hooks/useXP';
-import RankUpModal from './RankUpModal';
 import { analyzeTeamSynergies } from '../utils/ai';
 import AdGate from './AdGate';
 import { useAdGate } from '../hooks/useAdGate';
