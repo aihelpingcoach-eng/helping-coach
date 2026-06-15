@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import stadiumBg from '../assets/gemini_generated_image_w1jd4fw1jd4fw1jd.png';
+import stadiumBg from '../assets/gemini_generated_image_w1jd4fw1jd4fw1jd.jpg';
 
 export default function ParallaxBackground() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
