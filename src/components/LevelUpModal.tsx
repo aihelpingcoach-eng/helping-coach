@@ -203,7 +203,7 @@ const TIER_VIDEO = {
 
 function VideoTier({ tierNum, level }: { tierNum: 1|2|3|4|5|6|7; level: Level }) {
   const cfg = TIER_VIDEO[tierNum];
-  const shadow = '0 2px 20px rgba(0,0,0,0.95), 0 0 40px rgba(0,0,0,0.8)';
+  const shadow = '0 1px 0 rgba(0,0,0,1), 0 2px 8px rgba(0,0,0,1), 0 0 24px rgba(0,0,0,0.9)';
 
   useEffect(() => {
     navigator.vibrate?.(cfg.haptics as number[]);
@@ -217,22 +217,36 @@ function VideoTier({ tierNum, level }: { tierNum: 1|2|3|4|5|6|7; level: Level })
         <source src={cfg.src} type="video/mp4" />
       </video>
 
-      <div className="relative flex flex-col items-center gap-4" style={{ zIndex: 2 }}>
-        <p style={{ fontSize: '11px', fontWeight: 900, letterSpacing: '0.3em', textTransform: 'uppercase',
+      {/* Capa oscura para garantizar legibilidad del texto */}
+      <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+        background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.35) 100%)',
+        zIndex: 2 }} />
+
+      <div className="relative flex flex-col items-center gap-4" style={{ zIndex: 3 }}>
+        {/* Fondo pill detrás del bloque de texto */}
+        <div style={{
+          position: 'absolute', inset: '-28px -32px',
+          background: 'rgba(0,0,0,0.45)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderRadius: '24px',
+          border: '1px solid rgba(255,255,255,0.08)',
+        }} />
+        <p style={{ position: 'relative', fontSize: '11px', fontWeight: 900, letterSpacing: '0.3em', textTransform: 'uppercase',
           color: cfg.labelColor, textShadow: shadow, animation: 'tier-label-in 0.5s ease-out both' }}>
           {cfg.label}
         </p>
-        <p style={{ fontSize: '80px', fontWeight: 900, lineHeight: 1, letterSpacing: '-0.02em',
-          color: '#ffffff', textShadow: `0 0 60px ${cfg.numGlow}, 0 4px 24px rgba(0,0,0,0.9)`,
+        <p style={{ position: 'relative', fontSize: '80px', fontWeight: 900, lineHeight: 1, letterSpacing: '-0.02em',
+          color: '#ffffff', textShadow: `0 0 60px ${cfg.numGlow}, 0 2px 0 rgba(0,0,0,1), 0 4px 24px rgba(0,0,0,0.9)`,
           animation: 'level-num-in 0.6s ease-out 0.2s both' }}>
           {level.level}
         </p>
-        <p style={{ fontSize: '22px', fontWeight: 800, letterSpacing: '0.08em',
+        <p style={{ position: 'relative', fontSize: '22px', fontWeight: 800, letterSpacing: '0.08em',
           color: cfg.nameColor, textShadow: shadow, animation: 'msg-in 0.5s ease-out 0.5s both' }}>
           {level.name.toUpperCase()}
         </p>
-        <p style={{ fontSize: '13px', fontWeight: 500, color: cfg.msgColor,
-          textShadow: '0 2px 8px rgba(0,0,0,0.9)', maxWidth: '260px',
+        <p style={{ position: 'relative', fontSize: '13px', fontWeight: 500, color: cfg.msgColor,
+          textShadow: shadow, maxWidth: '260px',
           textAlign: 'center', lineHeight: 1.5, animation: 'msg-in 0.5s ease-out 0.8s both' }}>
           {level.msg}
         </p>
@@ -257,7 +271,7 @@ function Tier8({ level, onClose }: { level: Level; onClose: () => void }) {
     playTierSound(8);
   }, []);
 
-  const shadow = '0 2px 20px rgba(0,0,0,0.95), 0 0 40px rgba(0,0,0,0.8)';
+  const shadow = '0 1px 0 rgba(0,0,0,1), 0 2px 8px rgba(0,0,0,1), 0 0 24px rgba(0,0,0,0.9)';
 
   return (
     <div className="flex flex-col items-center justify-center h-full relative">
@@ -273,11 +287,27 @@ function Tier8({ level, onClose }: { level: Level; onClose: () => void }) {
         <source src="/videos/tier8_sapphire.mp4" type="video/mp4" />
       </video>
 
+      {/* Capa oscura para garantizar legibilidad del texto */}
+      <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+        background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.35) 100%)',
+        zIndex: 2 }} />
+
       {/* Text overlay */}
-      <div className="relative flex flex-col items-center gap-4" style={{ zIndex: 2 }}>
+      <div className="relative flex flex-col items-center gap-4" style={{ zIndex: 3 }}>
+
+        {/* Fondo pill detrás del bloque de texto */}
+        <div style={{
+          position: 'absolute', inset: '-28px -32px',
+          background: 'rgba(0,0,0,0.45)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderRadius: '24px',
+          border: '1px solid rgba(255,255,255,0.08)',
+        }} />
 
         {/* Tier label */}
         <p style={{
+          position: 'relative',
           fontFamily: 'system-ui, sans-serif',
           fontSize: '11px',
           fontWeight: 900,
@@ -292,13 +322,14 @@ function Tier8({ level, onClose }: { level: Level; onClose: () => void }) {
 
         {/* Level number */}
         <p style={{
+          position: 'relative',
           fontFamily: 'system-ui, sans-serif',
           fontSize: '80px',
           fontWeight: 900,
           lineHeight: 1,
           letterSpacing: '-0.02em',
           color: '#ffffff',
-          textShadow: '0 0 60px #60a5fa99, 0 4px 24px rgba(0,0,0,0.9)',
+          textShadow: '0 0 60px #60a5fa99, 0 2px 0 rgba(0,0,0,1), 0 4px 24px rgba(0,0,0,0.9)',
           animation: 'level-num-in 0.6s ease-out 0.2s both',
         }}>
           {level.level}
@@ -306,6 +337,7 @@ function Tier8({ level, onClose }: { level: Level; onClose: () => void }) {
 
         {/* Level name */}
         <p style={{
+          position: 'relative',
           fontFamily: 'system-ui, sans-serif',
           fontSize: '22px',
           fontWeight: 800,
@@ -319,10 +351,11 @@ function Tier8({ level, onClose }: { level: Level; onClose: () => void }) {
 
         {/* Message */}
         <p style={{
+          position: 'relative',
           fontSize: '13px',
           fontWeight: 500,
           color: 'rgba(186,230,253,0.75)',
-          textShadow: '0 2px 8px rgba(0,0,0,0.9)',
+          textShadow: shadow,
           maxWidth: '260px',
           textAlign: 'center',
           lineHeight: 1.5,
