@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Minus } from 'lucide-react';
+import { Plus, Minus, CalendarDays } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useMatches, Match } from '../hooks/useMatches';
 import { useXP } from '../hooks/useXP';
