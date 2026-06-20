@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, coachName: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, coachName: string) => Promise<{ error: Error | null; needsEmailConfirmation: boolean }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: Error | null }>;
 }
@@ -77,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       if (error) {
-        return { error };
+        return { error, needsEmailConfirmation: false };
       }
 
       if (data.user) {
@@ -94,9 +94,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         fireWebhook('signup', email, coachName);
       }
 
-      return { error: null };
+      // Supabase devuelve user pero session=null cuando el proyecto exige confirmar el email
+      const needsEmailConfirmation = !!data.user && !data.session;
+      return { error: null, needsEmailConfirmation };
     } catch (error) {
-      return { error: error as Error };
+      return { error: error as Error, needsEmailConfirmation: false };
     }
   };
 

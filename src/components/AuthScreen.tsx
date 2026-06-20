@@ -13,6 +13,7 @@ export default function AuthScreen() {
   const [loading, setLoading] = useState(false);
   const [showReset, setShowReset] = useState(false);
   const [resetMessage, setResetMessage] = useState('');
+  const [confirmationMessage, setConfirmationMessage] = useState('');
 
   const { signIn, signUp, resetPassword } = useAuth();
 
@@ -22,6 +23,7 @@ export default function AuthScreen() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setConfirmationMessage('');
     setLoading(true);
 
     if (!validateEmail(email)) { setError('Por favor, ingresa un email válido'); setLoading(false); return; }
@@ -33,11 +35,13 @@ export default function AuthScreen() {
     } else {
       if (password !== confirmPassword) { setError('Las contraseñas no coinciden'); setLoading(false); return; }
       if (!coachName.trim()) { setError('Por favor, ingresa tu nombre de entrenador'); setLoading(false); return; }
-      const { error: signUpError } = await signUp(email, password, coachName);
+      const { error: signUpError, needsEmailConfirmation } = await signUp(email, password, coachName);
       if (signUpError) {
         setError(signUpError.message.includes('already registered')
           ? 'Este email ya está registrado'
           : 'Error al crear la cuenta. Inténtalo de nuevo.');
+      } else if (needsEmailConfirmation) {
+        setConfirmationMessage('Cuenta creada. Revisa tu correo (incluida la carpeta de spam) y confirma tu email para poder iniciar sesión.');
       }
     }
     setLoading(false);
@@ -164,6 +168,9 @@ export default function AuthScreen() {
 
             {error && (
               <div className="bg-red-500/20 border border-red-500 text-red-200 px-3 py-2 rounded-lg text-xs">{error}</div>
+            )}
+            {confirmationMessage && (
+              <div className="bg-green-500/20 border border-green-500 text-green-200 px-3 py-2 rounded-lg text-xs">{confirmationMessage}</div>
             )}
 
             <button type="submit" disabled={loading}
