@@ -53,7 +53,11 @@ export default function AuthScreen() {
     if (!validateEmail(email)) { setError('Por favor, ingresa un email válido'); setLoading(false); return; }
     const { error: resetError } = await resetPassword(email);
     if (resetError) {
-      setError('Error al enviar el correo de recuperación');
+      setError(
+        resetError.message.includes('rate limit') || resetError.message.includes('Email rate limit')
+          ? 'Se ha alcanzado el límite de correos. Espera unos minutos e inténtalo de nuevo.'
+          : `Error al enviar el correo de recuperación: ${resetError.message}`
+      );
     } else {
       setResetMessage('Te hemos enviado un correo para restablecer tu contraseña');
       setTimeout(() => { setShowReset(false); setResetMessage(''); }, 3000);
