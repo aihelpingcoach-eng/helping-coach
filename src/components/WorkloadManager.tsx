@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Activity, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import { WeeklyWorkload, FatigueLevel } from '../types/advancedSystems';
 import { supabase } from '../lib/supabase';
+import EmptyState from './EmptyState';
 
 interface WorkloadManagerProps {
   coachId: string;
@@ -95,10 +96,11 @@ export default function WorkloadManager({ coachId, players }: WorkloadManagerPro
       </div>
 
       {workloads.length === 0 ? (
-        <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-6 text-center">
-          <p className="text-gray-400">No hay datos de carga para esta semana</p>
-          <p className="text-gray-500 text-sm mt-2">Los datos se generarán automáticamente con la actividad del equipo</p>
-        </div>
+        <EmptyState
+          variant="generic"
+          title="No hay datos de carga para esta semana"
+          subtitle="Los datos se generarán automáticamente con la actividad del equipo"
+        />
       ) : (
         <div className="space-y-3">
           {workloads.map((workload) => {

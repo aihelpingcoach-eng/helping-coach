@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronRight, Shield } from 'lucide-react';
-import logoImg from '../assets/logo_new.png';
+import onboardingTeam from '../assets/illustrations/onboarding-team.jpg';
+import onboardingTactics from '../assets/illustrations/onboarding-tactics.jpg';
 import { useXP } from '../hooks/useXP';
 
 interface OnboardingData {
@@ -46,8 +47,12 @@ export default function OnboardingWizard({ coachName, onComplete }: Props) {
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-black to-black pointer-events-none" />
 
       <div className="relative z-10 w-full max-w-sm flex flex-col items-center">
-        {/* Logo */}
-        <img src={logoImg} alt="Helpin Coach" className="w-16 h-16 object-contain mb-4" />
+        {/* Ilustración del paso */}
+        <img
+          src={step === 1 ? onboardingTeam : onboardingTactics}
+          alt=""
+          className="w-40 h-40 object-cover rounded-2xl mb-4 shadow-2xl shadow-purple-900/50"
+        />
 
         {/* Progress */}
         <div className="flex gap-2 mb-6">

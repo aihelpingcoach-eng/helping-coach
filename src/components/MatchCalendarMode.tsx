@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Plus, CalendarDays, Trophy, Minus } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useMatches, Match } from '../hooks/useMatches';
 import { useXP } from '../hooks/useXP';
 import CreateMatchModal from './matches/CreateMatchModal';
 import MatchResultModal from './matches/MatchResultModal';
 import MatchCard from './matches/MatchCard';
+import EmptyState from './EmptyState';
 
 type Tab = 'upcoming' | 'history';
 
@@ -94,11 +95,12 @@ export default function MatchCalendarMode() {
           </div>
         ) : tab === 'upcoming' ? (
           upcoming.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-48 text-center">
-              <CalendarDays size={48} className="text-gray-700 mb-3" />
-              <p className="text-gray-400 font-semibold">Sin partidos programados</p>
-              <p className="text-gray-600 text-sm mt-1">Pulsa "Nuevo" para añadir un partido</p>
-            </div>
+            <EmptyState
+              variant="matches"
+              title="Sin partidos programados"
+              subtitle='Pulsa "Nuevo" para añadir un partido'
+              className="h-48"
+            />
           ) : (
             upcoming.map(m => (
               <MatchCard
@@ -111,11 +113,12 @@ export default function MatchCalendarMode() {
           )
         ) : (
           history.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-48 text-center">
-              <Trophy size={48} className="text-gray-700 mb-3" />
-              <p className="text-gray-400 font-semibold">Sin historial todavía</p>
-              <p className="text-gray-600 text-sm mt-1">Registra resultados de tus partidos</p>
-            </div>
+            <EmptyState
+              variant="matches"
+              title="Sin historial todavía"
+              subtitle="Registra resultados de tus partidos"
+              className="h-48"
+            />
           ) : (
             [...history].reverse().map(m => (
               <MatchCard

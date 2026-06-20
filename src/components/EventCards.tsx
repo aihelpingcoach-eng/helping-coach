@@ -3,6 +3,7 @@ import { TrendingUp, TrendingDown, AlertCircle, Users, Heart, Zap, CloudSnow, X 
 import { EventCard, CardType } from '../types/advancedSystems';
 import { supabase } from '../lib/supabase';
 import { useXP } from '../hooks/useXP';
+import EmptyState from './EmptyState';
 
 const CARD_XP: Record<CardType, number> = {
   improvement:      40,
@@ -155,8 +156,8 @@ export default function EventCards({ coachId, onCardResolved }: EventCardsProps)
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {cards.length === 0 ? (
-          <div className="col-span-full bg-gray-900/50 border border-gray-700 rounded-lg p-6 text-center">
-            <p className="text-gray-400">No hay eventos activos</p>
+          <div className="col-span-full">
+            <EmptyState variant="generic" title="No hay eventos activos" />
           </div>
         ) : (
           cards.map((card) => (

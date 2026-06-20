@@ -4,6 +4,7 @@ import { useXP } from '../hooks/useXP';
 import { Player } from '../constants/playstyles';
 import { supabase } from '../lib/supabase';
 import PlayerHistoryPanel from './progress/PlayerHistoryPanel';
+import EmptyState from './EmptyState';
 
 export default function ProgressMode() {
   const [players, setPlayers] = useState<Player[]>([]);
@@ -66,11 +67,11 @@ export default function ProgressMode() {
   if (players.length === 0) {
     return (
       <div className="relative w-full h-full flex items-center justify-center px-4">
-        <div className="text-center">
-          <div className="text-6xl mb-4">🃏</div>
-          <h2 className="text-2xl font-bold text-white mb-2">No hay jugadores</h2>
-          <p className="text-gray-400">Añade jugadores en el modo Tácticas</p>
-        </div>
+        <EmptyState
+          variant="players"
+          title="No hay jugadores"
+          subtitle="Añade jugadores en el modo Tácticas"
+        />
       </div>
     );
   }

@@ -1,5 +1,6 @@
-import { CheckCircle2, Clock, Trash2, Play, ClipboardList } from 'lucide-react';
+import { CheckCircle2, Clock, Trash2, Play } from 'lucide-react';
 import { TrainingSession } from '../../hooks/useTrainingSessions';
+import EmptyState from '../EmptyState';
 
 interface Props {
   sessions: TrainingSession[];
@@ -39,11 +40,12 @@ export default function SessionHistory({ sessions, loading, onResume, onDelete }
 
   if (sessions.length === 0) {
     return (
-      <div className="text-center py-16 text-gray-500">
-        <ClipboardList size={48} className="mx-auto mb-4 opacity-30" />
-        <p className="text-lg font-medium text-gray-400">Sin sesiones todavía</p>
-        <p className="text-sm mt-1">Crea tu primera sesión desde la pestaña de ejercicios</p>
-      </div>
+      <EmptyState
+        variant="generic"
+        title="Sin sesiones todavía"
+        subtitle="Crea tu primera sesión desde la pestaña de ejercicios"
+        className="py-16"
+      />
     );
   }
 

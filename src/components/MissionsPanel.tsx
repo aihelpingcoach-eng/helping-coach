@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Target, Trophy, Star, Clock, CheckCircle } from 'lucide-react';
 import { CoachMission, MissionType } from '../types/advancedSystems';
 import { supabase } from '../lib/supabase';
+import EmptyState from './EmptyState';
 
 interface MissionsPanelProps {
   coachId: string;
@@ -109,11 +110,11 @@ export default function MissionsPanel({ coachId, onMissionComplete }: MissionsPa
       </div>
 
       {filteredMissions.length === 0 ? (
-        <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-6 text-center">
-          <CheckCircle className="text-green-400 mx-auto mb-2" size={32} />
-          <p className="text-gray-400">No hay misiones activas</p>
-          <p className="text-gray-500 text-sm mt-1">Nuevas misiones se generarán pronto</p>
-        </div>
+        <EmptyState
+          variant="generic"
+          title="No hay misiones activas"
+          subtitle="Nuevas misiones se generarán pronto"
+        />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {filteredMissions.map((mission) => (
