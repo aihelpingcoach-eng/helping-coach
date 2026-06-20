@@ -35,6 +35,7 @@ export default function TacticsMode() {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [showFormationAdvisor, setShowFormationAdvisor] = useState(false);
   const fieldRef = useRef<HTMLDivElement>(null);
+  const synergiesCacheRef = useRef<{ key: string; synergies: Synergy[] } | null>(null);
   const { profile: coachProfile } = useCoachProfile();
   const { giveXP, showLevelUpModal, newLevel, closeLevelUpModal } = useXP();
   const { withAdGate, showAdGate, featureName, handleAdComplete, handleAdCancel } = useAdGate();
@@ -146,24 +147,39 @@ export default function TacticsMode() {
       return;
     }
 
+    const playersWithPositions = formationPlayers
+      .filter(fp => fp.player)
+      .map(fp => {
+        const pos = positions[fp.position_index] ?? { x: 50, y: 50 };
+        return {
+          name: (fp.player as Player).name,
+          position: `Pos ${fp.position_index}`,
+          playstyle: (fp.player as Player).playstyle || 'Sin PlayStyle',
+          position_index: fp.position_index,
+          x: pos.x,
+          y: pos.y,
+        };
+      });
+
+    // El mismo equipo+formación siempre debe dar la misma sinergia.
+    // Si ya la calculamos antes, reusamos el resultado en vez de volver a llamar a la IA
+    // (cuyo motor de inferencia no garantiza determinismo perfecto incluso con temperature 0).
+    const cacheKey = `${selectedFormation}|${playersWithPositions
+      .map(p => `${p.position_index}:${p.name}:${p.playstyle}`)
+      .sort()
+      .join(',')}`;
+
+    if (synergiesCacheRef.current?.key === cacheKey) {
+      setSynergies(synergiesCacheRef.current.synergies);
+      return;
+    }
+
     setIsAnalyzingSynergies(true);
     try {
-      const playersWithPositions = formationPlayers
-        .filter(fp => fp.player)
-        .map(fp => {
-          const pos = positions[fp.position_index] ?? { x: 50, y: 50 };
-          return {
-            name: (fp.player as Player).name,
-            position: `Pos ${fp.position_index}`,
-            playstyle: (fp.player as Player).playstyle || 'Sin PlayStyle',
-            position_index: fp.position_index,
-            x: pos.x,
-            y: pos.y,
-          };
-        });
-
       const result = await analyzeTeamSynergies(selectedFormation, playersWithPositions);
-      setSynergies(result.synergies || []);
+      const newSynergies = result.synergies || [];
+      synergiesCacheRef.current = { key: cacheKey, synergies: newSynergies };
+      setSynergies(newSynergies);
 
       await giveXP('CONSULT_AI');
     } catch (error) {
