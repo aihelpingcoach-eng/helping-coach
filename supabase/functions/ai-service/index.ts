@@ -397,6 +397,11 @@ Devuelve SIEMPRE un JSON con este formato EXACTO:
 
     const systemPrompt = systemPrompts[coachType] || systemPrompts.helpin_coach;
 
+    // Tareas de clasificación/análisis deben ser deterministas: mismo input -> mismo output.
+    // Solo el chat conversacional necesita variedad creativa.
+    const conversationalTypes = ['helpin_coach', 'nursing_coach', 'training_coach'];
+    const temperature = conversationalTypes.includes(coachType) ? 0.7 : 0;
+
     const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -410,7 +415,7 @@ Devuelve SIEMPRE un JSON con este formato EXACTO:
           { role: 'user', content: message },
         ],
         max_tokens: 4096,
-        temperature: 0.7,
+        temperature,
       }),
     });
 
