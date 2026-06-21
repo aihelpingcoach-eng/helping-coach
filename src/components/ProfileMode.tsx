@@ -8,9 +8,11 @@ import { getXPProgress } from '../constants/progression';
 import { supabase } from '../lib/supabase';
 import XPProgressBar from './XPProgressBar';
 import LevelUpModal from './LevelUpModal';
+import { isAdmin } from '../utils/isAdmin';
 
 export default function ProfileMode() {
   const { user, signOut } = useAuth();
+  const isAdminUser = isAdmin(user?.email);
   const { totalXP } = useXP();
   const [previewLevel, setPreviewLevel] = useState<number | null>(null);
   const { restartTutorial } = useTutorial();
@@ -144,36 +146,38 @@ export default function ProfileMode() {
           )}
         </div>
 
-        {/* TEST — Previsualizar animaciones de nivel (quitar en producción) */}
-        <div className="mb-4 bg-slate-900/60 border border-slate-700/50 rounded-2xl p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <FlaskConical size={16} className="text-slate-400" />
-            <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">Preview animaciones</span>
+        {/* TEST — Previsualizar animaciones de nivel (solo admin) */}
+        {isAdminUser && (
+          <div className="mb-4 bg-slate-900/60 border border-slate-700/50 rounded-2xl p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <FlaskConical size={16} className="text-slate-400" />
+              <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">Preview animaciones</span>
+            </div>
+            <div className="grid grid-cols-4 gap-2">
+              {[
+                { lvl: 2,  label: 'T1', color: '#64748b', sub: 'Aluminio' },
+                { lvl: 4,  label: 'T2', color: '#78716c', sub: 'Hierro' },
+                { lvl: 6,  label: 'T3', color: '#d97706', sub: 'Oro' },
+                { lvl: 9,  label: 'T4', color: '#94a3b8', sub: 'Platino' },
+                { lvl: 12, label: 'T5', color: '#06b6d4', sub: 'Diamante' },
+                { lvl: 15, label: 'T6', color: '#dc2626', sub: 'Rubí' },
+                { lvl: 17, label: 'T7', color: '#059669', sub: 'Esmeralda' },
+                { lvl: 19, label: 'T8', color: '#2563eb', sub: 'Zafiro' },
+              ].map(({ lvl, label, color, sub }) => (
+                <button
+                  key={lvl}
+                  onClick={() => setPreviewLevel(lvl)}
+                  className="py-2 px-1 rounded-lg text-xs font-bold text-white transition-all active:scale-95 flex flex-col items-center gap-0.5"
+                  style={{ background: color }}
+                >
+                  <span>{label}</span>
+                  <span className="text-white/70 text-[10px] font-normal">{sub}</span>
+                </button>
+              ))}
+            </div>
+            <p className="text-slate-600 text-xs mt-2 text-center">T1–T8 · Tap para ver</p>
           </div>
-          <div className="grid grid-cols-4 gap-2">
-            {[
-              { lvl: 2,  label: 'T1', color: '#64748b', sub: 'Aluminio' },
-              { lvl: 4,  label: 'T2', color: '#78716c', sub: 'Hierro' },
-              { lvl: 6,  label: 'T3', color: '#d97706', sub: 'Oro' },
-              { lvl: 9,  label: 'T4', color: '#94a3b8', sub: 'Platino' },
-              { lvl: 12, label: 'T5', color: '#06b6d4', sub: 'Diamante' },
-              { lvl: 15, label: 'T6', color: '#dc2626', sub: 'Rubí' },
-              { lvl: 17, label: 'T7', color: '#059669', sub: 'Esmeralda' },
-              { lvl: 19, label: 'T8', color: '#2563eb', sub: 'Zafiro' },
-            ].map(({ lvl, label, color, sub }) => (
-              <button
-                key={lvl}
-                onClick={() => setPreviewLevel(lvl)}
-                className="py-2 px-1 rounded-lg text-xs font-bold text-white transition-all active:scale-95 flex flex-col items-center gap-0.5"
-                style={{ background: color }}
-              >
-                <span>{label}</span>
-                <span className="text-white/70 text-[10px] font-normal">{sub}</span>
-              </button>
-            ))}
-          </div>
-          <p className="text-slate-600 text-xs mt-2 text-center">T1–T8 · Tap para ver</p>
-        </div>
+        )}
 
         {previewLevel && (
           <LevelUpModal
