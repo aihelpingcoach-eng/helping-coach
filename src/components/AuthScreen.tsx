@@ -59,8 +59,8 @@ export default function AuthScreen() {
           : `Error al enviar el correo de recuperación: ${resetError.message}`
       );
     } else {
-      setResetMessage('Te hemos enviado un correo para restablecer tu contraseña');
-      setTimeout(() => { setShowReset(false); setResetMessage(''); }, 3000);
+      setResetMessage('Te hemos enviado un correo para restablecer tu contraseña. Si no lo ves, revisa también la carpeta de spam.');
+      setTimeout(() => { setShowReset(false); setResetMessage(''); }, 5000);
     }
     setLoading(false);
   };
