@@ -1,7 +1,7 @@
 interface Synergy {
   player_a: string;
   player_b: string;
-  color: 'yellow' | 'orange' | 'green' | 'purple';
+  color: 'red' | 'yellow' | 'orange' | 'green' | 'blue' | 'purple';
   reason: string;
 }
 
@@ -13,9 +13,11 @@ interface SynergyLinesProps {
 }
 
 const colorMap = {
+  red: '#EF4444',
   yellow: '#EAB308',
   orange: '#F59E0B',
   green: '#10B981',
+  blue: '#3B82F6',
   purple: '#9333EA',
 };
 

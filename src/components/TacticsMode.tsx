@@ -19,7 +19,7 @@ import LevelUpModal from './LevelUpModal';
 interface Synergy {
   player_a: string;
   player_b: string;
-  color: 'yellow' | 'orange' | 'green' | 'purple';
+  color: 'red' | 'yellow' | 'orange' | 'green' | 'blue' | 'purple';
   reason: string;
 }
 

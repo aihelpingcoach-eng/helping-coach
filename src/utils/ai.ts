@@ -244,7 +244,7 @@ Lesiones gestionadas: ${injuriesManaged}`;
 }
 
 interface SynergyAnalysisResult {
-  synergy_level: 'yellow' | 'orange' | 'green' | 'purple';
+  synergy_level: 'red' | 'yellow' | 'orange' | 'green' | 'blue' | 'purple';
   explanation: string;
 }
 
@@ -376,7 +376,7 @@ interface TeamSynergyResult {
   synergies: Array<{
     player_a: string;
     player_b: string;
-    color: 'yellow' | 'orange' | 'green' | 'purple';
+    color: 'red' | 'yellow' | 'orange' | 'green' | 'blue' | 'purple';
     reason: string;
   }>;
 }
@@ -416,7 +416,7 @@ export async function analyzeTeamSynergies(
 Jugadores:
 ${playersText}
 
-Asigna color (yellow/orange/green/purple) a CADA par. Reason muy breve (max 5 palabras). NO omitas ninguno:
+Asigna color (red/yellow/orange/green/blue/purple) a CADA par. Reason muy breve (max 5 palabras). NO omitas ninguno:
 ${pairsText}`;
 
     const response = await callAIService('team_synergy_analysis', userPrompt, {

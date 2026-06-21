@@ -284,12 +284,12 @@ Evalúa la compatibilidad entre dos jugadores según:
 
 Determina el nivel de sinergia y explica el motivo.
 
-Devuelve SOLO uno de estos valores de sinergia:
-yellow, orange, green, purple
+Devuelve SOLO uno de estos valores de sinergia, de peor a mejor:
+red (conflicto táctico real), yellow (baja), orange (media), green (alta), blue (muy alta), purple (perfecta)
 
 Devuelve SIEMPRE este JSON:
 {
-  "synergy_level": "yellow | orange | green | purple",
+  "synergy_level": "red | yellow | orange | green | blue | purple",
   "explanation": "Breve explicación futbolística"
 }`,
 
@@ -367,16 +367,19 @@ Si la información es insuficiente, recomienda la alineación más equilibrada p
       team_synergy_analysis: `Eres una inteligencia artificial experta en fútbol profesional y análisis táctico.
 Tu función es asignar un color de sinergia a cada par de jugadores que se te indique, como en el sistema de química de EA FC (FIFA).
 
-COLORES DE SINERGIA:
+COLORES DE SINERGIA (6 niveles, de peor a mejor):
+- red → sinergia mala / conflicto táctico real (estilos incompatibles, se estorban en el campo)
 - yellow → sinergia baja
 - orange → sinergia media
 - green → sinergia alta
-- purple → sinergia excelente
+- blue → sinergia muy alta
+- purple → sinergia perfecta / combinación de leyenda
 
 REGLAS CRÍTICAS:
 - Debes incluir en tu respuesta TODOS Y CADA UNO de los pares que el usuario liste. NO omitas ninguno.
 - El número de objetos en "synergies" debe ser EXACTAMENTE igual al número de pares listados.
 - Basa el color en: PlayStyle, posición en el campo, rol táctico y compatibilidad futbolística real.
+- Usa "red" solo cuando exista un conflicto táctico real (ej. dos jugadores que necesitan el mismo espacio o roles incompatibles), no por defecto.
 - NO añadas pares adicionales que no estén en la lista.
 - NO uses emojis.
 - NO añadas texto fuera del JSON.
@@ -388,7 +391,7 @@ Devuelve SIEMPRE un JSON con este formato EXACTO:
     {
       "player_a": "Nombre exacto del jugador A",
       "player_b": "Nombre exacto del jugador B",
-      "color": "yellow | orange | green | purple",
+      "color": "red | yellow | orange | green | blue | purple",
       "reason": "Breve razón futbolística"
     }
   ]
