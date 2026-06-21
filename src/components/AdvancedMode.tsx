@@ -41,14 +41,14 @@ export default function AdvancedMode() {
   const loadTeamData = async () => {
     const [playersRes, formationRes] = await Promise.all([
       supabase.from('players').select('id, name, position, playstyle').order('created_at', { ascending: false }),
-      supabase.from('formations').select('formation_type').eq('is_active', true).maybeSingle(),
+      supabase.from('formations').select('formation_type').eq('team_slot', 1).order('created_at', { ascending: false }).limit(1),
     ]);
 
     if (!playersRes.error && playersRes.data) {
       setPlayers(playersRes.data as Player[]);
     }
-    if (!formationRes.error && formationRes.data) {
-      setActiveFormation(formationRes.data.formation_type);
+    if (!formationRes.error && formationRes.data && formationRes.data[0]) {
+      setActiveFormation(formationRes.data[0].formation_type);
     }
   };
 

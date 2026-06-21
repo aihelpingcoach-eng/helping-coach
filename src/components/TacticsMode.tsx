@@ -23,8 +23,16 @@ interface Synergy {
   reason: string;
 }
 
+type TeamSlot = 1 | 2 | 3;
+
+function getStoredTeamSlot(): TeamSlot {
+  const stored = Number(localStorage.getItem('helpingcoach_team_slot'));
+  return stored === 1 || stored === 2 || stored === 3 ? stored : 1;
+}
+
 export default function TacticsMode() {
   const [selectedFormation, setSelectedFormation] = useState<FormationType>('4-3-3');
+  const [selectedTeamSlot, setSelectedTeamSlot] = useState<TeamSlot>(getStoredTeamSlot);
   const [formationPlayers, setFormationPlayers] = useState<FormationPlayer[]>([]);
   const [selectedPosition, setSelectedPosition] = useState<number | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -41,22 +49,73 @@ export default function TacticsMode() {
   const { withAdGate, showAdGate, featureName, handleAdComplete, handleAdCancel } = useAdGate();
 
   useEffect(() => {
+    localStorage.setItem('helpingcoach_team_slot', String(selectedTeamSlot));
     loadFormationPlayers();
     loadAllPlayers();
-  }, [selectedFormation]);
+  }, [selectedTeamSlot]);
+
+  const getCurrentFormationRow = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    const { data } = await supabase
+      .from('formations')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('team_slot', selectedTeamSlot)
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    return data?.[0] ?? null;
+  };
 
   const loadFormationPlayers = async () => {
+    const formation = await getCurrentFormationRow();
+
+    if (!formation) {
+      setFormationPlayers([]);
+      return;
+    }
+
+    setSelectedFormation(formation.formation_type as FormationType);
+
     const { data, error } = await supabase
       .from('formation_players')
-      .select('*, player:players(*), formation:formations(formation_type)')
+      .select('*, player:players(*)')
+      .eq('formation_id', formation.id)
       .order('position_index');
 
     if (!error && data) {
-      const filtered = (data as any[]).filter(
-        fp => fp.formation?.formation_type === selectedFormation
-      );
-      setFormationPlayers(filtered as FormationPlayer[]);
+      setFormationPlayers(data as FormationPlayer[]);
     }
+  };
+
+  const changeFormation = async (newType: FormationType) => {
+    const formation = await getCurrentFormationRow();
+
+    if (!formation) {
+      setSelectedFormation(newType);
+      return;
+    }
+
+    await supabase
+      .from('formations')
+      .update({ formation_type: newType, name: newType })
+      .eq('id', formation.id);
+
+    const newSlotCount = FORMATIONS[newType].length;
+    const sortedPlayers = [...formationPlayers].sort((a, b) => a.position_index - b.position_index);
+
+    await Promise.all(
+      sortedPlayers.map((fp, i) =>
+        i < newSlotCount
+          ? supabase.from('formation_players').update({ position_index: i }).eq('id', fp.id)
+          : supabase.from('formation_players').delete().eq('id', fp.id)
+      )
+    );
+
+    setSelectedFormation(newType);
+    await loadFormationPlayers();
   };
 
   const loadAllPlayers = async () => {
@@ -79,21 +138,15 @@ export default function TacticsMode() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data: formationRows, error: fErr } = await supabase
-      .from('formations')
-      .select('*')
-      .eq('formation_type', selectedFormation)
-      .eq('user_id', user.id)
-      .limit(1);
-
-    const formation = formationRows?.[0] ?? null;
+    const formation = await getCurrentFormationRow();
 
     if (!formation) {
-      const { data: newFormation, error: nfErr } = await supabase
+      const { data: newFormation } = await supabase
         .from('formations')
         .insert({
           name: selectedFormation,
           formation_type: selectedFormation,
+          team_slot: selectedTeamSlot,
           is_active: true,
           user_id: user.id,
         })
@@ -230,6 +283,22 @@ export default function TacticsMode() {
   return (
     <div className="relative w-full h-full">
       <div className="h-[calc(100vh-7rem)] sm:h-[calc(100vh-8rem)] flex flex-col max-w-7xl mx-auto px-2 sm:px-4 py-2 sm:py-4">
+        <div className="flex items-center justify-center gap-1.5 mb-2 flex-shrink-0">
+          {([1, 2, 3] as TeamSlot[]).map((slot) => (
+            <button
+              key={slot}
+              onClick={() => setSelectedTeamSlot(slot)}
+              className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all touch-manipulation ${
+                selectedTeamSlot === slot
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-black/50 text-gray-400 border border-purple-500/30'
+              }`}
+            >
+              Equipo {slot}
+            </button>
+          ))}
+        </div>
+
         <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2 sm:mb-4 flex-shrink-0">
           <TacticalRecommendations
             formation={selectedFormation}
@@ -238,7 +307,7 @@ export default function TacticsMode() {
 
           <select
             value={selectedFormation}
-            onChange={(e) => setSelectedFormation(e.target.value as FormationType)}
+            onChange={(e) => changeFormation(e.target.value as FormationType)}
             className="bg-black/70 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-lg border border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500 font-semibold text-sm sm:text-lg touch-manipulation h-[44px] sm:h-[52px]"
           >
             {Object.keys(FORMATIONS).map((formation) => (
@@ -286,7 +355,7 @@ export default function TacticsMode() {
               currentFormation={selectedFormation}
               players={playersInFormation}
               onFormationSelect={(formation) => {
-                setSelectedFormation(formation as FormationType);
+                changeFormation(formation as FormationType);
                 setShowFormationAdvisor(false);
               }}
             />
