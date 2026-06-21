@@ -176,10 +176,38 @@ export default function TacticsMode() {
 
     setIsAnalyzingSynergies(true);
     try {
+      // Caché persistente en BD: sobrevive a recargas de página, a diferencia del useRef en memoria.
+      if (coachProfile?.id) {
+        const { data: cached } = await supabase
+          .from('team_synergies')
+          .select('synergies')
+          .eq('coach_id', coachProfile.id)
+          .eq('formation_type', selectedFormation)
+          .eq('cache_key', cacheKey)
+          .maybeSingle();
+
+        if (cached) {
+          const cachedSynergies = cached.synergies as Synergy[];
+          synergiesCacheRef.current = { key: cacheKey, synergies: cachedSynergies };
+          setSynergies(cachedSynergies);
+          setIsAnalyzingSynergies(false);
+          return;
+        }
+      }
+
       const result = await analyzeTeamSynergies(selectedFormation, playersWithPositions);
       const newSynergies = result.synergies || [];
       synergiesCacheRef.current = { key: cacheKey, synergies: newSynergies };
       setSynergies(newSynergies);
+
+      if (coachProfile?.id) {
+        await supabase.from('team_synergies').insert({
+          coach_id: coachProfile.id,
+          formation_type: selectedFormation,
+          cache_key: cacheKey,
+          synergies: newSynergies,
+        });
+      }
 
       await giveXP('CONSULT_AI');
     } catch (error) {
