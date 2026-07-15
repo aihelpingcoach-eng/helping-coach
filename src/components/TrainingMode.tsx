@@ -169,7 +169,7 @@ export default function TrainingMode() {
                     key={exercise.id}
                     className="bg-gradient-to-br from-orange-900/20 to-black border-2 border-orange-800/50 rounded-xl overflow-hidden hover:border-orange-600 transition-all"
                   >
-                    <div className="w-full bg-black/40" style={{ height: '140px' }}>
+                    <div className="w-full bg-white" style={{ height: '140px' }}>
                       {exercise.image_url ? (
                         <img src={exercise.image_url} alt={exercise.name} className="w-full h-full object-contain" />
                       ) : (
