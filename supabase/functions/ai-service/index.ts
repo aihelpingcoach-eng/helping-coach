@@ -1,10 +1,16 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
+
+// Máximo de llamadas de IA por usuario por día. Suficientemente alto para
+// uso normal, pero evita que alguien con la clave anon (pública en el
+// bundle) automatice llamadas ilimitadas y consuma el presupuesto de IA.
+const DAILY_AI_CALL_LIMIT = 150;
 
 interface AIRequest {
   coachType: 'helpin_coach' | 'nursing_coach' | 'training_coach' | 'player_analysis' | 'player_progression' | 'team_dna' | 'role_assignment' | 'coach_progression' | 'synergy_analysis' | 'team_synergy_analysis' | 'match_report' | 'formation_advisor';
@@ -21,6 +27,46 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
+    // La app antes llamaba a esta función solo con la clave anon (pública),
+    // sin verificar que hubiera un usuario real logueado. Ahora exigimos el
+    // access_token de la sesión y validamos que corresponda a un usuario real
+    // antes de gastar presupuesto de IA.
+    const authHeader = req.headers.get('Authorization') ?? '';
+    const token = authHeader.replace('Bearer ', '');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabaseAdmin = createClient(supabaseUrl, serviceKey);
+
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+    if (userError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'unauthorized', message: 'Debes iniciar sesión para usar la IA.' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+    const { data: usageRow } = await supabaseAdmin
+      .from('ai_usage_daily')
+      .select('call_count')
+      .eq('user_id', user.id)
+      .eq('usage_date', today)
+      .maybeSingle();
+
+    if (usageRow && usageRow.call_count >= DAILY_AI_CALL_LIMIT) {
+      return new Response(
+        JSON.stringify({ error: 'rate_limited', message: 'Has alcanzado el límite diario de solicitudes de IA. Inténtalo de nuevo mañana.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    await supabaseAdmin
+      .from('ai_usage_daily')
+      .upsert(
+        { user_id: user.id, usage_date: today, call_count: (usageRow?.call_count ?? 0) + 1 },
+        { onConflict: 'user_id,usage_date' }
+      );
+
     const { coachType, message, context }: AIRequest = await req.json();
     console.log('Request received:', { coachType, messageLength: message.length });
 
