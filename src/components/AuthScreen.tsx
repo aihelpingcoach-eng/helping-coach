@@ -79,10 +79,10 @@ export default function AuthScreen() {
             <h2 className="text-2xl font-bold text-center text-white mb-1">Recuperar Contraseña</h2>
             <p className="text-gray-400 text-center text-sm mb-5">Ingresa tu email para recibir instrucciones</p>
 
-            <form onSubmit={handlePasswordReset} className="space-y-4">
+            <form onSubmit={handlePasswordReset} className="space-y-4" autoComplete="on">
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                <input type="email" name="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)}
                   className={inputClass} placeholder="tu@email.com" required />
               </div>
               {error && <div className="bg-red-500/20 border border-red-500 text-red-200 px-3 py-2 rounded-lg text-xs">{error}</div>}
@@ -129,13 +129,13 @@ export default function AuthScreen() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit} className="space-y-3" autoComplete="on">
             {!isLogin && (
               <div>
                 <label className="block text-xs font-medium text-gray-300 mb-1">Nombre del Entrenador</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                  <input type="text" value={coachName} onChange={e => setCoachName(e.target.value)}
+                  <input type="text" name="name" autoComplete="name" value={coachName} onChange={e => setCoachName(e.target.value)}
                     className={inputClass} placeholder="Ej: Pep Guardiola" required={!isLogin} />
                 </div>
               </div>
@@ -145,7 +145,7 @@ export default function AuthScreen() {
               <label className="block text-xs font-medium text-gray-300 mb-1">Email</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                <input type="email" name="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)}
                   className={inputClass} placeholder="tu@email.com" required />
               </div>
             </div>
@@ -154,7 +154,7 @@ export default function AuthScreen() {
               <label className="block text-xs font-medium text-gray-300 mb-1">Contraseña</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+                <input type="password" name="password" autoComplete={isLogin ? 'current-password' : 'new-password'} value={password} onChange={e => setPassword(e.target.value)}
                   className={inputClass} placeholder="••••••••" required minLength={8} />
               </div>
             </div>
@@ -164,7 +164,7 @@ export default function AuthScreen() {
                 <label className="block text-xs font-medium text-gray-300 mb-1">Confirmar Contraseña</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                  <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
+                  <input type="password" name="confirm-password" autoComplete="new-password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
                     className={inputClass} placeholder="••••••••" required={!isLogin} minLength={8} />
                 </div>
               </div>
