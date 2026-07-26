@@ -6,25 +6,15 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Da acceso al Stripe Billing Portal: desde ahí el usuario puede actualizar
+// su método de pago, ver facturas anteriores y cancelar su suscripción Pro
+// por su cuenta, sin que tengamos que construir esa UI nosotros.
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const { userId, email } = await req.json();
-
-    if (!userId || !email) {
-      return new Response(JSON.stringify({ error: 'userId and email are required' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    // Antes se confiaba en userId/email tal cual llegaban del cliente, sin
-    // verificar que la sesión que llama realmente sea ese usuario. Eso
-    // permitía generar sesiones de Stripe Checkout con metadata.user_id
-    // arbitrario. Validamos el token contra el propio Supabase Auth.
     const authHeader = req.headers.get('Authorization') ?? '';
     const token = authHeader.replace('Bearer ', '');
     const supabaseAdmin = createClient(
@@ -33,50 +23,42 @@ serve(async (req) => {
     );
     const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
 
-    if (userError || !user || user.id !== userId || user.email !== email) {
+    if (userError || !user) {
       return new Response(JSON.stringify({ error: 'unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // Si el usuario ya tiene un stripe_customer_id (por ejemplo, canceló y
-    // vuelve a suscribirse), lo reutilizamos en vez de dejar que Stripe cree
-    // un Customer nuevo cada vez con customer_email.
-    const { data: existingProfile } = await supabaseAdmin
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('coach_profiles')
       .select('stripe_customer_id')
       .eq('user_id', user.id)
       .single();
 
+    if (profileError || !profile?.stripe_customer_id) {
+      return new Response(JSON.stringify({ error: 'No tienes una suscripción activa para gestionar.' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
-    const stripePriceId = Deno.env.get('STRIPE_PRICE_ID');
     const appUrl = Deno.env.get('APP_URL') || 'https://helping-coach.vercel.app';
 
-    if (!stripeSecretKey || !stripePriceId) {
-      return new Response(JSON.stringify({ error: `Stripe not configured. KEY=${!!stripeSecretKey} PRICE=${!!stripePriceId}` }), {
+    if (!stripeSecretKey) {
+      return new Response(JSON.stringify({ error: 'Stripe no está configurado (falta STRIPE_SECRET_KEY).' }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     const params = new URLSearchParams({
-      'payment_method_types[]': 'card',
-      'line_items[0][price]': stripePriceId,
-      'line_items[0][quantity]': '1',
-      'mode': 'subscription',
-      'success_url': `${appUrl}?payment=success`,
-      'cancel_url': `${appUrl}?payment=cancelled`,
-      'metadata[user_id]': userId,
+      customer: profile.stripe_customer_id,
+      return_url: appUrl,
     });
 
-    if (existingProfile?.stripe_customer_id) {
-      params.set('customer', existingProfile.stripe_customer_id);
-    } else {
-      params.set('customer_email', email);
-    }
-
-    const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+    const response = await fetch('https://api.stripe.com/v1/billing_portal/sessions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${stripeSecretKey}`,
@@ -98,7 +80,7 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: `Exception: ${error.message}` }), {
+    return new Response(JSON.stringify({ error: `Exception: ${error instanceof Error ? error.message : String(error)}` }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

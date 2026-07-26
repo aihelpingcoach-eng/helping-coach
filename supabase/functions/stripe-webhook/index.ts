@@ -70,13 +70,33 @@ serve(async (req) => {
     }
   }
 
+  // Cubre renovaciones, cambios de estado (impago, pausada) y cancelaciones
+  // "at period end" que Stripe reporta acá antes de emitir el delete final.
+  if (event.type === 'customer.subscription.updated' || event.type === 'customer.subscription.created') {
+    const subscription = event.data.object;
+    const customerId = subscription.customer;
+    const activeStatuses = ['active', 'trialing'];
+    const isActive = activeStatuses.includes(subscription.status);
+    const periodEnd = subscription.current_period_end
+      ? new Date(subscription.current_period_end * 1000).toISOString()
+      : null;
+
+    await supabase
+      .from('coach_profiles')
+      .update({
+        plan: isActive ? 'pro' : 'free',
+        plan_expires_at: isActive ? periodEnd : null,
+      })
+      .eq('stripe_customer_id', customerId);
+  }
+
   if (event.type === 'customer.subscription.deleted') {
     const subscription = event.data.object;
     const customerId = subscription.customer;
 
     await supabase
       .from('coach_profiles')
-      .update({ plan: 'free' })
+      .update({ plan: 'free', plan_expires_at: null })
       .eq('stripe_customer_id', customerId);
   }
 

@@ -46,6 +46,19 @@ export default function ProfileMode() {
     }
   };
 
+  const handleManageSubscription = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase.functions.invoke('create-portal-session', {});
+      if (error) throw new Error(JSON.stringify(error));
+      if (data?.error) throw new Error(data.error);
+      if (!data?.url) throw new Error('No URL returned: ' + JSON.stringify(data));
+      window.location.href = data.url;
+    } catch (err) {
+      alert('Error: ' + (err instanceof Error ? err.message : String(err)));
+    }
+  };
+
   return (
     <div className="relative w-full p-4 sm:p-6">
       <div className="max-w-2xl mx-auto">
@@ -100,12 +113,21 @@ export default function ProfileMode() {
         {/* Plan section */}
         <div className="mb-4">
           {isPro ? (
-            <div className="bg-gradient-to-r from-purple-900/50 to-yellow-900/20 border border-yellow-500/40 rounded-2xl p-4 flex items-center gap-3">
-              <Crown size={22} className="text-yellow-400 flex-shrink-0" />
-              <div>
-                <p className="text-white font-bold text-sm">Plan Pro activo</p>
-                <p className="text-slate-400 text-xs">IA ilimitada · Sin anuncios</p>
+            <div className="bg-gradient-to-r from-purple-900/50 to-yellow-900/20 border border-yellow-500/40 rounded-2xl p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <Crown size={22} className="text-yellow-400 flex-shrink-0" />
+                <div>
+                  <p className="text-white font-bold text-sm">Plan Pro activo</p>
+                  <p className="text-slate-400 text-xs">IA ilimitada · Sin anuncios</p>
+                </div>
               </div>
+              <button
+                onClick={handleManageSubscription}
+                className="w-full bg-white/10 hover:bg-white/15 text-white font-semibold py-2.5 rounded-xl transition-all active:scale-95 text-sm"
+                style={{ minHeight: '44px' }}
+              >
+                Gestionar suscripción
+              </button>
             </div>
           ) : (
             <div className="bg-gradient-to-br from-purple-900/40 to-slate-900 border border-purple-500/40 rounded-2xl p-4">
