@@ -1,15 +1,7 @@
-import { ReactNode } from 'react';
 import LegalLayout from './LegalLayout';
+import LegalReview from './LegalReview';
 
 const CONTACT_EMAIL = 'ai.helpingcoach@gmail.com';
-
-function LegalReview({ children }: { children: ReactNode }) {
-  return (
-    <span className="inline-block bg-yellow-500/20 text-yellow-300 text-[11px] font-semibold px-2 py-0.5 rounded ml-2 align-middle">
-      ⚠️ {children}
-    </span>
-  );
-}
 
 export default function PrivacyPolicy() {
   return (
@@ -106,10 +98,47 @@ export default function PrivacyPolicy() {
 
       <h2>8. Cookies y almacenamiento local</h2>
       <p>
-        La App no utiliza cookies de rastreo publicitario ni de análisis de terceros. Únicamente
-        usa el almacenamiento local del navegador (<code>localStorage</code>) para mantener tu
-        sesión iniciada. Puedes borrar este dato en cualquier momento desde la configuración de tu
-        navegador, aunque esto cerrará tu sesión.
+        Helpin Coach <strong>no utiliza cookies</strong>: no hay cookies de análisis (como Google
+        Analytics), ni píxeles publicitarios, ni cookies de rastreo de terceros. No compartimos
+        datos con redes publicitarias.
+      </p>
+      <p>
+        Lo único que guardamos en tu navegador es el almacenamiento local (
+        <code>localStorage</code>), y con un solo propósito:
+      </p>
+      <div className="overflow-x-auto my-3">
+        <table className="w-full text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr className="text-left text-gray-400 border-b border-white/10">
+              <th className="py-2 pr-3">Dato</th>
+              <th className="py-2 pr-3">Tipo</th>
+              <th className="py-2 pr-3">Finalidad</th>
+              <th className="py-2 pr-3">Duración</th>
+              <th className="py-2">Cómo desactivarlo</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-300">
+            <tr className="border-b border-white/5">
+              <td className="py-2 pr-3">Token de sesión (Supabase Auth)</td>
+              <td className="py-2 pr-3">Estrictamente necesario</td>
+              <td className="py-2 pr-3">Mantener tu sesión iniciada entre visitas</td>
+              <td className="py-2 pr-3">Hasta que cierres sesión o borres los datos del navegador</td>
+              <td className="py-2">Borrar datos del sitio en la configuración de tu navegador (cerrará tu sesión)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Por ser un dato técnico <strong>estrictamente necesario</strong> para que la App funcione
+        (no se usa para publicidad, análisis ni perfilado), no requiere un banner de consentimiento
+        interactivo — basta con este aviso informativo, conforme a la excepción del artículo 5.3 de
+        la Directiva ePrivacy para almacenamiento técnicamente necesario{' '}
+        <LegalReview>confirmar con abogado si aplica igual en tu jurisdicción de lanzamiento</LegalReview>.
+      </p>
+      <p>
+        La App no responde actualmente a las señales de "No rastrear" (Do Not Track) del
+        navegador porque, al no usar cookies de rastreo, no hay nada que dicha señal deba
+        desactivar.
       </p>
 
       <h2>9. Seguridad</h2>
