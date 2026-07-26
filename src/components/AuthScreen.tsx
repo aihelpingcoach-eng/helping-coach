@@ -193,6 +193,12 @@ export default function AuthScreen() {
               </button>
             )}
           </form>
+
+          <p className="text-center text-[11px] text-gray-500 mt-4">
+            {isLogin ? 'Al continuar aceptas' : 'Al crear una cuenta aceptas'} nuestros{' '}
+            <a href="/terminos" className="text-purple-400 underline">Términos de Servicio</a> y nuestra{' '}
+            <a href="/privacidad" className="text-purple-400 underline">Política de Privacidad</a>.
+          </p>
         </div>
       </div>
     </div>

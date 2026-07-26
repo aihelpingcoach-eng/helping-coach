@@ -206,11 +206,17 @@ export default function ProfileMode() {
           </button>
         </div>
 
-        <div className="p-4 bg-purple-900/20 border border-purple-500/20 rounded-xl">
+        <div className="p-4 bg-purple-900/20 border border-purple-500/20 rounded-xl mb-4">
           <h4 className="text-white font-semibold text-sm mb-1">Tus Datos Están Seguros</h4>
           <p className="text-gray-400 text-xs leading-relaxed">
             Todos tus jugadores, alineaciones y progreso están vinculados a tu cuenta y solo tú puedes acceder a ellos.
           </p>
+        </div>
+
+        <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
+          <a href="/privacidad" className="hover:text-gray-300 underline">Política de Privacidad</a>
+          <span>·</span>
+          <a href="/terminos" className="hover:text-gray-300 underline">Términos de Servicio</a>
         </div>
       </div>
     </div>

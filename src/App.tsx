@@ -1,17 +1,10 @@
-import { useState } from 'react';
+import { useState, Suspense, lazy } from 'react';
 import { Bell, Search } from 'lucide-react';
 import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './contexts/AuthContext';
 import AuthGate from './components/AuthGate';
 import BottomNav, { AppMode } from './components/BottomNav';
 import TacticsMode from './components/TacticsMode';
-import InjuriesMode from './components/InjuriesMode';
-import TrainingMode from './components/TrainingMode';
-import ProgressMode from './components/ProgressMode';
-import ProfileMode from './components/ProfileMode';
-import AdvancedMode from './components/AdvancedMode';
-import MatchCalendarMode from './components/MatchCalendarMode';
-import AdminPanel from './components/AdminPanel';
 import MusicPlayer from './components/MusicPlayer';
 import ParallaxBackground from './components/ParallaxBackground';
 import Tutorial from './components/Tutorial';
@@ -19,11 +12,31 @@ import NotificationPanel from './components/NotificationPanel';
 import OnboardingWizard from './components/OnboardingWizard';
 import GlobalSearch from './components/GlobalSearch';
 import ErrorBoundary from './components/ErrorBoundary';
+import PrivacyPolicy from './components/legal/PrivacyPolicy';
+import TermsOfService from './components/legal/TermsOfService';
 import { useMatches } from './hooks/useMatches';
 import { useSmartReminders } from './hooks/useNotifications';
 import { useCoachProfile } from './hooks/useCoachProfile';
 import { isAdmin } from './utils/isAdmin';
 import logoImg from './assets/logo_new.png';
+
+// Solo Táctica (la pestaña inicial) se carga de entrada; el resto se carga
+// bajo demanda para reducir el bundle inicial.
+const InjuriesMode = lazy(() => import('./components/InjuriesMode'));
+const TrainingMode = lazy(() => import('./components/TrainingMode'));
+const ProgressMode = lazy(() => import('./components/ProgressMode'));
+const ProfileMode = lazy(() => import('./components/ProfileMode'));
+const AdvancedMode = lazy(() => import('./components/AdvancedMode'));
+const MatchCalendarMode = lazy(() => import('./components/MatchCalendarMode'));
+const AdminPanel = lazy(() => import('./components/AdminPanel'));
+
+function TabLoadingFallback() {
+  return (
+    <div className="flex items-center justify-center py-20">
+      <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+}
 
 function AppContent() {
   const [activeMode, setActiveMode] = useState<AppMode>('tactics');
@@ -88,13 +101,15 @@ function AppContent() {
 
         <div className="flex-1 overflow-y-auto" style={{ paddingBottom: 'calc(60px + env(safe-area-inset-bottom))' }}>
           {activeMode === 'tactics' && <TacticsMode />}
-          {activeMode === 'injuries' && <InjuriesMode />}
-          {activeMode === 'training' && <TrainingMode />}
-          {activeMode === 'advanced' && <AdvancedMode />}
-          {activeMode === 'progress' && <ProgressMode />}
-          {activeMode === 'calendar' && <MatchCalendarMode />}
-          {activeMode === 'profile' && <ProfileMode />}
-          {activeMode === 'admin' && isAdminUser && <AdminPanel />}
+          <Suspense fallback={<TabLoadingFallback />}>
+            {activeMode === 'injuries' && <InjuriesMode />}
+            {activeMode === 'training' && <TrainingMode />}
+            {activeMode === 'advanced' && <AdvancedMode />}
+            {activeMode === 'progress' && <ProgressMode />}
+            {activeMode === 'calendar' && <MatchCalendarMode />}
+            {activeMode === 'profile' && <ProfileMode />}
+            {activeMode === 'admin' && isAdminUser && <AdminPanel />}
+          </Suspense>
         </div>
       </div>
 
@@ -118,6 +133,12 @@ function AppContent() {
 }
 
 function App() {
+  // Páginas legales públicas: deben ser accesibles sin iniciar sesión
+  // (requisito de las tiendas de apps y de transparencia legal).
+  const path = window.location.pathname;
+  if (path === '/privacidad') return <PrivacyPolicy />;
+  if (path === '/terminos') return <TermsOfService />;
+
   return (
     <ErrorBoundary>
       <AuthProvider>
