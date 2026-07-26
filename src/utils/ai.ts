@@ -16,7 +16,7 @@ interface AIServiceResponse {
 async function callAIService(
   coachType: 'helpin_coach' | 'nursing_coach' | 'training_coach' | 'player_analysis' | 'player_progression' | 'team_dna' | 'role_assignment' | 'coach_progression' | 'synergy_analysis' | 'team_synergy_analysis' | 'match_report' | 'formation_advisor',
   message: string,
-  context: any
+  context: Record<string, unknown>
 ): Promise<string> {
   try {
     const functionUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-service`;
@@ -114,7 +114,7 @@ Asigna el PlayStyle más adecuado y explica tu elección.`;
 export async function chatWithCoach(
   coachType: 'helpin' | 'nursing' | 'training',
   message: string,
-  context: any
+  context: Record<string, unknown>
 ): Promise<string> {
   const coachTypeMap = {
     helpin: 'helpin_coach' as const,

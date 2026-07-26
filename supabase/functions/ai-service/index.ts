@@ -15,7 +15,7 @@ const DAILY_AI_CALL_LIMIT = 150;
 interface AIRequest {
   coachType: 'helpin_coach' | 'nursing_coach' | 'training_coach' | 'player_analysis' | 'player_progression' | 'team_dna' | 'role_assignment' | 'coach_progression' | 'synergy_analysis' | 'team_synergy_analysis' | 'match_report' | 'formation_advisor';
   message: string;
-  context: any;
+  context: Record<string, unknown>;
 }
 
 Deno.serve(async (req: Request) => {

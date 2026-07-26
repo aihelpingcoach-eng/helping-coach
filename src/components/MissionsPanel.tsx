@@ -1,21 +1,22 @@
 import { useState, useEffect } from 'react';
-import { Target, Trophy, Star, Clock, CheckCircle } from 'lucide-react';
+import { Target, Trophy, Clock } from 'lucide-react';
 import { CoachMission, MissionType } from '../types/advancedSystems';
 import { supabase } from '../lib/supabase';
 import EmptyState from './EmptyState';
 
 interface MissionsPanelProps {
   coachId: string;
-  onMissionComplete?: (xp: number) => void;
 }
 
-export default function MissionsPanel({ coachId, onMissionComplete }: MissionsPanelProps) {
+export default function MissionsPanel({ coachId }: MissionsPanelProps) {
   const [missions, setMissions] = useState<CoachMission[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'daily' | 'weekly' | 'special'>('all');
 
   useEffect(() => {
     loadMissions();
+    // loadMissions no está memoizada; solo debe recargar cuando cambia coachId.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coachId]);
 
   const loadMissions = async () => {

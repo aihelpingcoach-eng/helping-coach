@@ -39,6 +39,8 @@ export function useTrainingSessions(userId: string | undefined) {
 
   useEffect(() => {
     fetchSessions();
+    // fetchSessions no está memoizada; solo debe recargar cuando cambia userId.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   const createSession = async (payload: CreateSessionPayload): Promise<TrainingSession | null> => {

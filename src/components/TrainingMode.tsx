@@ -218,7 +218,6 @@ export default function TrainingMode() {
         {showCreateModal && (
           <CreateSessionModal
             exercises={exercises}
-            category={selectedCategory}
             onClose={() => setShowCreateModal(false)}
             onCreate={handleCreateSession}
           />

@@ -13,6 +13,8 @@ export default function TacticalAlerts({ coachId }: TacticalAlertsProps) {
 
   useEffect(() => {
     loadAlerts();
+    // loadAlerts no está memoizada; solo debe recargar cuando cambia coachId.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coachId]);
 
   const loadAlerts = async () => {

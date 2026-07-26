@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { X, Dumbbell, Shield, AlertCircle, ArrowRight, Star, Zap } from 'lucide-react';
-import { Player, PLAYSTYLE_CATEGORIES } from '../constants/playstyles';
+import { Player } from '../constants/playstyles';
 
 interface PlayerProfileProps {
   player: Player;
@@ -27,13 +27,14 @@ export default function PlayerProfile({ player, isOpen, onClose, allPlayers }: P
       }
     };
 
-    if (isOpen && modalRef.current) {
-      modalRef.current.addEventListener('touchstart', handleTouchStart, false);
-      modalRef.current.addEventListener('touchend', handleTouchEnd, false);
+    const node = modalRef.current;
+    if (isOpen && node) {
+      node.addEventListener('touchstart', handleTouchStart, false);
+      node.addEventListener('touchend', handleTouchEnd, false);
 
       return () => {
-        modalRef.current?.removeEventListener('touchstart', handleTouchStart);
-        modalRef.current?.removeEventListener('touchend', handleTouchEnd);
+        node.removeEventListener('touchstart', handleTouchStart);
+        node.removeEventListener('touchend', handleTouchEnd);
       };
     }
   }, [isOpen, touchStartY, onClose]);

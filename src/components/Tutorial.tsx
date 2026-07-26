@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { X, ChevronRight, Play, SkipForward, ArrowRight } from 'lucide-react';
-import { useTutorial, TutorialStep } from '../hooks/useTutorial';
+import { useTutorial } from '../hooks/useTutorial';
 
 interface ElementPosition {
   top: number;
@@ -10,7 +10,7 @@ interface ElementPosition {
 }
 
 export default function Tutorial() {
-  const { currentStep, isOpen, steps, nextStep, skipTutorial, closeTutorial } = useTutorial();
+  const { currentStep, isOpen, steps, nextStep, skipTutorial } = useTutorial();
   const [elementPosition, setElementPosition] = useState<ElementPosition | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 

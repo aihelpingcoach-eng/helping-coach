@@ -15,7 +15,7 @@ interface Message {
 interface CoachChatProps {
   coachType: 'helpin' | 'nursing' | 'training';
   onClose: () => void;
-  context: any;
+  context: Record<string, unknown>;
   onXPEarned?: () => void;
 }
 

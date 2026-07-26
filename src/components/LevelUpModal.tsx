@@ -1,7 +1,6 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { LEVELS, getTierForLevel, getLevelProgress, Level } from '../constants/levels';
-import { GEM_IMAGES } from '../assets/gems';
+import { LEVELS, getTierForLevel, Level } from '../constants/levels';
 
 interface LevelUpModalProps {
   visible: boolean;
@@ -60,96 +59,8 @@ function playTierSound(tier: number) {
   } catch { /* AudioContext unavailable */ }
 }
 
-// ─── Confetti canvas hook ──────────────────────────────────────────────────────
-function useConfettiCanvas() {
-  const ref = useRef<HTMLCanvasElement>(null);
-  const fire = useCallback((opts: confetti.Options) => {
-    const fn = ref.current ? confetti.create(ref.current, { resize: true }) : confetti;
-    fn(opts);
-  }, []);
-  return { ref, fire };
-}
-
-// ─── Gem Centerpiece — shared across all tiers ────────────────────────────────
-interface GemProps {
-  level: Level;
-  tier: number;
-  animClass: string;
-  size?: 'md' | 'lg' | 'xl';
-  spin?: boolean;
-  heartbeat?: boolean;
-  flip3d?: boolean;
-}
-function GemCenterpiece({ level, tier, animClass, size = 'md', spin = false, heartbeat = false, flip3d = false }: GemProps) {
-  const cfg = TIER_CFG[tier as keyof typeof TIER_CFG];
-  const ringSize  = size === 'xl' ? 'w-44 h-44' : size === 'lg' ? 'w-36 h-36' : 'w-28 h-28';
-  const imgSize   = size === 'xl' ? 'w-36 h-36' : size === 'lg' ? 'w-28 h-28' : 'w-20 h-20';
-  const glowSize  = size === 'xl' ? 220 : size === 'lg' ? 180 : 140;
-  const gemSrc    = GEM_IMAGES[tier as keyof typeof GEM_IMAGES] ?? GEM_IMAGES['locked'];
-
-  const gemMotion = heartbeat ? 'animate-heartbeat' : 'animate-gem-levitate';
-
-  return (
-    <div className="relative flex flex-col items-center gap-3">
-      {/* Radial glow */}
-      <div className="absolute pointer-events-none"
-        style={{
-          width: glowSize, height: glowSize,
-          borderRadius: '50%',
-          background: `radial-gradient(circle, ${cfg.glow}55 0%, ${cfg.glow}22 50%, transparent 75%)`,
-          animation: 'glow-breathe 2s ease-in-out infinite',
-          top: '50%', left: '50%',
-          transform: 'translate(-50%, -50%)',
-        }} />
-
-      {/* Outer spinning ring */}
-      <div className={`absolute rounded-full border ${cfg.ringCls} pointer-events-none animate-ring-spin`}
-        style={{ width: glowSize * 0.82, height: glowSize * 0.82, top: '50%', left: '50%', marginLeft: -(glowSize * 0.82) / 2, marginTop: -(glowSize * 0.82) / 2 }} />
-
-      {/* Inner counter-spinning ring (tier 3+) */}
-      {tier >= 3 && (
-        <div className={`absolute rounded-full border-2 ${cfg.ringCls} pointer-events-none animate-ring-spin-reverse opacity-60`}
-          style={{ width: glowSize * 0.65, height: glowSize * 0.65, top: '50%', left: '50%', marginLeft: -(glowSize * 0.65) / 2, marginTop: -(glowSize * 0.65) / 2 }} />
-      )}
-
-      {/* Badge circle */}
-      <div style={flip3d ? { perspective: '700px' } : {}}>
-        <div className={`${ringSize} rounded-full bg-gradient-to-br ${level.color} flex items-center justify-center shadow-2xl border-4 border-white/20 ${animClass} ${gemMotion}`}
-          style={{ boxShadow: `0 0 40px ${cfg.glow}55, 0 8px 32px rgba(0,0,0,0.6)` }}>
-          <img src={gemSrc} alt={level.name} className={`${imgSize} object-contain drop-shadow-2xl`} style={{ filter: `drop-shadow(0 0 12px ${cfg.glow}99)` }} />
-        </div>
-      </div>
-
-      {/* Level name + message */}
-      <div className="text-center" style={{ animation: 'msg-in 0.5s ease-out 0.8s both' }}>
-        <p className="text-white font-black text-2xl tracking-wide">{level.name}</p>
-        <p className="text-white/55 text-xs mt-1 max-w-[240px] leading-relaxed">{level.msg}</p>
-      </div>
-    </div>
-  );
-}
-
-// ─── Shared text header ────────────────────────────────────────────────────────
-function TierHeader({ tier, level }: { tier: number; level: Level }) {
-  const cfg = TIER_CFG[tier as keyof typeof TIER_CFG];
-  const shadow = '0 2px 12px rgba(0,0,0,0.9), 0 0 24px rgba(0,0,0,0.7)';
-  return (
-    <div className="flex flex-col items-center gap-1" style={{ position: 'relative', zIndex: 20 }}>
-      <p className={`${cfg.textCls} text-[10px] font-black tracking-[0.25em] uppercase`}
-        style={{ animation: 'tier-label-in 0.45s ease-out both', textShadow: shadow }}>
-        {cfg.labelIcon} {cfg.label}
-      </p>
-      <p className="text-white font-black tracking-widest"
-        style={{ fontSize: '52px', lineHeight: 1, animation: 'level-num-in 0.55s ease-out 0.15s both', textShadow: shadow }}>
-        {level.level}
-      </p>
-    </div>
-  );
-}
-
 // ─── XP bar ───────────────────────────────────────────────────────────────────
 function XPBar({ level, tier, delay = 800 }: { level: Level; tier: number; delay?: number }) {
-  const { progressPercent } = getLevelProgress(0); // will be overridden by inline style
   const cfg = TIER_CFG[tier as keyof typeof TIER_CFG];
   const pct = Math.min(100, ((level.level - 1) / 19) * 100);
   return (
@@ -172,24 +83,6 @@ function XPBar({ level, tier, delay = 800 }: { level: Level; tier: number; delay
   );
 }
 
-// ─── Backdrop (blur + tinted radial gradient) ──────────────────────────────────
-function Backdrop({ tier }: { tier: number }) {
-  const cfg = TIER_CFG[tier as keyof typeof TIER_CFG];
-  return (
-    <div style={{
-      position: 'fixed',
-      top: 0, left: 0,
-      width: '100vw',
-      height: '100vh',
-      zIndex: 150,
-      backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)',
-      background: `radial-gradient(ellipse at 50% 45%, ${cfg.bg} 0%, rgba(0,0,0,0.93) 70%)`,
-      animation: 'backdrop-enter 0.35s ease-out both',
-    }} />
-  );
-}
-
 // ─── Video Tier — componente genérico para todos los tiers con video ──────────
 const TIER_VIDEO = {
   1: { src: '/videos/tier1_aluminium.mp4', label: '✦ Aluminio ✦',  labelColor: '#94a3b8', numGlow: '#94a3b899', nameColor: '#cbd5e1', msgColor: 'rgba(203,213,225,0.75)', haptics: [80] },
@@ -208,6 +101,10 @@ function VideoTier({ tierNum, level }: { tierNum: 1|2|3|4|5|6|7; level: Level })
   useEffect(() => {
     navigator.vibrate?.(cfg.haptics as number[]);
     playTierSound(tierNum);
+    // Debe sonar/vibrar una sola vez al montar esta pantalla de tier; tierNum
+    // no cambia durante la vida de esta instancia (el padre desmonta y monta
+    // un componente distinto por cada tier).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -265,7 +162,7 @@ function Tier6({ level }: { level: Level; onClose: () => void }) { return <Video
 function Tier7({ level }: { level: Level; onClose: () => void }) { return <VideoTier tierNum={7} level={level} />; }
 
 // ─── TIER 8 — Zafiro (19-20 · video) ────────────────────────────────────────────
-function Tier8({ level, onClose }: { level: Level; onClose: () => void }) {
+function Tier8({ level }: { level: Level; onClose: () => void }) {
   useEffect(() => {
     navigator.vibrate?.([100, 50, 100, 50, 300, 100, 500]);
     playTierSound(8);
@@ -374,9 +271,8 @@ function Tier8({ level, onClose }: { level: Level; onClose: () => void }) {
 export default function LevelUpModal({ visible, newLevel, onClose }: LevelUpModalProps) {
   if (!visible || newLevel < 2 || newLevel > 20) return null;
 
-  const level      = LEVELS[newLevel - 1];
-  const tier       = getTierForLevel(newLevel);
-  const isBlocking = tier >= 7;
+  const level = LEVELS[newLevel - 1];
+  const tier  = getTierForLevel(newLevel);
 
   // Portal to document.body bypasses any overflow:hidden/auto ancestor
   return createPortal(

@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Activity, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import { WeeklyWorkload, FatigueLevel } from '../types/advancedSystems';
+import { Player } from '../constants/playstyles';
 import { supabase } from '../lib/supabase';
 import EmptyState from './EmptyState';
 
 interface WorkloadManagerProps {
   coachId: string;
-  players: any[];
+  players: Player[];
 }
 
 export default function WorkloadManager({ coachId, players }: WorkloadManagerProps) {
@@ -15,6 +16,8 @@ export default function WorkloadManager({ coachId, players }: WorkloadManagerPro
 
   useEffect(() => {
     loadWorkloads();
+    // loadWorkloads no está memoizada; solo debe recargar cuando cambia coachId.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coachId]);
 
   const loadWorkloads = async () => {

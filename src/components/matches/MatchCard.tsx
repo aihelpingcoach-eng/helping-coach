@@ -1,4 +1,4 @@
-import { MapPin, Clock, Trash2, Edit3 } from 'lucide-react';
+import { MapPin, Trash2, Edit3 } from 'lucide-react';
 import { Match } from '../../hooks/useMatches';
 
 interface Props {

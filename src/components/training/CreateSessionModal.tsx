@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { X, Plus, Check } from 'lucide-react';
 import { ExerciseRow } from '../../hooks/useExercises';
-import { TrainingCategory } from '../../constants/training';
 
 interface Props {
   exercises: ExerciseRow[];
-  category: TrainingCategory;
   onClose: () => void;
   onCreate: (name: string, exerciseIds: string[]) => Promise<void>;
 }
@@ -13,7 +11,7 @@ interface Props {
 const today = new Date();
 const defaultName = `Sesión ${today.getDate()}/${today.getMonth() + 1}`;
 
-export default function CreateSessionModal({ exercises, category, onClose, onCreate }: Props) {
+export default function CreateSessionModal({ exercises, onClose, onCreate }: Props) {
   const [name, setName] = useState(defaultName);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
@@ -22,7 +20,11 @@ export default function CreateSessionModal({ exercises, category, onClose, onCre
   const toggle = (id: string) => {
     setSelected(prev => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
       return next;
     });
   };

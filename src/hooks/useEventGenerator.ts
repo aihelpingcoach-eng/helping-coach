@@ -100,5 +100,9 @@ export function useEventGenerator(
 
     // Insertar en paralelo
     Promise.all(events.map(e => insertEvent(coachId, e))).catch(() => {});
+    // Se usa .length a propósito en vez de los arrays completos: matches/sessions
+    // son objetos nuevos en cada fetch, así que depender de la referencia
+    // completa dispararía el efecto en cada render aunque el contenido no cambie.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coachId, matches.length, sessions.length]);
 }

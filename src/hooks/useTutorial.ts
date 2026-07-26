@@ -123,6 +123,8 @@ export function useTutorial() {
 
   useEffect(() => {
     checkTutorialStatus();
+    // Debe ejecutarse una única vez al montar; checkTutorialStatus no está memoizada.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkTutorialStatus = async () => {
@@ -182,7 +184,12 @@ export function useTutorial() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const updateData: any = {
+      const updateData: {
+        current_step: number;
+        is_completed: boolean;
+        skipped: boolean;
+        completed_at?: string;
+      } = {
         current_step: step,
         is_completed: completed,
         skipped: skipped,

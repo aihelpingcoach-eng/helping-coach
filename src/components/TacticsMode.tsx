@@ -52,6 +52,9 @@ export default function TacticsMode() {
     localStorage.setItem('helpingcoach_team_slot', String(selectedTeamSlot));
     loadFormationPlayers();
     loadAllPlayers();
+    // Ninguna de las dos funciones está memoizada; solo deben recargar
+    // cuando cambia el equipo seleccionado.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTeamSlot]);
 
   const getCurrentFormationRow = async () => {
@@ -154,7 +157,7 @@ export default function TacticsMode() {
         .single();
 
       if (newFormation && selectedPosition !== null) {
-        const { error: fpErr } = await supabase
+        await supabase
           .from('formation_players')
           .insert({
             formation_id: newFormation.id,

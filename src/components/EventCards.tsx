@@ -29,6 +29,8 @@ export default function EventCards({ coachId, onCardResolved }: EventCardsProps)
 
   useEffect(() => {
     loadCards();
+    // loadCards no está memoizada; solo debe recargar cuando cambia coachId.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coachId]);
 
   const loadCards = async () => {

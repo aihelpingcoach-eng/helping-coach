@@ -15,6 +15,8 @@ export function useXP() {
 
   useEffect(() => {
     if (user) loadTotalXP();
+    // loadTotalXP no está memoizada; solo debe recargar cuando cambia user.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadTotalXP = async () => {

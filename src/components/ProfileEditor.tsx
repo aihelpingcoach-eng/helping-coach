@@ -38,6 +38,8 @@ export default function ProfileEditor({ onClose }: ProfileEditorProps) {
 
   useEffect(() => {
     loadProfile();
+    // loadProfile no está memoizada; solo debe recargar cuando cambia user.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadProfile = async () => {

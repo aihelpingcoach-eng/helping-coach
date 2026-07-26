@@ -16,6 +16,9 @@ export default function CareerMode({ coachId }: CareerModeProps) {
 
   useEffect(() => {
     loadCareer();
+    // loadCareer se recrea cada render (no está memoizada); incluirla en las
+    // deps causaría un loop de refetch. Solo debe recargar cuando cambia coachId.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coachId]);
 
   const loadCareer = async () => {
