@@ -12,6 +12,7 @@
     overflow: hidden;
     -webkit-text-size-adjust: 100%;
     height: 100%;
+    background-color: #000;
   }
 
   body {
@@ -22,12 +23,14 @@
     overflow: hidden;
     position: fixed;
     width: 100%;
+    background-color: #000;
   }
 
   #root {
     height: 100vh;
     height: -webkit-fill-available;
     overflow: hidden;
+    background-color: #000;
   }
 
   input, textarea, select, button {

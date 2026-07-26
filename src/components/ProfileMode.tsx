@@ -20,7 +20,7 @@ export default function ProfileMode() {
   const isPro = profile?.plan === 'pro';
 
   const coachName = user?.user_metadata?.coach_name || 'Entrenador';
-  const { currentRank, nextRank, progress } = getXPProgress(totalXP);
+  const { currentRank } = getXPProgress(totalXP);
 
   const handleLogout = async () => {
     if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
@@ -74,24 +74,6 @@ export default function ProfileMode() {
             </div>
 
             <XPProgressBar totalXP={totalXP} />
-
-            {nextRank && false && (
-              <div>
-                <div className="flex justify-between items-center text-xs mb-1.5">
-                  <span className="text-gray-400">Progreso al siguiente rango</span>
-                  <span className="text-white font-bold">{Math.round(progress)}%</span>
-                </div>
-                <div className="w-full bg-gray-700 rounded-full h-2.5 overflow-hidden">
-                  <div
-                    className={`h-full bg-gradient-to-r ${nextRank.color} transition-all duration-500`}
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-                <p className="text-gray-400 text-xs mt-1.5">
-                  Próximo: <span className="text-white font-semibold">{nextRank.name} {nextRank.icon}</span>
-                </p>
-              </div>
-            )}
           </div>
         </div>
 

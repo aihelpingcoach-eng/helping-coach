@@ -38,8 +38,6 @@ export default function PlayerProfile({ player, isOpen, onClose, allPlayers }: P
     }
   }, [isOpen, touchStartY, onClose]);
 
-  if (!isOpen) return null;
-
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
@@ -75,6 +73,8 @@ export default function PlayerProfile({ player, isOpen, onClose, allPlayers }: P
       physical: Math.round(pseudo(6) * 30 + 60),
     };
   }, [player.id, player.level]);
+
+  if (!isOpen) return null;
 
   return (
     <div
