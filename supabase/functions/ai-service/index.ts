@@ -13,7 +13,7 @@ const corsHeaders = {
 // que el tope de Free debe ser bajo para que una sola cuenta no se coma
 // la cuota del resto. Pro tiene más margen, pero tampoco es infinito.
 const DAILY_AI_CALL_LIMIT_FREE = 15;
-const DAILY_AI_CALL_LIMIT_PRO = 100;
+const DAILY_AI_CALL_LIMIT_PRO = 40;
 
 interface AIRequest {
   coachType: 'helpin_coach' | 'nursing_coach' | 'training_coach' | 'player_analysis' | 'player_progression' | 'team_dna' | 'role_assignment' | 'coach_progression' | 'synergy_analysis' | 'team_synergy_analysis' | 'match_report' | 'formation_advisor';
