@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { X, Play, Zap } from 'lucide-react';
+import AdUnit from './AdUnit';
+import { isAdSenseConfigured } from '../utils/adsense';
 
 interface AdGateProps {
   onComplete: () => void;
@@ -51,7 +53,15 @@ export default function AdGate({ onComplete, onCancel, featureName = 'esta funci
           </p>
         </div>
 
-        {/* Countdown / anuncio simulado */}
+        {/* Anuncio real de AdSense (si la cuenta ya está configurada y aprobada) */}
+        {isAdSenseConfigured && (
+          <div className="bg-slate-800/60 rounded-xl mb-3 min-h-[100px] flex items-center justify-center border border-slate-700/50 overflow-hidden">
+            <AdUnit />
+          </div>
+        )}
+
+        {/* Countdown — sigue marcando cuándo se puede continuar, con o sin
+            anuncio real configurado */}
         <div className="bg-slate-800/60 rounded-xl p-4 mb-5 min-h-[80px] flex items-center justify-center border border-slate-700/50">
           {ready ? (
             <div className="text-center">
