@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
-import { Sparkles, TrendingUp, AlertTriangle, Lightbulb } from 'lucide-react';
-import { computeTeamDNA } from '../constants/teamDNA';
+import { useState } from 'react';
+import { Sparkles, TrendingUp, AlertTriangle, Lightbulb, RefreshCw } from 'lucide-react';
+import { computeTeamDNA, TeamDNAType } from '../constants/teamDNA';
 
 interface Player {
   id: string;
@@ -15,10 +15,12 @@ interface TeamDNAAnalysisProps {
 }
 
 export default function TeamDNAAnalysis({ formation, players }: TeamDNAAnalysisProps) {
-  const analysis = useMemo(
-    () => players.length > 0 ? computeTeamDNA(formation, players) : null,
-    [formation, players]
-  );
+  const [analysis, setAnalysis] = useState<TeamDNAType | null>(null);
+
+  const handleAnalyze = () => {
+    if (players.length === 0) return;
+    setAnalysis(computeTeamDNA(formation, players));
+  };
 
   return (
     <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-6 border border-slate-700">
@@ -35,9 +37,20 @@ export default function TeamDNAAnalysis({ formation, players }: TeamDNAAnalysisP
       {!analysis ? (
         <div className="text-center py-8">
           <Sparkles className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-          <p className="text-slate-400 text-sm">
-            Agrega jugadores a tu equipo para analizar su identidad táctica
+          <p className="text-slate-400 text-sm mb-4">
+            {players.length === 0
+              ? 'Agrega jugadores a tu equipo para analizar su identidad táctica'
+              : 'Analiza la identidad táctica de tu equipo cuando quieras'}
           </p>
+          {players.length > 0 && (
+            <button
+              onClick={handleAnalyze}
+              className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors active:scale-95"
+            >
+              <Sparkles size={16} />
+              Analizar equipo
+            </button>
+          )}
         </div>
       ) : (
         <div className="space-y-4">
@@ -91,6 +104,15 @@ export default function TeamDNAAnalysis({ formation, players }: TeamDNAAnalysisP
             </div>
             <p className="text-slate-300 text-sm leading-relaxed">{analysis.recommendation}</p>
           </div>
+
+          <button
+            onClick={handleAnalyze}
+            disabled={players.length === 0}
+            className="w-full inline-flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed text-slate-300 font-medium text-sm px-4 py-2.5 rounded-xl transition-colors active:scale-95"
+          >
+            <RefreshCw size={14} />
+            Volver a analizar
+          </button>
         </div>
       )}
     </div>
