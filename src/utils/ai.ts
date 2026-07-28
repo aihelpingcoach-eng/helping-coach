@@ -45,7 +45,13 @@ async function callAIService(
     if (!response.ok) {
       const errorText = await response.text();
       console.error('AI service error response:', errorText);
-      throw new Error(`Error del servicio de IA: ${response.status}`);
+      let serverMessage: string | undefined;
+      try {
+        serverMessage = JSON.parse(errorText).message;
+      } catch {
+        // el cuerpo no era JSON; seguimos con el mensaje genérico
+      }
+      throw new Error(serverMessage || `Error del servicio de IA: ${response.status}`);
     }
 
     const data: AIServiceResponse = await response.json();

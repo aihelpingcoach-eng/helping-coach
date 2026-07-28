@@ -7,10 +7,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
-// Máximo de llamadas de IA por usuario por día. Suficientemente alto para
-// uso normal, pero evita que alguien con la clave anon (pública en el
-// bundle) automatice llamadas ilimitadas y consuma el presupuesto de IA.
-const DAILY_AI_CALL_LIMIT = 150;
+// Límite diario de llamadas de IA por usuario, según su plan. La cuota
+// gratuita de Groq (proveedor de IA) es compartida por TODA la app y
+// bastante ajustada (~100.000 tokens/día ≈ 80-100 llamadas en total), así
+// que el tope de Free debe ser bajo para que una sola cuenta no se coma
+// la cuota del resto. Pro tiene más margen, pero tampoco es infinito.
+const DAILY_AI_CALL_LIMIT_FREE = 15;
+const DAILY_AI_CALL_LIMIT_PRO = 100;
 
 interface AIRequest {
   coachType: 'helpin_coach' | 'nursing_coach' | 'training_coach' | 'player_analysis' | 'player_progression' | 'team_dna' | 'role_assignment' | 'coach_progression' | 'synergy_analysis' | 'team_synergy_analysis' | 'match_report' | 'formation_advisor';
@@ -45,6 +48,13 @@ Deno.serve(async (req: Request) => {
       );
     }
 
+    const { data: profile } = await supabaseAdmin
+      .from('coach_profiles')
+      .select('plan')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    const dailyLimit = profile?.plan === 'pro' ? DAILY_AI_CALL_LIMIT_PRO : DAILY_AI_CALL_LIMIT_FREE;
+
     const today = new Date().toISOString().slice(0, 10);
     const { data: usageRow } = await supabaseAdmin
       .from('ai_usage_daily')
@@ -53,7 +63,7 @@ Deno.serve(async (req: Request) => {
       .eq('usage_date', today)
       .maybeSingle();
 
-    if (usageRow && usageRow.call_count >= DAILY_AI_CALL_LIMIT) {
+    if (usageRow && usageRow.call_count >= dailyLimit) {
       return new Response(
         JSON.stringify({ error: 'rate_limited', message: 'Has alcanzado el límite diario de solicitudes de IA. Inténtalo de nuevo mañana.' }),
         { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -467,6 +477,16 @@ Devuelve SIEMPRE un JSON con este formato EXACTO:
         temperature,
       }),
     });
+
+    if (groqResponse.status === 429) {
+      // Cuota compartida de Groq agotada para toda la app (no es el límite
+      // por usuario, ese ya se comprobó arriba). Mensaje claro en vez de
+      // un error crudo de la API.
+      return new Response(
+        JSON.stringify({ error: 'rate_limited', message: 'La IA está muy solicitada ahora mismo. Inténtalo de nuevo en unos minutos.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     if (!groqResponse.ok) {
       const errorData = await groqResponse.text();

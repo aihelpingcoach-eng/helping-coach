@@ -118,7 +118,7 @@ export default function ProfileMode() {
                 <Crown size={22} className="text-yellow-400 flex-shrink-0" />
                 <div>
                   <p className="text-white font-bold text-sm">Plan Pro activo</p>
-                  <p className="text-slate-400 text-xs">IA ilimitada · Sin anuncios</p>
+                  <p className="text-slate-400 text-xs">IA sin anuncios · Uso amplio diario</p>
                 </div>
               </div>
               <button
@@ -137,7 +137,7 @@ export default function ProfileMode() {
                 <span className="ml-auto text-purple-300 font-bold text-sm">4,99€/mes</span>
               </div>
               <p className="text-slate-400 text-xs mb-3 leading-relaxed">
-                IA ilimitada sin anuncios: sinergias, asesor de formaciones, informe de partido y chat.
+                IA sin anuncios y con mucho más margen diario: sinergias, asesor de formaciones, informe de partido y chat.
               </p>
               <button
                 onClick={handleUpgrade}
