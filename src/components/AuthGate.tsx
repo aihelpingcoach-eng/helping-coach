@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import AuthScreen from './AuthScreen';
+import LandingPage from './LandingPage';
 import splashBall from '../assets/illustrations/splash-ball.png';
 
 export default function AuthGate({ children }: { children: ReactNode }) {
@@ -18,6 +19,12 @@ export default function AuthGate({ children }: { children: ReactNode }) {
   }
 
   if (!user) {
+    // La landing de marketing solo se muestra en "/" y sin sesión. Cualquier
+    // otra ruta (p. ej. /acceder, o "/" con sesión activa en una PWA
+    // instalada) va directo al login o a la app.
+    if (window.location.pathname === '/') {
+      return <LandingPage />;
+    }
     return <AuthScreen />;
   }
 

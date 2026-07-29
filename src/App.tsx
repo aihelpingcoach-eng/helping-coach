@@ -135,6 +135,10 @@ function AppContent() {
 function App() {
   // Páginas legales públicas: deben ser accesibles sin iniciar sesión
   // (requisito de las tiendas de apps y de transparencia legal).
+  // La landing ("/") NO se decide aquí: si ya hay sesión iniciada (PWA
+  // instalada, bookmark, etc.) el usuario debe entrar directo a la app,
+  // no ver la página de marketing. Esa comprobación vive en AuthGate,
+  // que sí conoce el estado de sesión.
   const path = window.location.pathname;
   if (path === '/privacidad') return <PrivacyPolicy />;
   if (path === '/terminos') return <TermsOfService />;
