@@ -74,7 +74,7 @@ export default function AuthScreen() {
         <div className="relative z-10 flex-1 overflow-y-auto flex items-center justify-center p-4">
           <div className="w-full max-w-sm bg-black/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-purple-500/30 p-6">
             <div className="flex justify-center mb-4">
-              <img src={logoImg} alt="Helpin Coach" className="w-16 h-16 object-contain" />
+              <img src={logoImg} alt="Helping Coach" className="w-16 h-16 object-contain" />
             </div>
             <h2 className="text-2xl font-bold text-center text-white mb-1">Recuperar Contraseña</h2>
             <p className="text-gray-400 text-center text-sm mb-5">Ingresa tu email para recibir instrucciones</p>
@@ -111,8 +111,8 @@ export default function AuthScreen() {
 
           {/* Logo + título */}
           <div className="flex flex-col items-center mb-5">
-            <img src={logoImg} alt="Helpin Coach" className="w-16 h-16 object-contain mb-2" />
-            <h1 className="text-2xl font-bold text-white">Helpin Coach</h1>
+            <img src={logoImg} alt="Helping Coach" className="w-16 h-16 object-contain mb-2" />
+            <h1 className="text-2xl font-bold text-white">Helping Coach</h1>
             <p className="text-gray-400 text-xs mt-0.5">Tu asistente táctico inteligente</p>
           </div>
 

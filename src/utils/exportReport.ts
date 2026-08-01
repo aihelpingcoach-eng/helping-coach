@@ -21,7 +21,7 @@ export function buildMatchReportText(opts: {
   const lines: string[] = [
     '====================================',
     '       INFORME DE PARTIDO',
-    `       Helpin Coach — ${date}`,
+    `       Helping Coach — ${date}`,
     '====================================',
     '',
     `Resultado:   ${opts.result}`,
@@ -69,7 +69,7 @@ export function buildTeamStatsText(opts: {
   const lines: string[] = [
     '====================================',
     '      ESTADÍSTICAS DEL EQUIPO',
-    `      Helpin Coach — ${date}`,
+    `      Helping Coach — ${date}`,
     '====================================',
     '',
     '--- RENDIMIENTO EN PARTIDOS ---',

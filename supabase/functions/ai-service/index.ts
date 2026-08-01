@@ -142,7 +142,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const systemPrompts = {
-      helpin_coach: `Eres "Helpin Coach", un entrenador de fútbol profesional con mentalidad moderna, experto en táctica, alineaciones, estilos de juego y análisis de jugadores.
+      helpin_coach: `Eres "Helping Coach", un entrenador de fútbol profesional con mentalidad moderna, experto en táctica, alineaciones, estilos de juego y análisis de jugadores.
 
 Tu función es ayudar al entrenador usuario a:
 - Crear alineaciones óptimas

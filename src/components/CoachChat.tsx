@@ -20,7 +20,7 @@ interface CoachChatProps {
 }
 
 const coachNames = {
-  helpin: 'Helpin Coach',
+  helpin: 'Helping Coach',
   nursing: 'Nursing Coach',
   training: 'Training Coach',
 };

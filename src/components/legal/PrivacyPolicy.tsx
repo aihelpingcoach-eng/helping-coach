@@ -15,14 +15,14 @@ export default function PrivacyPolicy() {
       </div>
 
       <p>
-        Esta Política de Privacidad explica qué datos recoge Helpin Coach ("la App", "nosotros"),
+        Esta Política de Privacidad explica qué datos recoge Helping Coach ("la App", "nosotros"),
         con qué finalidad, con qué base legal, y qué derechos tienes sobre ellos. Al crear una
         cuenta aceptas esta política y los <a href="/terminos">Términos de Servicio</a>.
       </p>
 
       <h2>1. Responsable del tratamiento <LegalReview>revisión legal</LegalReview></h2>
       <p>
-        Helpin Coach es responsable del tratamiento de los datos descritos en este documento.
+        Helping Coach es responsable del tratamiento de los datos descritos en este documento.
         Actualmente opera como proyecto individual, sin una entidad legal (sociedad) constituida a
         la fecha de esta versión; este dato debe actualizarse aquí si se constituye una empresa.
         Puedes contactarnos en{' '}

@@ -9,7 +9,7 @@ interface AnimatedCoachProps {
 
 const coachData = {
   tactical: {
-    name: 'Helpin Coach',
+    name: 'Helping Coach',
     color: 'from-purple-600 to-pink-600',
     icon: '⚽',
     emoji: {

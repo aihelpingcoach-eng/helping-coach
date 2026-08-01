@@ -16,8 +16,8 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-white/10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
           <a href="/" className="flex items-center gap-2.5 flex-shrink-0">
-            <img src={logoImg} alt="Helpin Coach" className="w-8 h-8 object-contain" />
-            <span className="text-white font-bold text-base sm:text-lg">Helpin Coach</span>
+            <img src={logoImg} alt="Helping Coach" className="w-8 h-8 object-contain" />
+            <span className="text-white font-bold text-base sm:text-lg">Helping Coach</span>
           </a>
           <nav className="hidden sm:flex items-center gap-6 text-sm text-gray-400">
             <a href="#funcionalidades" className="hover:text-white transition-colors">Funcionalidades</a>
@@ -43,7 +43,7 @@ export default function LandingPage() {
             <span className="text-purple-400">Decide más rápido.</span>
           </h1>
           <p className="max-w-2xl mx-auto lg:mx-0 text-gray-400 text-base sm:text-lg leading-relaxed mb-10">
-            Helpin Coach es el asistente inteligente para entrenadores de fútbol. Gestiona tu plantilla,
+            Helping Coach es el asistente inteligente para entrenadores de fútbol. Gestiona tu plantilla,
             diseña tácticas, analiza partidos y consulta a la IA — todo en una sola aplicación.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
@@ -73,7 +73,7 @@ export default function LandingPage() {
           <div className="hidden sm:block absolute -left-6 top-10 w-44 rotate-[-6deg] rounded-[1.75rem] border-4 border-white/10 shadow-2xl shadow-black/60 overflow-hidden bg-black opacity-90">
             <img
               src={trainingScreenshot}
-              alt="Biblioteca de ejercicios de entrenamiento de Helpin Coach"
+              alt="Biblioteca de ejercicios de entrenamiento de Helping Coach"
               className="w-full h-auto block"
               width={520}
               height={1128}
@@ -82,7 +82,7 @@ export default function LandingPage() {
           <div className="relative w-56 sm:w-64 ml-8 sm:ml-12 rounded-[2rem] border-4 border-white/10 shadow-2xl shadow-purple-950/60 overflow-hidden bg-black">
             <img
               src={tacticsScreenshot}
-              alt="Tablero táctico de Helpin Coach con una alineación 4-3-3 y niveles de jugadores"
+              alt="Tablero táctico de Helping Coach con una alineación 4-3-3 y niveles de jugadores"
               className="w-full h-auto block"
               width={520}
               height={1128}
@@ -346,7 +346,7 @@ export default function LandingPage() {
             Lleva tu equipo al siguiente nivel
           </h2>
           <p className="text-gray-400 text-sm sm:text-base max-w-lg mx-auto mb-8">
-            Únete a los entrenadores que ya usan Helpin Coach para preparar mejor sus partidos,
+            Únete a los entrenadores que ya usan Helping Coach para preparar mejor sus partidos,
             gestionar su plantilla y tomar decisiones con apoyo de la inteligencia artificial.
           </p>
           <button
@@ -361,15 +361,15 @@ export default function LandingPage() {
         <footer className="border-t border-white/10">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <img src={logoImg} alt="Helpin Coach" className="w-6 h-6 object-contain" />
-              <span className="text-gray-500 text-sm">Helpin Coach</span>
+              <img src={logoImg} alt="Helping Coach" className="w-6 h-6 object-contain" />
+              <span className="text-gray-500 text-sm">Helping Coach</span>
             </div>
             <nav className="flex items-center gap-5 text-sm text-gray-500">
               <a href="/privacidad" className="hover:text-gray-300 transition-colors">Privacidad</a>
               <a href="/terminos" className="hover:text-gray-300 transition-colors">Términos</a>
               <a href="mailto:ai.helpingcoach@gmail.com" className="hover:text-gray-300 transition-colors">Contacto</a>
             </nav>
-            <p className="text-gray-600 text-xs">{new Date().getFullYear()} Helpin Coach</p>
+            <p className="text-gray-600 text-xs">{new Date().getFullYear()} Helping Coach</p>
           </div>
         </footer>
       </section>

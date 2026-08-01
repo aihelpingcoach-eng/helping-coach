@@ -397,7 +397,7 @@ export default function TacticsMode() {
       <button
         onClick={() => setShowCoachChat(true)}
         className="fixed bottom-[4.5rem] sm:bottom-24 right-3 sm:right-6 z-20 bg-purple-600 active:bg-purple-700 text-white p-2.5 sm:p-4 rounded-full transition-all active:scale-95 shadow-2xl touch-manipulation"
-        title="Helpin Coach"
+        title="Helping Coach"
         data-tutorial="tutorial-coach"
       >
         <MessageCircle size={24} className="sm:w-8 sm:h-8" />

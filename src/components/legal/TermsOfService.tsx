@@ -15,14 +15,14 @@ export default function TermsOfService() {
 
       <h2>1. Aceptación de los Términos</h2>
       <p>
-        Al acceder o usar Helpin Coach ("la App", "el Servicio"), aceptas quedar vinculado por
+        Al acceder o usar Helping Coach ("la App", "el Servicio"), aceptas quedar vinculado por
         estos Términos de Servicio y por nuestra <a href="/privacidad">Política de Privacidad</a>.
         Si no estás de acuerdo, no debes usar la App.
       </p>
 
       <h2>2. El Servicio</h2>
       <p>
-        Helpin Coach es una herramienta de apoyo para entrenadores de fútbol amateur: gestión de
+        Helping Coach es una herramienta de apoyo para entrenadores de fútbol amateur: gestión de
         alineaciones, seguimiento de progresión de jugadores, biblioteca de ejercicios y lesiones,
         y funciones asistidas por inteligencia artificial (chat de coaching, recomendaciones de
         formación, análisis de sinergias, generación de informes).
@@ -124,7 +124,7 @@ export default function TermsOfService() {
 
       <h2>11. Propiedad intelectual</h2>
       <p>
-        El nombre "Helpin Coach", el logotipo, el diseño de la App, el código fuente y los
+        El nombre "Helping Coach", el logotipo, el diseño de la App, el código fuente y los
         contenidos curados (biblioteca de ejercicios y lesiones) son propiedad nuestra o de
         nuestros licenciantes. No se concede ninguna licencia para copiar, modificar o
         redistribuir estos elementos sin autorización.

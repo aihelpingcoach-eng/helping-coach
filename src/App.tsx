@@ -69,10 +69,10 @@ function AppContent() {
             <div className="flex items-center gap-2 sm:gap-3">
               <img
                 src={logoImg}
-                alt="Helpin Coach"
+                alt="Helping Coach"
                 className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
               />
-              <h1 className="text-base sm:text-xl font-bold text-white">Helpin Coach</h1>
+              <h1 className="text-base sm:text-xl font-bold text-white">Helping Coach</h1>
             </div>
             <div className="relative">
               <button

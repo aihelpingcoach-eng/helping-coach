@@ -43,7 +43,7 @@ supabase secrets set AI_API_KEY=tu_api_key_aqui
 
 El sistema incluye 5 tipos de coaches IA:
 
-1. **Helpin Coach** (`helpin_coach`) - Experto en táctica y alineaciones
+1. **Helping Coach** (`helpin_coach`) - Experto en táctica y alineaciones
 2. **Nursing Coach** (`nursing_coach`) - Especialista en lesiones y recuperación
 3. **Training Coach** (`training_coach`) - Preparador físico de alto rendimiento
 4. **Player Analysis** (`player_analysis`) - Analiza jugadores y determina PlayStyles

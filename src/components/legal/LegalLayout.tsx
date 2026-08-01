@@ -15,8 +15,8 @@ export default function LegalLayout({ title, updatedAt, children }: LegalLayoutP
     >
       <div className="max-w-3xl mx-auto px-4 py-10 sm:py-14">
         <div className="flex items-center gap-3 mb-8">
-          <img src={logoImg} alt="Helpin Coach" className="w-10 h-10 object-contain" />
-          <span className="text-white font-bold text-lg">Helpin Coach</span>
+          <img src={logoImg} alt="Helping Coach" className="w-10 h-10 object-contain" />
+          <span className="text-white font-bold text-lg">Helping Coach</span>
         </div>
 
         <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">{title}</h1>
@@ -28,7 +28,7 @@ export default function LegalLayout({ title, updatedAt, children }: LegalLayoutP
 
         <div className="mt-12 pt-6 border-t border-white/10">
           <a href="/" className="text-purple-400 hover:text-purple-300 text-sm">
-            ← Volver a Helpin Coach
+            ← Volver a Helping Coach
           </a>
         </div>
       </div>
