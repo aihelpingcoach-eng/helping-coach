@@ -1,4 +1,7 @@
 import logoImg from '../assets/logo_new.png';
+import Reveal from './Reveal';
+import tacticsScreenshot from '../assets/landing/screenshot-tactics.webp';
+import trainingScreenshot from '../assets/landing/screenshot-training.webp';
 
 export default function LandingPage() {
   const goToApp = () => { window.location.href = '/acceder'; };
@@ -30,42 +33,72 @@ export default function LandingPage() {
       </header>
 
       {/* ── 2. HERO ── */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-20 sm:pt-24 sm:pb-28 text-center">
-        <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 rounded-full px-4 py-1.5 mb-6 text-purple-300 text-sm font-medium">
-          Asistente de fútbol con inteligencia artificial
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-14 pb-16 sm:pt-20 sm:pb-24 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+        <div className="text-center lg:text-left animate-fade-in-up" style={{ animationDelay: '0ms' }}>
+          <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 rounded-full px-4 py-1.5 mb-6 text-purple-300 text-sm font-medium">
+            Asistente de fútbol con inteligencia artificial
+          </div>
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
+            Entrena mejor.<br />
+            <span className="text-purple-400">Decide más rápido.</span>
+          </h1>
+          <p className="max-w-2xl mx-auto lg:mx-0 text-gray-400 text-base sm:text-lg leading-relaxed mb-10">
+            Helpin Coach es el asistente inteligente para entrenadores de fútbol. Gestiona tu plantilla,
+            diseña tácticas, analiza partidos y consulta a la IA — todo en una sola aplicación.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+            <button
+              onClick={goToApp}
+              className="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-8 py-3.5 rounded-xl text-base transition-colors shadow-lg shadow-purple-900/40"
+            >
+              Crear cuenta gratis
+            </button>
+            <button
+              onClick={goToApp}
+              className="border border-white/20 hover:border-white/40 text-gray-300 hover:text-white font-medium px-8 py-3.5 rounded-xl text-base transition-colors"
+            >
+              Ya tengo cuenta
+            </button>
+          </div>
         </div>
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
-          Entrena mejor.<br />
-          <span className="text-purple-400">Decide más rápido.</span>
-        </h1>
-        <p className="max-w-2xl mx-auto text-gray-400 text-base sm:text-lg leading-relaxed mb-10">
-          Helpin Coach es el asistente inteligente para entrenadores de fútbol. Gestiona tu plantilla,
-          diseña tácticas, analiza partidos y consulta a la IA — todo en una sola aplicación.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <button
-            onClick={goToApp}
-            className="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-8 py-3.5 rounded-xl text-base transition-colors shadow-lg shadow-purple-900/40"
-          >
-            Crear cuenta gratis
-          </button>
-          <button
-            onClick={goToApp}
-            className="border border-white/20 hover:border-white/40 text-gray-300 hover:text-white font-medium px-8 py-3.5 rounded-xl text-base transition-colors"
-          >
-            Ya tengo cuenta
-          </button>
+
+        <div
+          className="relative flex justify-center lg:justify-end animate-fade-in-up py-4"
+          style={{ animationDelay: '150ms' }}
+        >
+          <div
+            className="absolute w-64 h-64 sm:w-80 sm:h-80 bg-purple-600/30 rounded-full blur-3xl"
+            aria-hidden="true"
+          />
+          <div className="hidden sm:block absolute -left-6 top-10 w-44 rotate-[-6deg] rounded-[1.75rem] border-4 border-white/10 shadow-2xl shadow-black/60 overflow-hidden bg-black opacity-90">
+            <img
+              src={trainingScreenshot}
+              alt="Biblioteca de ejercicios de entrenamiento de Helpin Coach"
+              className="w-full h-auto block"
+              width={520}
+              height={1128}
+            />
+          </div>
+          <div className="relative w-56 sm:w-64 ml-8 sm:ml-12 rounded-[2rem] border-4 border-white/10 shadow-2xl shadow-purple-950/60 overflow-hidden bg-black">
+            <img
+              src={tacticsScreenshot}
+              alt="Tablero táctico de Helpin Coach con una alineación 4-3-3 y niveles de jugadores"
+              className="w-full h-auto block"
+              width={520}
+              height={1128}
+            />
+          </div>
         </div>
       </section>
 
       {/* ── 3. FUNCIONALIDADES ── */}
       <section id="funcionalidades" className="max-w-6xl mx-auto px-4 sm:px-6 pb-20 sm:pb-28">
-        <div className="text-center mb-12">
+        <Reveal className="text-center mb-12">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">Todo lo que necesitas para entrenar</h2>
           <p className="text-gray-400 text-sm sm:text-base max-w-xl mx-auto">
             Diseñado para entrenadores que quieren más control, más claridad y mejores resultados.
           </p>
-        </div>
+        </Reveal>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
@@ -105,19 +138,21 @@ export default function LandingPage() {
               title: 'Análisis de partidos',
               desc: 'Informes post-partido con métricas y recomendaciones personalizadas.',
             },
-          ].map((feat) => (
-            <div key={feat.title} className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:border-purple-500/40 transition-colors">
-              <div className="text-purple-400 mb-3">{feat.icon}</div>
-              <h3 className="text-white font-semibold text-sm sm:text-base mb-1.5">{feat.title}</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">{feat.desc}</p>
-            </div>
+          ].map((feat, i) => (
+            <Reveal key={feat.title} delayMs={i * 80}>
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:border-purple-500/40 hover:-translate-y-0.5 transition-all h-full">
+                <div className="text-purple-400 mb-3">{feat.icon}</div>
+                <h3 className="text-white font-semibold text-sm sm:text-base mb-1.5">{feat.title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{feat.desc}</p>
+              </div>
+            </Reveal>
           ))}
         </div>
       </section>
 
       {/* ── 4. ASISTENTE IA (DETALLE) ── */}
       <section className="bg-purple-900/10 border-y border-white/10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+        <Reveal className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <div>
             <p className="text-purple-400 text-sm font-semibold uppercase tracking-wider mb-3">Inteligencia Artificial</p>
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 leading-tight">
@@ -170,11 +205,12 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* ── 5. GESTIÓN DE PLANTILLA ── */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+      <section>
+        <Reveal className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
         <div className="order-2 lg:order-1 grid grid-cols-2 gap-3">
           {[
             { name: 'Carlos M.', pos: 'Portero', nivel: 'Avanzado', color: 'bg-blue-500/20 border-blue-500/40 text-blue-300' },
@@ -220,11 +256,12 @@ export default function LandingPage() {
             ))}
           </ul>
         </div>
+        </Reveal>
       </section>
 
       {/* ── 6. CÓMO FUNCIONA ── */}
       <section id="como-funciona" className="bg-purple-900/10 border-y border-white/10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
+        <Reveal className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">Empieza en tres pasos</h2>
             <p className="text-gray-400 text-sm sm:text-base max-w-xl mx-auto">
@@ -258,12 +295,12 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* ── 7. CALENDARIO Y PARTIDOS ── */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
-        <div className="bg-gradient-to-br from-purple-900/30 to-gray-900/50 border border-purple-500/20 rounded-3xl p-8 sm:p-12 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        <Reveal className="bg-gradient-to-br from-purple-900/30 to-gray-900/50 border border-purple-500/20 rounded-3xl p-8 sm:p-12 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           <div>
             <p className="text-purple-400 text-sm font-semibold uppercase tracking-wider mb-3">Calendario</p>
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 leading-tight">
@@ -299,12 +336,12 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* ── 8. CTA FINAL + FOOTER ── */}
       <section className="border-t border-white/10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center">
+        <Reveal className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center">
           <h2 className="text-2xl sm:text-4xl font-bold text-white mb-4">
             Lleva tu equipo al siguiente nivel
           </h2>
@@ -319,7 +356,7 @@ export default function LandingPage() {
             Crear cuenta gratis
           </button>
           <p className="mt-4 text-gray-600 text-xs">Sin tarjeta de crédito. Sin compromiso.</p>
-        </div>
+        </Reveal>
 
         <footer className="border-t border-white/10">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
