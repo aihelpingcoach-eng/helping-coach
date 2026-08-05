@@ -99,7 +99,7 @@ function AppContent() {
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto" style={{ paddingBottom: 'calc(60px + env(safe-area-inset-bottom))' }}>
+        <div className="flex-1 overflow-y-auto" style={{ paddingBottom: 'calc(132px + env(safe-area-inset-bottom))' }}>
           {activeMode === 'tactics' && <TacticsMode />}
           <Suspense fallback={<TabLoadingFallback />}>
             {activeMode === 'injuries' && <InjuriesMode />}

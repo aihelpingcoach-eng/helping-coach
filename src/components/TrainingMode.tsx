@@ -130,24 +130,27 @@ export default function TrainingMode() {
         {view === 'library' && (
           <>
             {/* Categorías */}
-            <div className="flex gap-3 mb-8 overflow-x-auto pb-2 scrollbar-hide">
-              {categories.map((category) => {
-                const Icon = category.icon;
-                return (
-                  <button
-                    key={category.id}
-                    onClick={() => setSelectedCategory(category.id)}
-                    className={`flex items-center gap-2 px-5 py-3 rounded-lg font-bold transition-all whitespace-nowrap ${
-                      selectedCategory === category.id
-                        ? `${category.color} text-white scale-105`
-                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                    }`}
-                  >
-                    <Icon size={20} />
-                    {category.name}
-                  </button>
-                );
-              })}
+            <div className="relative mb-8">
+              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                {categories.map((category) => {
+                  const Icon = category.icon;
+                  return (
+                    <button
+                      key={category.id}
+                      onClick={() => setSelectedCategory(category.id)}
+                      className={`flex items-center gap-2 px-5 py-3 rounded-lg font-bold transition-all whitespace-nowrap ${
+                        selectedCategory === category.id
+                          ? `${category.color} text-white scale-105`
+                          : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                      }`}
+                    >
+                      <Icon size={20} />
+                      {category.name}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="pointer-events-none absolute top-0 right-0 h-full w-10 bg-gradient-to-l from-black to-transparent" />
             </div>
 
             {/* Ejercicios */}
@@ -200,7 +203,7 @@ export default function TrainingMode() {
         {/* Botón CoachChat */}
         <button
           onClick={() => setShowCoachChat(true)}
-          className="fixed bottom-32 right-8 z-20 bg-orange-600 hover:bg-orange-700 text-white p-4 rounded-full transition-all hover:scale-110 shadow-2xl"
+          className="fixed bottom-20 sm:bottom-24 right-4 sm:right-8 z-20 bg-orange-600 hover:bg-orange-700 text-white p-4 rounded-full transition-all hover:scale-110 shadow-2xl"
           title="Training Coach"
         >
           <MessageCircle size={32} />

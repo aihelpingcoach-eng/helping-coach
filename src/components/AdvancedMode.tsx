@@ -83,24 +83,27 @@ export default function AdvancedMode() {
           </p>
         </div>
 
-        <div className="flex overflow-x-auto gap-2 mb-6 pb-2 scrollbar-hide">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg scale-105'
-                    : 'bg-gray-800/50 text-gray-400 hover:bg-gray-800 hover:text-white'
-                }`}
-              >
-                <Icon size={18} />
-                <span className="text-sm">{tab.label}</span>
-              </button>
-            );
-          })}
+        <div className="relative mb-6">
+          <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all ${
+                    activeTab === tab.id
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg scale-105'
+                      : 'bg-gray-800/50 text-gray-400 hover:bg-gray-800 hover:text-white'
+                  }`}
+                >
+                  <Icon size={18} />
+                  <span className="text-sm">{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="pointer-events-none absolute top-0 right-0 h-full w-10 bg-gradient-to-l from-black to-transparent" />
         </div>
 
         <div className="space-y-6">

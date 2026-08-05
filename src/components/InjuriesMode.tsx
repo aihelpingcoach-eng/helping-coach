@@ -195,7 +195,7 @@ export default function InjuriesMode() {
 
         <button
           onClick={() => setShowCoachChat(true)}
-          className="fixed bottom-32 right-4 sm:right-8 z-20 bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white p-4 rounded-2xl transition-all hover:scale-110 shadow-2xl active:scale-95 backdrop-blur-xl border border-red-400/30"
+          className="fixed bottom-20 sm:bottom-24 right-4 sm:right-8 z-20 bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white p-4 rounded-2xl transition-all hover:scale-110 shadow-2xl active:scale-95 backdrop-blur-xl border border-red-400/30"
           title="Nursing Coach"
         >
           <MessageCircle size={24} />

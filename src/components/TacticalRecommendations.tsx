@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Player, FormationType } from '../constants/playstyles';
-import { Lightbulb, X } from 'lucide-react';
+import { ClipboardList, X } from 'lucide-react';
 
 interface TacticalRecommendationsProps {
   formation: FormationType;
@@ -57,7 +57,7 @@ export default function TacticalRecommendations({ formation, players }: Tactical
         className="bg-blue-600 active:bg-blue-700 text-white p-2 sm:p-3 rounded-full transition-all active:scale-95 shadow-lg touch-manipulation h-[44px] w-[44px] sm:h-[52px] sm:w-[52px] flex items-center justify-center"
         title="Recomendaciones Tácticas"
       >
-        <Lightbulb size={20} className="sm:w-6 sm:h-6" />
+        <ClipboardList size={20} className="sm:w-6 sm:h-6" />
       </button>
 
       {showModal && (
@@ -72,7 +72,7 @@ export default function TacticalRecommendations({ formation, players }: Tactical
 
             <div className="flex items-center gap-3 mb-6">
               <div className="bg-blue-600 p-3 rounded-full">
-                <Lightbulb size={24} className="text-white" />
+                <ClipboardList size={24} className="text-white" />
               </div>
               <h2 className="text-2xl font-bold text-white">Recomendaciones Tácticas</h2>
             </div>
