@@ -99,7 +99,7 @@ export default function MatchCalendarMode() {
               variant="matches"
               title="Sin partidos programados"
               subtitle='Pulsa "Nuevo" para añadir un partido'
-              className="h-48"
+              className="h-full"
             />
           ) : (
             upcoming.map(m => (
@@ -117,7 +117,7 @@ export default function MatchCalendarMode() {
               variant="matches"
               title="Sin historial todavía"
               subtitle="Registra resultados de tus partidos"
-              className="h-48"
+              className="h-full"
             />
           ) : (
             [...history].reverse().map(m => (

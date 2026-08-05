@@ -53,7 +53,11 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
-      <ParallaxBackground />
+      {activeMode === 'tactics' ? (
+        <ParallaxBackground />
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900" />
+      )}
 
       <div className="relative z-10 h-screen flex flex-col">
         <header className="flex-shrink-0 bg-black/30 backdrop-blur-md border-b border-purple-500/30">

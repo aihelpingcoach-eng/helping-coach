@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Target, Trophy, Clock } from 'lucide-react';
+import { Trophy, Clock } from 'lucide-react';
 import { CoachMission, MissionType } from '../types/advancedSystems';
 import { supabase } from '../lib/supabase';
 import EmptyState from './EmptyState';
@@ -91,10 +91,6 @@ export default function MissionsPanel({ coachId }: MissionsPanelProps) {
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 mb-4">
-        <div className="flex items-center gap-2">
-          <Target className="text-yellow-400" size={24} />
-          <h3 className="text-xl font-bold text-white">Misiones del Coach</h3>
-        </div>
         <div className="flex gap-2">
           {(['all', 'daily', 'weekly'] as const).map((f) => (
             <button

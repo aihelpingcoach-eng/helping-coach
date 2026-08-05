@@ -5,6 +5,7 @@ import { Player } from '../constants/playstyles';
 import { supabase } from '../lib/supabase';
 import PlayerHistoryPanel from './progress/PlayerHistoryPanel';
 import EmptyState from './EmptyState';
+import playerPlaceholder from '../assets/illustrations/player-placeholder.png';
 
 export default function ProgressMode() {
   const [players, setPlayers] = useState<Player[]>([]);
@@ -98,19 +99,11 @@ export default function ProgressMode() {
             style={{ height: 'min(48vh, 340px)' }}
             onClick={() => !swipeDirection && setHistoryPlayer(currentPlayer)}
           >
-            {currentPlayer.image_url ? (
-              <img
-                src={currentPlayer.image_url}
-                alt={currentPlayer.name}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-purple-600 to-black flex items-center justify-center">
-                <div className="text-7xl font-bold text-white/20">
-                  {currentPlayer.name.charAt(0)}
-                </div>
-              </div>
-            )}
+            <img
+              src={currentPlayer.image_url || playerPlaceholder}
+              alt={currentPlayer.name}
+              className="w-full h-full object-cover"
+            />
 
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
 
