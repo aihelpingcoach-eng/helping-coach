@@ -20,6 +20,8 @@ interface CoachProfile {
   plan: 'free' | 'pro';
   stripe_customer_id: string | null;
   plan_expires_at: string | null;
+  progress_swipe_days: number[];
+  last_swipe_session_date: string | null;
 }
 
 export function useCoachProfile() {

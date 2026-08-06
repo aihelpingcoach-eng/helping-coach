@@ -185,9 +185,9 @@ export default function PlayerHistoryPanel({ player, onClose }: Props) {
                   <div key={entry.id} className="flex items-center justify-between bg-gray-800/50 rounded-lg px-4 py-2.5">
                     <span className="text-gray-400 text-sm">{formatDate(entry.created_at)}</span>
                     <span className={`flex items-center gap-1 font-bold text-sm ${
-                      entry.level_change > 0 ? 'text-green-400' : 'text-red-400'
+                      entry.level_change > 0 ? 'text-green-400' : entry.level_change < 0 ? 'text-red-400' : 'text-gray-400'
                     }`}>
-                      {entry.level_change > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                      {entry.level_change > 0 ? <TrendingUp size={14} /> : entry.level_change < 0 ? <TrendingDown size={14} /> : <Minus size={14} />}
                       {entry.level_change > 0 ? `+${entry.level_change}` : entry.level_change}
                       {entry.level_after !== null && (
                         <span className="text-gray-500 font-normal ml-1">→ niv. {entry.level_after}</span>
