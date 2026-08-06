@@ -2,10 +2,10 @@ import { useState, Suspense, lazy } from 'react';
 import { Bell, Search } from 'lucide-react';
 import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './contexts/AuthContext';
+import { MusicProvider } from './contexts/MusicContext';
 import AuthGate from './components/AuthGate';
 import BottomNav, { AppMode } from './components/BottomNav';
 import TacticsMode from './components/TacticsMode';
-import MusicPlayer from './components/MusicPlayer';
 import ParallaxBackground from './components/ParallaxBackground';
 import Tutorial from './components/Tutorial';
 import NotificationPanel from './components/NotificationPanel';
@@ -52,6 +52,7 @@ function AppContent() {
   const totalCount = reminders.length;
 
   return (
+    <MusicProvider>
     <div className="min-h-screen bg-black relative overflow-hidden">
       {activeMode === 'tactics' ? (
         <ParallaxBackground />
@@ -118,7 +119,6 @@ function AppContent() {
       </div>
 
       <BottomNav activeMode={activeMode} onModeChange={setActiveMode} showAdmin={isAdminUser} />
-      <MusicPlayer />
       <Tutorial />
       {showSearch && (
         <GlobalSearch
@@ -133,6 +133,7 @@ function AppContent() {
         />
       )}
     </div>
+    </MusicProvider>
   );
 }
 

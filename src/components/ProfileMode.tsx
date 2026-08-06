@@ -1,5 +1,5 @@
-import { LogOut, User, Mail, Award, RotateCcw, Zap, Crown, FlaskConical } from 'lucide-react';
-import { useState } from 'react';
+import { LogOut, User, Mail, Award, RotateCcw, Zap, Crown, FlaskConical, Camera, Loader2 } from 'lucide-react';
+import { useState, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useXP } from '../hooks/useXP';
 import { useTutorial } from '../hooks/useTutorial';
@@ -8,6 +8,7 @@ import { getXPProgress } from '../constants/progression';
 import { supabase } from '../lib/supabase';
 import XPProgressBar from './XPProgressBar';
 import LevelUpModal from './LevelUpModal';
+import MusicControls from './MusicControls';
 import { isAdmin } from '../utils/isAdmin';
 
 export default function ProfileMode() {
@@ -15,12 +16,52 @@ export default function ProfileMode() {
   const isAdminUser = isAdmin(user?.email);
   const { totalXP } = useXP();
   const [previewLevel, setPreviewLevel] = useState<number | null>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { restartTutorial } = useTutorial();
-  const { profile } = useCoachProfile();
+  const { profile, updateProfile } = useCoachProfile();
   const isPro = profile?.plan === 'pro';
 
   const coachName = user?.user_metadata?.coach_name || 'Entrenador';
   const { currentRank } = getXPProgress(totalXP);
+
+  const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file || !user) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('La imagen debe ser menor a 5MB');
+      return;
+    }
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      alert('Solo se permiten imágenes JPG, PNG o WebP');
+      return;
+    }
+
+    setUploadingPhoto(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('coach-photos')
+        .upload(fileName, file, { cacheControl: '3600', upsert: false });
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('coach-photos')
+        .getPublicUrl(fileName);
+
+      await updateProfile({ profile_photo: publicUrl });
+    } catch (error) {
+      console.error('Error uploading photo:', error);
+      alert('Error al subir la foto. Inténtalo de nuevo.');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
 
   const handleLogout = async () => {
     if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
@@ -66,8 +107,29 @@ export default function ProfileMode() {
 
         <div className="bg-gradient-to-br from-purple-900/40 to-black border border-purple-500/40 rounded-2xl p-4 sm:p-6 mb-4">
           <div className="flex items-center gap-4 mb-4">
-            <div className="bg-purple-600 p-3 sm:p-4 rounded-full flex-shrink-0">
-              <User size={32} className="text-white sm:w-10 sm:h-10" />
+            <div className="relative flex-shrink-0">
+              <div className="w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-full overflow-hidden bg-purple-600 flex items-center justify-center">
+                {profile?.profile_photo ? (
+                  <img src={profile.profile_photo} alt={coachName} className="w-full h-full object-cover" />
+                ) : (
+                  <User size={32} className="text-white sm:w-10 sm:h-10" />
+                )}
+              </div>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingPhoto}
+                title="Cambiar foto de perfil"
+                className="absolute -bottom-1 -right-1 bg-purple-500 hover:bg-purple-400 text-white p-1.5 rounded-full border-2 border-gray-950 transition-colors"
+              >
+                {uploadingPhoto ? <Loader2 size={14} className="animate-spin" /> : <Camera size={14} />}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                onChange={handlePhotoSelect}
+                className="hidden"
+              />
             </div>
             <div className="flex-1 min-w-0">
               <h2 className="text-xl sm:text-2xl font-bold text-white mb-0.5 truncate">{coachName}</h2>
@@ -109,6 +171,8 @@ export default function ProfileMode() {
             </div>
           </div>
         </div>
+
+        <MusicControls />
 
         {/* Plan section */}
         <div className="mb-4">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Target, Zap, Activity, Trophy, Sparkles, FileText, BarChart3 } from 'lucide-react';
+import { Target, Zap, Activity, Trophy, Sparkles, FileText, BarChart3, ListOrdered } from 'lucide-react';
 import TacticalAlerts from './TacticalAlerts';
 import EventCards from './EventCards';
 import WorkloadManager from './WorkloadManager';
@@ -8,6 +8,7 @@ import CareerMode from './CareerMode';
 import TeamDNAAnalysis from './TeamDNAAnalysis';
 import MatchReportGenerator from './MatchReportGenerator';
 import TeamStatsPanel from './TeamStatsPanel';
+import LeaderboardPanel from './LeaderboardPanel';
 import { useCoachProfile } from '../hooks/useCoachProfile';
 import { useAuth } from '../contexts/AuthContext';
 import { useMatches } from '../hooks/useMatches';
@@ -15,7 +16,7 @@ import { useTrainingSessions } from '../hooks/useTrainingSessions';
 import { useEventGenerator } from '../hooks/useEventGenerator';
 import { supabase } from '../lib/supabase';
 
-type AdvancedTab = 'overview' | 'alerts' | 'events' | 'workload' | 'missions' | 'career' | 'report' | 'stats';
+type AdvancedTab = 'overview' | 'alerts' | 'events' | 'workload' | 'missions' | 'career' | 'report' | 'stats' | 'ranking';
 
 interface Player {
   id: string;
@@ -83,6 +84,7 @@ export default function AdvancedMode() {
     { id: 'career' as AdvancedTab, label: 'Carrera', icon: Trophy },
     { id: 'report' as AdvancedTab, label: 'Informe', icon: FileText },
     { id: 'stats' as AdvancedTab, label: 'Estadísticas', icon: BarChart3 },
+    { id: 'ranking' as AdvancedTab, label: 'Clasificación', icon: ListOrdered },
   ];
 
   const teamPlaystyles = players.map(p => p.playstyle).filter(Boolean);
@@ -200,6 +202,16 @@ export default function AdvancedMode() {
 
           {activeTab === 'stats' && (
             <TeamStatsPanel userId={user?.id ?? ''} />
+          )}
+
+          {activeTab === 'ranking' && (
+            <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
+              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <ListOrdered className="text-purple-400" />
+                Clasificación de Entrenadores
+              </h3>
+              <LeaderboardPanel />
+            </div>
           )}
         </div>
       </div>
