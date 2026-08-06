@@ -17,6 +17,10 @@ export const PLAYSTYLES = {
     'Acrobatic',
     'Low Driven Shot',
     'Gamechanger',
+    'Trivela',
+    'Power Header',
+    'First Time Shot',
+    'Clinical Finisher',
   ],
   PASSING: [
     'Pinged Pass',
@@ -25,6 +29,9 @@ export const PLAYSTYLES = {
     'Tiki Taka',
     'Whipped Pass',
     'Inventive',
+    'Through Ball',
+    'No Look Pass',
+    'Driven Pass',
   ],
   BALL_CONTROL: [
     'First Touch',
@@ -33,6 +40,9 @@ export const PLAYSTYLES = {
     'Press Proven',
     'Flair',
     'Trickster',
+    'Quick Turn',
+    'Close Control',
+    'Composure',
   ],
   DEFENSE: [
     'Block',
@@ -41,6 +51,9 @@ export const PLAYSTYLES = {
     'Slide Tackle',
     'Anticipate',
     'Aerial Fortress',
+    'Last Man',
+    'Covering Run',
+    'Tenacious Marking',
   ],
   PHYSICAL: [
     'Quick Step',
@@ -48,6 +61,9 @@ export const PLAYSTYLES = {
     'Bruiser',
     'Long Throw',
     'Enforcer',
+    'Powerful Stride',
+    'Explosive Sprint',
+    'Iron Lungs',
   ],
   GOALKEEPER: [
     'Footwork',
@@ -56,6 +72,8 @@ export const PLAYSTYLES = {
     'Far Throw',
     'Far Reach',
     'Deflector',
+    'Sweeper Keeper',
+    'Penalty Specialist',
   ],
 } as const;
 

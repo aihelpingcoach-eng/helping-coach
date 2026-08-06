@@ -89,8 +89,8 @@ Deno.serve(async (req: Request) => {
 
       if (coachType === 'player_analysis') {
         mockResponse = JSON.stringify({
-          playstyle: "Técnico",
-          category: "Ataque",
+          playstyle: "Technical",
+          category: "Control de balón",
           explanation: "Este es un análisis simulado. Configura la API Key de Gemini para obtener análisis reales de jugadores basados en IA."
         });
       }
@@ -236,22 +236,27 @@ Cuando propongas ejercicios:
 
 Tu función es analizar descripciones de jugadores y determinar:
 - Su PlayStyle principal
-- Categoría del PlayStyle (Físico, Mentalidad, Defensa, Ataque)
+- Categoría del PlayStyle
 - Explicación detallada de por qué ese PlayStyle encaja
 
 Perfil del entrenador: Rango ${progressionRank} (${totalXP} XP)
 ${experienceNote}
 
-PlayStyles disponibles:
-FÍSICO: Rápido, Veloz, Controlado, Longitud, Incansable, Resistente
-MENTALIDAD: Combativo, Agresivo, Oportuno, Finalizador, Liderazgo, Intrépido
-DEFENSA: Anticipación, Interceptor, Acrobático, Caza, Rápido-Regreso, Defensa-Block
-ATAQUE: Carrilero, Falso-9, Regate, Precisión, Tiki-Taka, Pase-Largo, Caballito, Bombardeo, Primer-Toque, Truco, Técnico, Cañonazo
+IMPORTANTE: "playstyle" debe ser EXACTAMENTE uno de estos nombres (en inglés, tal cual), y "category" debe ser EXACTAMENTE la etiqueta en español que aparece junto a su grupo:
+
+Finalización: Finesse Shot, Power Shot, Chip Shot, Dead Ball, Precision Header, Acrobatic, Low Driven Shot, Gamechanger, Trivela, Power Header, First Time Shot, Clinical Finisher
+Pase: Pinged Pass, Incisive Pass, Long Ball Pass, Tiki Taka, Whipped Pass, Inventive, Through Ball, No Look Pass, Driven Pass
+Control de balón: First Touch, Technical, Rapid, Press Proven, Flair, Trickster, Quick Turn, Close Control, Composure
+Defensa: Block, Intercept, Jockey, Slide Tackle, Anticipate, Aerial Fortress, Last Man, Covering Run, Tenacious Marking
+Físico: Quick Step, Relentless, Bruiser, Long Throw, Enforcer, Powerful Stride, Explosive Sprint, Iron Lungs
+Portero: Footwork, Cross Claimer, Rush Out, Far Throw, Far Reach, Deflector, Sweeper Keeper, Penalty Specialist
+
+Elige el PlayStyle que mejor encaje con la descripción y la posición del jugador (usa "Portero" solo si es portero).
 
 Responde SIEMPRE en formato JSON estricto sin texto adicional:
 {
-  "playstyle": "Nombre del PlayStyle",
-  "category": "Físico|Mentalidad|Defensa|Ataque",
+  "playstyle": "Nombre exacto del PlayStyle en inglés, de la lista de arriba",
+  "category": "Finalización|Pase|Control de balón|Defensa|Físico|Portero",
   "explanation": "Explicación detallada adaptada al nivel del entrenador"
 }`,
 

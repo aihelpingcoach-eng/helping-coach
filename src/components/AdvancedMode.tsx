@@ -33,22 +33,36 @@ export default function AdvancedMode() {
   useEventGenerator(profile?.id ?? '', matches, sessions);
   const [players, setPlayers] = useState<Player[]>([]);
   const [activeFormation, setActiveFormation] = useState('4-3-3');
+  const [teamSlot, setTeamSlot] = useState<1 | 2 | 3>(1);
 
   useEffect(() => {
-    loadTeamData();
-  }, []);
+    loadTeamData(teamSlot);
+  }, [teamSlot]);
 
-  const loadTeamData = async () => {
-    const [playersRes, formationRes] = await Promise.all([
-      supabase.from('players').select('id, name, position, playstyle').order('created_at', { ascending: false }),
-      supabase.from('formations').select('formation_type').eq('team_slot', 1).order('created_at', { ascending: false }).limit(1),
-    ]);
+  const loadTeamData = async (slot: 1 | 2 | 3) => {
+    const { data: formations } = await supabase
+      .from('formations')
+      .select('id, formation_type')
+      .eq('team_slot', slot)
+      .order('created_at', { ascending: false })
+      .limit(1);
 
-    if (!playersRes.error && playersRes.data) {
-      setPlayers(playersRes.data as Player[]);
+    const formation = formations?.[0];
+    if (!formation) {
+      setPlayers([]);
+      setActiveFormation('4-3-3');
+      return;
     }
-    if (!formationRes.error && formationRes.data && formationRes.data[0]) {
-      setActiveFormation(formationRes.data[0].formation_type);
+
+    setActiveFormation(formation.formation_type);
+
+    const { data: links, error } = await supabase
+      .from('formation_players')
+      .select('player:players(id, name, position, playstyle)')
+      .eq('formation_id', formation.id);
+
+    if (!error && links) {
+      setPlayers(links.map(l => l.player).filter(Boolean) as unknown as Player[]);
     }
   };
 
@@ -133,11 +147,14 @@ export default function AdvancedMode() {
               </div>
 
               <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                  <Sparkles className="text-purple-400" />
-                  ADN del Equipo
-                </h3>
-                <TeamDNAAnalysis formation={activeFormation} players={players} />
+                <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
+                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    <Sparkles className="text-purple-400" />
+                    ADN del Equipo
+                  </h3>
+                  <TeamSlotSelector value={teamSlot} onChange={setTeamSlot} />
+                </div>
+                <TeamDNAAnalysis key={teamSlot} formation={activeFormation} players={players} />
               </div>
             </div>
           )}
@@ -174,7 +191,10 @@ export default function AdvancedMode() {
 
           {activeTab === 'report' && (
             <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
-              <MatchReportGenerator teamPlaystyles={teamPlaystyles} />
+              <div className="flex items-center justify-end mb-4">
+                <TeamSlotSelector value={teamSlot} onChange={setTeamSlot} />
+              </div>
+              <MatchReportGenerator key={teamSlot} teamPlaystyles={teamPlaystyles} />
             </div>
           )}
 
@@ -183,6 +203,24 @@ export default function AdvancedMode() {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function TeamSlotSelector({ value, onChange }: { value: 1 | 2 | 3; onChange: (slot: 1 | 2 | 3) => void }) {
+  return (
+    <div className="flex items-center gap-1 bg-gray-800/70 rounded-lg p-1">
+      {([1, 2, 3] as const).map(slot => (
+        <button
+          key={slot}
+          onClick={() => onChange(slot)}
+          className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
+            value === slot ? 'bg-purple-600 text-white' : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          Equipo {slot}
+        </button>
+      ))}
     </div>
   );
 }

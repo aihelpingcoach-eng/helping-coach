@@ -85,7 +85,7 @@ export const TEAM_DNA_TYPES: TeamDNAType[] = [
     strengths: ['Desgaste progresivo del rival', 'Control total del tiempo y ritmo', 'Mínima presión defensiva propia'],
     weaknesses: ['Proceso lento para generar ocasiones', 'Riesgo si pierde el balón en campo propio', 'Necesita calidad técnica en todos los jugadores'],
     recommendation: 'No tengas prisa — el balón es tu mejor arma defensiva. Espera el momento exacto para la última línea de pase.',
-    playstyleScores: { 'Pinged Pass': 4, 'Tiki Taka': 4, 'First Touch': 3, 'Technical': 3, 'Inventive': 2, 'Incisive Pass': 2 },
+    playstyleScores: { 'Pinged Pass': 4, 'Tiki Taka': 4, 'First Touch': 3, 'Technical': 3, 'Inventive': 2, 'Incisive Pass': 2, 'Sweeper Keeper': 3, 'Composure': 2 },
     formationBonus: ['4-3-3 Holding', '4-1-4-1', '3-2-4-1'],
   },
   {
@@ -118,7 +118,7 @@ export const TEAM_DNA_TYPES: TeamDNAType[] = [
     strengths: ['Superioridad numérica en el mediocampo', 'Difícil de presionar colectivamente', 'Desmarques entre líneas imprevisibles'],
     weaknesses: ['Vulnerable por las bandas', 'Necesita laterales con proyección ofensiva', 'Complejo de ejecutar bajo presión'],
     recommendation: 'Busca al mediapunta entre líneas — él es la llave para abrir defensas cerradas. Los desmarques en corto crean el espacio.',
-    playstyleScores: { 'Incisive Pass': 5, 'Inventive': 4, 'Technical': 3, 'Tiki Taka': 2, 'First Touch': 2 },
+    playstyleScores: { 'Incisive Pass': 5, 'Inventive': 4, 'Technical': 3, 'Tiki Taka': 2, 'First Touch': 2, 'Through Ball': 4, 'No Look Pass': 2 },
     formationBonus: ['4-3-1-2', '4-2-3-1', '4-1-4-1'],
   },
   {
@@ -151,7 +151,7 @@ export const TEAM_DNA_TYPES: TeamDNAType[] = [
     strengths: ['Completamente imprevisible para el rival', 'Genera superioridades 1v1 constantes', 'Alta calidad técnica bajo presión'],
     weaknesses: ['Tendencia al individualismo excesivo', 'Pérdidas por exceso de regate', 'Inconsistente sin disciplina táctica'],
     recommendation: 'Da libertad creativa a tus mejores jugadores, pero establece responsabilidades defensivas claras. La técnica individual es colectiva.',
-    playstyleScores: { 'Technical': 5, 'Trickster': 4, 'Flair': 4, 'First Touch': 3, 'Acrobatic': 2 },
+    playstyleScores: { 'Technical': 5, 'Trickster': 4, 'Flair': 4, 'First Touch': 3, 'Acrobatic': 2, 'Trivela': 3, 'Close Control': 3, 'Quick Turn': 2 },
     formationBonus: ['4-3-3', '3-4-3', '4-3-3 False 9'],
   },
   {
@@ -162,7 +162,7 @@ export const TEAM_DNA_TYPES: TeamDNAType[] = [
     strengths: ['Rompe líneas defensivas con facilidad', 'Difícil de defender en profundidad', 'Genera superioridades numéricas rápidas'],
     weaknesses: ['Se agota en la segunda mitad', 'Pierde efectividad en espacios pequeños', 'Muy dependiente de la forma física'],
     recommendation: 'Prepara tu equipo físicamente para 90 minutos — la velocidad sin fondo físico dura solo media hora.',
-    playstyleScores: { 'Quick Step': 5, 'Rapid': 5, 'Relentless': 2, 'Gamechanger': 2 },
+    playstyleScores: { 'Quick Step': 5, 'Rapid': 5, 'Relentless': 2, 'Gamechanger': 2, 'Explosive Sprint': 5, 'Powerful Stride': 2 },
     formationBonus: ['4-3-3', '3-4-3', '4-2-4', '2-3-5'],
   },
   {
@@ -173,7 +173,7 @@ export const TEAM_DNA_TYPES: TeamDNAType[] = [
     strengths: ['Extremadamente difícil de superar', 'Sólido en momentos de presión', 'Efectivo para mantener ventajas en el marcador'],
     weaknesses: ['Poca iniciativa y creatividad ofensiva', 'Cansancio mental acumulativo', 'Muy difícil de remontar partidos'],
     recommendation: 'La solidez defensiva gana puntos. No concedas espacios entre líneas y mantén el bloque compacto en todo momento.',
-    playstyleScores: { 'Block': 5, 'Intercept': 4, 'Jockey': 4, 'Anticipate': 3, 'Aerial Fortress': 2, 'Slide Tackle': 2 },
+    playstyleScores: { 'Block': 5, 'Intercept': 4, 'Jockey': 4, 'Anticipate': 3, 'Aerial Fortress': 2, 'Slide Tackle': 2, 'Last Man': 4, 'Tenacious Marking': 3 },
     formationBonus: ['5-4-1', '5-3-2', '4-5-1', '4-4-2'],
   },
   {
@@ -195,7 +195,7 @@ export const TEAM_DNA_TYPES: TeamDNAType[] = [
     strengths: ['Muy efectivo en el área rival en set pieces', 'Saca partido de todos los centros laterales', 'Difícil de defender en el área propia'],
     weaknesses: ['Muy predecible para el rival', 'Ineficaz contra rivales bajos y veloces', 'Poca eficacia en espacios cortos'],
     recommendation: 'Busca la cabeza de tu rematador en cada centro. Él es el punto final de todas las jugadas preparadas.',
-    playstyleScores: { 'Aerial Fortress': 5, 'Precision Header': 5, 'Long Ball Pass': 3, 'Bruiser': 2, 'Dead Ball': 2 },
+    playstyleScores: { 'Aerial Fortress': 5, 'Precision Header': 5, 'Long Ball Pass': 3, 'Bruiser': 2, 'Dead Ball': 2, 'Power Header': 4 },
     formationBonus: ['4-4-2', '5-3-2', '3-5-2', 'WM'],
   },
   {
