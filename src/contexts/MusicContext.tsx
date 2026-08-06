@@ -30,7 +30,11 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    audio.volume = volume;
+    // El oído humano percibe el volumen de forma logarítmica, no lineal:
+    // con audio.volume = volume directo, mover el slider del 40% al 100%
+    // apenas se nota. Se eleva al cuadrado para que el cambio percibido
+    // sea proporcional a la posición del slider.
+    audio.volume = volume ** 2;
   }, [volume]);
 
   // Intenta reproducir al montar; si el navegador bloquea el autoplay,
