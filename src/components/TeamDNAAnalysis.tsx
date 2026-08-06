@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sparkles, TrendingUp, AlertTriangle, Lightbulb, RefreshCw } from 'lucide-react';
 import { computeTeamDNA, TeamDNAType } from '../constants/teamDNA';
 
@@ -21,6 +21,17 @@ export default function TeamDNAAnalysis({ formation, players }: TeamDNAAnalysisP
     if (players.length === 0) return;
     setAnalysis(computeTeamDNA(formation, players));
   };
+
+  // El cálculo es determinista (mismos jugadores + formación = mismo ADN),
+  // así que se calcula solo en vez de exigir un clic cada vez que se
+  // entra a la pestaña o se cambia de equipo.
+  useEffect(() => {
+    if (players.length > 0) {
+      setAnalysis(computeTeamDNA(formation, players));
+    } else {
+      setAnalysis(null);
+    }
+  }, [formation, players]);
 
   return (
     <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-6 border border-slate-700">
