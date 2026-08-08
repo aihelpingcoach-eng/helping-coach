@@ -1,4 +1,5 @@
 import type { IllustrationType } from '../constants/training';
+import { TacticalDiagram, TACTICAL_STEPS } from './TacticalIllustration';
 
 // ─── PNG illustrations (add a new import + entry in PNG_MAP as images are generated) ─
 import sentadilla_png from '../assets/exercises/sentadilla.png';
@@ -1392,6 +1393,10 @@ function SvgFallback({ type }: { type: IllustrationType }) {
 }
 
 export default function ExerciseIllustration({ type }: { type: IllustrationType }) {
+  const tacticalSteps = TACTICAL_STEPS[type];
+  if (tacticalSteps) {
+    return <TacticalDiagram steps={tacticalSteps} />;
+  }
   const png = PNG_MAP[type];
   if (png) {
     return <img src={png} alt={type} className="w-full h-full object-contain" />;

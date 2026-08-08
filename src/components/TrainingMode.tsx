@@ -189,7 +189,7 @@ export default function TrainingMode() {
                     key={exercise.id}
                     className="bg-gradient-to-br from-orange-900/20 to-black border-2 border-orange-800/50 rounded-xl overflow-hidden hover:border-orange-600 transition-all"
                   >
-                    <div className="w-full bg-white" style={{ height: '140px' }}>
+                    <div className="w-full bg-white" style={{ height: exercise.category === 'tactico' ? '220px' : '140px' }}>
                       <ExerciseThumbnail exercise={exercise} />
                     </div>
                     <div className="p-6">
