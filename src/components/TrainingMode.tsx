@@ -7,13 +7,30 @@ import { useAuth } from '../contexts/AuthContext';
 import LevelUpModal from './LevelUpModal';
 import { TrainingCategory } from '../constants/training';
 import ExerciseIllustration from './ExerciseIllustration';
-import { useExercises } from '../hooks/useExercises';
+import { useExercises, ExerciseRow } from '../hooks/useExercises';
 import { useTrainingSessions, TrainingSession } from '../hooks/useTrainingSessions';
 import CreateSessionModal from './training/CreateSessionModal';
 import ActiveSession from './training/ActiveSession';
 import SessionHistory from './training/SessionHistory';
 
 type View = 'library' | 'history';
+
+function ExerciseThumbnail({ exercise }: { exercise: ExerciseRow }) {
+  const [imageFailed, setImageFailed] = useState(false);
+
+  if (!exercise.image_url || imageFailed) {
+    return <ExerciseIllustration type={exercise.illustration} />;
+  }
+
+  return (
+    <img
+      src={exercise.image_url}
+      alt={exercise.name}
+      className="w-full h-full object-contain"
+      onError={() => setImageFailed(true)}
+    />
+  );
+}
 
 export default function TrainingMode() {
   const [selectedCategory, setSelectedCategory] = useState<TrainingCategory>('fuerza');
@@ -173,11 +190,7 @@ export default function TrainingMode() {
                     className="bg-gradient-to-br from-orange-900/20 to-black border-2 border-orange-800/50 rounded-xl overflow-hidden hover:border-orange-600 transition-all"
                   >
                     <div className="w-full bg-white" style={{ height: '140px' }}>
-                      {exercise.image_url ? (
-                        <img src={exercise.image_url} alt={exercise.name} className="w-full h-full object-contain" />
-                      ) : (
-                        <ExerciseIllustration type={exercise.illustration} />
-                      )}
+                      <ExerciseThumbnail exercise={exercise} />
                     </div>
                     <div className="p-6">
                       <h3 className="text-2xl font-bold text-white mb-3">{exercise.name}</h3>
