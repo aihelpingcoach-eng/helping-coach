@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MessageCircle, Zap, Brain, Heart, Rocket, Shield, Plus, History } from 'lucide-react';
+import { MessageCircle, Zap, Brain, Heart, Rocket, Shield, Plus, History, Filter } from 'lucide-react';
 import CoachChat from './CoachChat';
 import { useCoachProfile } from '../hooks/useCoachProfile';
 import { useXP } from '../hooks/useXP';
@@ -34,6 +34,8 @@ function ExerciseThumbnail({ exercise }: { exercise: ExerciseRow }) {
 
 export default function TrainingMode() {
   const [selectedCategory, setSelectedCategory] = useState<TrainingCategory>('fuerza');
+  const [selectedMuscle, setSelectedMuscle] = useState<string>('all');
+  const [selectedEquipment, setSelectedEquipment] = useState<string>('all');
   const [view, setView] = useState<View>('library');
   const [showCoachChat, setShowCoachChat] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -44,6 +46,19 @@ export default function TrainingMode() {
   const { giveXP, showLevelUpModal, newLevel, closeLevelUpModal } = useXP();
   const { exercises, loading } = useExercises(selectedCategory);
   const { sessions, loading: sessionsLoading, createSession, completeSession, deleteSession } = useTrainingSessions(user?.id);
+
+  const muscles = Array.from(new Set(exercises.map(e => e.muscle).filter((m): m is string => !!m))).sort();
+  const equipments = Array.from(new Set(exercises.map(e => e.equipment).filter((eq): eq is string => !!eq))).sort();
+  const filteredExercises = exercises.filter(e =>
+    (selectedMuscle === 'all' || e.muscle === selectedMuscle) &&
+    (selectedEquipment === 'all' || e.equipment === selectedEquipment)
+  );
+
+  const handleCategoryChange = (category: TrainingCategory) => {
+    setSelectedCategory(category);
+    setSelectedMuscle('all');
+    setSelectedEquipment('all');
+  };
 
   const categories = [
     { id: 'fuerza' as TrainingCategory, name: 'Fuerza', icon: Zap, color: 'bg-yellow-600' },
@@ -154,7 +169,7 @@ export default function TrainingMode() {
                   return (
                     <button
                       key={category.id}
-                      onClick={() => setSelectedCategory(category.id)}
+                      onClick={() => handleCategoryChange(category.id)}
                       className={`flex items-center gap-2 px-5 py-3 rounded-lg font-bold transition-all whitespace-nowrap ${
                         selectedCategory === category.id
                           ? `${category.color} text-white scale-105`
@@ -170,6 +185,45 @@ export default function TrainingMode() {
               <div className="pointer-events-none absolute top-0 right-0 h-full w-10 bg-gradient-to-l from-black to-transparent" />
             </div>
 
+            {/* Filtro por músculo / material */}
+            {!loading && (muscles.length > 0 || equipments.length > 0) && (
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                <div className="flex items-center gap-1.5 text-gray-500 text-sm">
+                  <Filter size={15} />
+                  Filtrar:
+                </div>
+                {muscles.length > 0 && (
+                  <select
+                    value={selectedMuscle}
+                    onChange={(e) => setSelectedMuscle(e.target.value)}
+                    className="bg-gray-800 text-white text-sm rounded-lg px-3 py-2 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  >
+                    <option value="all">Todos los músculos</option>
+                    {muscles.map(m => <option key={m} value={m}>{m}</option>)}
+                  </select>
+                )}
+                {equipments.length > 0 && (
+                  <select
+                    value={selectedEquipment}
+                    onChange={(e) => setSelectedEquipment(e.target.value)}
+                    className="bg-gray-800 text-white text-sm rounded-lg px-3 py-2 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  >
+                    <option value="all">Todo el material</option>
+                    {equipments.map(eq => <option key={eq} value={eq}>{eq}</option>)}
+                  </select>
+                )}
+                {(selectedMuscle !== 'all' || selectedEquipment !== 'all') && (
+                  <button
+                    onClick={() => { setSelectedMuscle('all'); setSelectedEquipment('all'); }}
+                    className="text-orange-400 text-sm font-semibold hover:text-orange-300"
+                  >
+                    Limpiar
+                  </button>
+                )}
+                <span className="text-gray-600 text-sm ml-auto">{filteredExercises.length} ejercicios</span>
+              </div>
+            )}
+
             {/* Ejercicios */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {loading ? (
@@ -183,8 +237,12 @@ export default function TrainingMode() {
                     </div>
                   </div>
                 ))
+              ) : filteredExercises.length === 0 ? (
+                <div className="col-span-full text-center py-12 text-gray-500">
+                  No hay ejercicios con ese filtro. Prueba a cambiarlo.
+                </div>
               ) : (
-                exercises.map((exercise) => (
+                filteredExercises.map((exercise) => (
                   <div
                     key={exercise.id}
                     className="bg-gradient-to-br from-orange-900/20 to-black border-2 border-orange-800/50 rounded-xl overflow-hidden hover:border-orange-600 transition-all"

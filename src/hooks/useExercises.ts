@@ -11,6 +11,8 @@ export interface ExerciseRow {
   illustration: string;
   category: string;
   image_url: string | null;
+  equipment: string | null;
+  muscle: string | null;
 }
 
 export function useExercises(category: TrainingCategory) {
@@ -23,7 +25,7 @@ export function useExercises(category: TrainingCategory) {
 
     supabase
       .from('exercises')
-      .select('id, name, description, duration, benefit, illustration, category, image_url')
+      .select('id, name, description, duration, benefit, illustration, category, image_url, equipment, muscle')
       .eq('category', category)
       .order('name')
       .then(({ data, error }) => {
