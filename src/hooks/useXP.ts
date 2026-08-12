@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { awardXP } from '../utils/progression';
+import { awardXP, awardCustomXP, XPResult } from '../utils/progression';
 import { XP_REWARDS } from '../constants/progression';
 import { getLevelByXP, getLevelProgress, Level } from '../constants/levels';
 import { supabase } from '../lib/supabase';
@@ -33,19 +33,31 @@ export function useXP() {
     }
   };
 
+  const applyResult = async (oldXP: number, result: XPResult) => {
+    if (!result.success) return;
+    const oldLvl = getLevelByXP(oldXP).level;
+    const newLvl = getLevelByXP(result.newTotalXP).level;
+    if (newLvl > oldLvl) {
+      setNewLevel(newLvl);
+      setShowLevelUpModal(true);
+    }
+    await loadTotalXP();
+  };
+
   const giveXP = async (actionKey: keyof typeof XP_REWARDS) => {
     if (!user) return;
     const oldXP = totalXP; // capture BEFORE await to avoid stale comparison
     const result = await awardXP(user.id, actionKey);
-    if (result.success) {
-      const oldLvl = getLevelByXP(oldXP).level;
-      const newLvl = getLevelByXP(result.newTotalXP).level;
-      if (newLvl > oldLvl) {
-        setNewLevel(newLvl);
-        setShowLevelUpModal(true);
-      }
-      await loadTotalXP();
-    }
+    await applyResult(oldXP, result);
+  };
+
+  // Para XP de cantidad variable: recompensas de misión propias, o XP que se
+  // reduce a medida que sube el nivel (ver getDecayedXP en constants/levels).
+  const giveCustomXP = async (amount: number) => {
+    if (!user) return;
+    const oldXP = totalXP;
+    const result = await awardCustomXP(user.id, amount);
+    await applyResult(oldXP, result);
   };
 
   const closeLevelUpModal = () => setShowLevelUpModal(false);
@@ -55,6 +67,7 @@ export function useXP() {
 
   return {
     giveXP,
+    giveCustomXP,
     totalXP,
     showLevelUpModal,
     newLevel,

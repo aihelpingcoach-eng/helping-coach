@@ -11,6 +11,7 @@ interface MissionTemplate {
   description: string;
   objective: string;
   target: number;
+  reward_xp: number;
   reward_description: string;
   computeProgress: (stats: Stats) => number;
 }
@@ -22,8 +23,8 @@ interface Stats {
   sessionsThisWeek: number;
 }
 
-const REWARD_XP = 50;
-
+// Recompensa proporcional a lo que cuesta cada misión: un gesto trivial de
+// una sola vez da poco, una meta que exige mantener un habito da mas.
 const TEMPLATES: MissionTemplate[] = [
   {
     mission_type: 'tactical',
@@ -32,6 +33,7 @@ const TEMPLATES: MissionTemplate[] = [
     description: 'Añade jugadores a tu equipo para poder crear alineaciones completas.',
     objective: 'Añadir 5 jugadores',
     target: 5,
+    reward_xp: 30,
     reward_description: 'Desbloquea análisis de sinergias',
     computeProgress: (s) => Math.min(s.playerCount, 5),
   },
@@ -42,6 +44,7 @@ const TEMPLATES: MissionTemplate[] = [
     description: 'Ten al menos 11 jugadores disponibles para completar una alineación titular.',
     objective: 'Llegar a 11 jugadores',
     target: 11,
+    reward_xp: 90,
     reward_description: 'Coach más experimentado',
     computeProgress: (s) => Math.min(s.playerCount, 11),
   },
@@ -52,6 +55,7 @@ const TEMPLATES: MissionTemplate[] = [
     description: 'Registra tu primer partido para empezar a llevar el historial del equipo.',
     objective: 'Registrar 1 partido',
     target: 1,
+    reward_xp: 20,
     reward_description: 'Desbloquea estadísticas de equipo',
     computeProgress: (s) => Math.min(s.matchesPlayed, 1),
   },
@@ -62,6 +66,7 @@ const TEMPLATES: MissionTemplate[] = [
     description: 'Registra el resultado de tus partidos para llevar un seguimiento real del rendimiento.',
     objective: 'Registrar 3 resultados',
     target: 3,
+    reward_xp: 60,
     reward_description: 'Mejor análisis de rendimiento',
     computeProgress: (s) => Math.min(s.matchesWithResult, 3),
   },
@@ -72,6 +77,7 @@ const TEMPLATES: MissionTemplate[] = [
     description: 'Completa sesiones de entrenamiento con tu equipo esta semana.',
     objective: 'Completar 3 sesiones',
     target: 3,
+    reward_xp: 50,
     reward_description: 'Equipo mejor preparado',
     computeProgress: (s) => Math.min(s.sessionsThisWeek, 3),
   },
@@ -81,7 +87,7 @@ export function useMissionGenerator(
   coachId: string,
   matches: Match[],
   sessions: TrainingSession[],
-  giveXP: (actionKey: 'COMPLETE_MISSION') => Promise<void>
+  giveCustomXP: (amount: number) => Promise<void>
 ) {
   const ran = useRef(false);
 
@@ -109,7 +115,7 @@ export function useMissionGenerator(
 
       const { data: existing } = await supabase
         .from('coach_missions')
-        .select('id, title, progress, target, is_completed')
+        .select('id, title, progress, target, reward_xp, is_completed')
         .eq('coach_id', coachId);
 
       for (const tmpl of TEMPLATES) {
@@ -118,12 +124,12 @@ export function useMissionGenerator(
         const completed = progress >= tmpl.target;
 
         if (current) {
-          if (progress !== current.progress || completed) {
+          if (progress !== current.progress || completed || current.reward_xp !== tmpl.reward_xp) {
             await supabase
               .from('coach_missions')
-              .update({ progress, is_completed: completed })
+              .update({ progress, is_completed: completed, reward_xp: tmpl.reward_xp })
               .eq('id', current.id);
-            if (completed) await giveXP('COMPLETE_MISSION');
+            if (completed) await giveCustomXP(tmpl.reward_xp);
           }
         } else {
           const alreadyCompletedBefore = existing?.some(m => m.title === tmpl.title && m.is_completed);
@@ -137,11 +143,11 @@ export function useMissionGenerator(
             objective: tmpl.objective,
             progress,
             target: tmpl.target,
-            reward_xp: REWARD_XP,
+            reward_xp: tmpl.reward_xp,
             reward_description: tmpl.reward_description,
             is_completed: completed,
           });
-          if (completed) await giveXP('COMPLETE_MISSION');
+          if (completed) await giveCustomXP(tmpl.reward_xp);
         }
       }
     })().catch(() => {});

@@ -57,6 +57,18 @@ export function getTierForLevel(level: number): 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 {
   return 8;                  // Zafiro
 }
 
+// Multiplicador de XP por tier, para actividades repetitivas de bajo esfuerzo
+// (como evaluar jugadores con swipe) que darían XP infinita gratis si no
+// bajaran con el nivel. Cuanto más alto el tier, más cuesta subir.
+const TIER_XP_MULTIPLIER: Record<1 | 2 | 3 | 4 | 5 | 6 | 7 | 8, number> = {
+  1: 1, 2: 0.8, 3: 0.65, 4: 0.5, 5: 0.4, 6: 0.3, 7: 0.25, 8: 0.2,
+};
+
+export function getDecayedXP(baseXP: number, level: number): number {
+  const tier = getTierForLevel(level);
+  return Math.max(1, Math.round(baseXP * TIER_XP_MULTIPLIER[tier]));
+}
+
 export function getLevelByXP(totalXP: number): Level {
   let current = LEVELS[0];
   for (const lvl of LEVELS) {

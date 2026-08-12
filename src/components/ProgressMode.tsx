@@ -3,6 +3,8 @@ import { ChevronLeft, ChevronRight, Minus, BarChart2, Settings, X, CalendarCheck
 import { useXP } from '../hooks/useXP';
 import { Player } from '../constants/playstyles';
 import { supabase } from '../lib/supabase';
+import { XP_REWARDS } from '../constants/progression';
+import { getDecayedXP } from '../constants/levels';
 import { useCoachProfile } from '../hooks/useCoachProfile';
 import PlayerHistoryPanel from './progress/PlayerHistoryPanel';
 import EmptyState from './EmptyState';
@@ -102,7 +104,7 @@ export default function ProgressMode() {
   const [swipeDirection, setSwipeDirection] = useState<SwipeDirection | null>(null);
   const [historyPlayer, setHistoryPlayer] = useState<Player | null>(null);
   const [showDaySettings, setShowDaySettings] = useState(false);
-  const { giveXP } = useXP();
+  const { giveCustomXP, currentLevel } = useXP();
   const { profile, updateProfile } = useCoachProfile();
 
   useEffect(() => {
@@ -150,7 +152,9 @@ export default function ProgressMode() {
         .eq('id', currentPlayer.id);
     }
 
-    giveXP('EVALUATE_PLAYER');
+    // El XP de evaluar jugadores baja con el nivel del entrenador: es una
+    // accion repetible por cada jugador, sin esto daria XP infinita gratis.
+    giveCustomXP(getDecayedXP(XP_REWARDS.EVALUATE_PLAYER.xp, currentLevel.level));
 
     if (isLastOfRound) {
       updateProfile({ last_swipe_session_date: todayISO() });

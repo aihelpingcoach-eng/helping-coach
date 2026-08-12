@@ -33,9 +33,9 @@ export default function AdvancedMode() {
   const { user } = useAuth();
   const { matches } = useMatches(user?.id);
   const { sessions } = useTrainingSessions(user?.id);
-  const { giveXP } = useXP();
+  const { giveCustomXP } = useXP();
   useEventGenerator(profile?.id ?? '', matches, sessions);
-  useMissionGenerator(profile?.id ?? '', matches, sessions, giveXP);
+  useMissionGenerator(profile?.id ?? '', matches, sessions, giveCustomXP);
   const [players, setPlayers] = useState<Player[]>([]);
   const [activeFormation, setActiveFormation] = useState('4-3-3');
   const [teamSlot, setTeamSlot] = useState<1 | 2 | 3>(1);

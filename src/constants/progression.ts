@@ -140,11 +140,6 @@ export const XP_REWARDS: { [key: string]: XPReward } = {
     xp: 10,
     description: 'Evaluar progreso de jugador',
   },
-  COMPLETE_MISSION: {
-    action: 'complete_mission',
-    xp: 50,
-    description: 'Completar una misión',
-  },
 };
 
 export function getRankByXP(totalXP: number): Rank {

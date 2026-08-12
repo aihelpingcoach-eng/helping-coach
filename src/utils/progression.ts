@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabase';
 import { getRankByXP, XP_REWARDS } from '../constants/progression';
 
-interface XPResult {
+export interface XPResult {
   success: boolean;
   newTotalXP: number;
   rankUp: boolean;
@@ -22,7 +22,19 @@ export async function awardXP(
       xpGained: 0,
     };
   }
+  return applyXP(userId, reward.xp);
+}
 
+// Para XP de cantidad variable (misiones con recompensa propia, XP que se
+// reduce con el nivel...) en vez de una de las acciones fijas de XP_REWARDS.
+export async function awardCustomXP(userId: string, amount: number): Promise<XPResult> {
+  if (amount <= 0) {
+    return { success: false, newTotalXP: 0, rankUp: false, xpGained: 0 };
+  }
+  return applyXP(userId, amount);
+}
+
+async function applyXP(userId: string, amount: number): Promise<XPResult> {
   try {
     const { data: profile, error: fetchError } = await supabase
       .from('coach_profiles')
@@ -42,7 +54,7 @@ export async function awardXP(
 
     const oldTotalXP = profile.total_xp || 0;
     const oldRank = getRankByXP(oldTotalXP);
-    const newTotalXP = oldTotalXP + reward.xp;
+    const newTotalXP = oldTotalXP + amount;
     const newRank = getRankByXP(newTotalXP);
 
     const rankUp = oldRank.id !== newRank.id;
@@ -72,10 +84,10 @@ export async function awardXP(
       newTotalXP,
       rankUp,
       newRank: rankUp ? newRank.name : undefined,
-      xpGained: reward.xp,
+      xpGained: amount,
     };
   } catch (error) {
-    console.error('Error in awardXP:', error);
+    console.error('Error in applyXP:', error);
     return {
       success: false,
       newTotalXP: 0,
