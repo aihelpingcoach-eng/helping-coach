@@ -1,4 +1,4 @@
-import { LogOut, User, Mail, Award, RotateCcw, Zap, Crown, FlaskConical, Camera, Loader2 } from 'lucide-react';
+import { LogOut, User, Mail, Award, RotateCcw, Zap, Crown, FlaskConical, Camera, Loader2, Settings } from 'lucide-react';
 import { useState, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useXP } from '../hooks/useXP';
@@ -9,6 +9,7 @@ import { supabase } from '../lib/supabase';
 import XPProgressBar from './XPProgressBar';
 import LevelUpModal from './LevelUpModal';
 import MusicControls from './MusicControls';
+import ProfileEditor from './ProfileEditor';
 import { isAdmin } from '../utils/isAdmin';
 
 export default function ProfileMode() {
@@ -17,6 +18,7 @@ export default function ProfileMode() {
   const { totalXP } = useXP();
   const [previewLevel, setPreviewLevel] = useState<number | null>(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [showEditor, setShowEditor] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { restartTutorial } = useTutorial();
   const { profile, updateProfile } = useCoachProfile();
@@ -172,6 +174,15 @@ export default function ProfileMode() {
           </div>
         </div>
 
+        <button
+          onClick={() => setShowEditor(true)}
+          className="w-full flex items-center justify-center gap-2 bg-gray-900/60 border border-gray-700/60 hover:border-purple-500/60 text-white font-semibold py-3.5 rounded-2xl transition-all mb-4 touch-manipulation"
+          style={{ minHeight: '48px' }}
+        >
+          <Settings size={18} className="text-purple-400" />
+          Editar perfil y estilo de entrenador
+        </button>
+
         <MusicControls />
 
         {/* Plan section */}
@@ -254,6 +265,8 @@ export default function ProfileMode() {
             onClose={() => setPreviewLevel(null)}
           />
         )}
+
+        {showEditor && <ProfileEditor onClose={() => setShowEditor(false)} />}
 
         <div className="space-y-3 mb-4">
           <button

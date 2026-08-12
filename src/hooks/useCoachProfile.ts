@@ -80,14 +80,18 @@ export function useCoachProfile() {
   };
 
   const updateProfile = async (updates: Partial<CoachProfile>) => {
-    if (!user || !profile) return;
+    if (!user || !profile) return false;
     const { data, error } = await supabase
       .from('coach_profiles')
       .update(updates)
       .eq('user_id', user.id)
       .select()
       .maybeSingle();
-    if (!error && data) setProfile(data);
+    if (!error && data) {
+      setProfile(data);
+      return true;
+    }
+    return false;
   };
 
   return { profile, loading, updateProfile };
