@@ -14,6 +14,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useMatches } from '../hooks/useMatches';
 import { useTrainingSessions } from '../hooks/useTrainingSessions';
 import { useEventGenerator } from '../hooks/useEventGenerator';
+import { useMissionGenerator } from '../hooks/useMissionGenerator';
+import { useXP } from '../hooks/useXP';
 import { supabase } from '../lib/supabase';
 
 type AdvancedTab = 'overview' | 'alerts' | 'events' | 'workload' | 'missions' | 'career' | 'report' | 'stats' | 'ranking';
@@ -31,7 +33,9 @@ export default function AdvancedMode() {
   const { user } = useAuth();
   const { matches } = useMatches(user?.id);
   const { sessions } = useTrainingSessions(user?.id);
+  const { giveXP } = useXP();
   useEventGenerator(profile?.id ?? '', matches, sessions);
+  useMissionGenerator(profile?.id ?? '', matches, sessions, giveXP);
   const [players, setPlayers] = useState<Player[]>([]);
   const [activeFormation, setActiveFormation] = useState('4-3-3');
   const [teamSlot, setTeamSlot] = useState<1 | 2 | 3>(1);

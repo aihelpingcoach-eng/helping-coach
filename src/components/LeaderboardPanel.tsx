@@ -2,15 +2,7 @@ import { useState, useEffect } from 'react';
 import { Trophy, User, Crown, Medal } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-
-interface RankingRow {
-  user_id: string;
-  coach_name: string;
-  team_name: string;
-  profile_photo: string;
-  total_xp: number;
-  rank: string;
-}
+import CoachProfileModal, { RankingRow } from './CoachProfileModal';
 
 const MEDAL_COLORS = ['text-yellow-400', 'text-gray-300', 'text-orange-400'];
 
@@ -18,6 +10,7 @@ export default function LeaderboardPanel() {
   const { user } = useAuth();
   const [rows, setRows] = useState<RankingRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCoach, setSelectedCoach] = useState<RankingRow | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -61,12 +54,13 @@ export default function LeaderboardPanel() {
         const isMe = row.user_id === user?.id;
         const position = index + 1;
         return (
-          <div
+          <button
             key={row.user_id}
-            className={`flex items-center gap-3 rounded-xl p-3 border transition-colors ${
+            onClick={() => setSelectedCoach(row)}
+            className={`w-full flex items-center gap-3 rounded-xl p-3 border transition-colors text-left active:scale-[0.99] ${
               isMe
-                ? 'bg-purple-900/40 border-purple-500/60'
-                : 'bg-gray-900/50 border-gray-700/50'
+                ? 'bg-purple-900/40 border-purple-500/60 hover:border-purple-500'
+                : 'bg-gray-900/50 border-gray-700/50 hover:border-gray-600'
             }`}
           >
             <div className="w-8 flex-shrink-0 flex items-center justify-center font-bold">
@@ -97,12 +91,16 @@ export default function LeaderboardPanel() {
               <Crown size={14} className="text-yellow-400" />
               {row.total_xp.toLocaleString()}
             </div>
-          </div>
+          </button>
         );
       })}
 
       {myPosition === -1 && (
         <p className="text-center text-gray-500 text-xs pt-2">Aún no apareces en la clasificación</p>
+      )}
+
+      {selectedCoach && (
+        <CoachProfileModal coach={selectedCoach} onClose={() => setSelectedCoach(null)} />
       )}
     </div>
   );
