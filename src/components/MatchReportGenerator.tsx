@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FileText, Loader, Users, AlertCircle, CheckCircle, TrendingUp, Download } from 'lucide-react';
 import { generateMatchReport } from '../utils/ai';
 import { downloadTextFile, buildMatchReportText } from '../utils/exportReport';

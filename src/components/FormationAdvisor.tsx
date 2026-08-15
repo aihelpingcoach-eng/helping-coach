@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Lightbulb, Loader, Shield, TrendingUp, AlertTriangle, Target } from 'lucide-react';
 import { recommendFormation } from '../utils/ai';
 import AdGate from './AdGate';
@@ -7,8 +7,8 @@ import { useAdGate } from '../hooks/useAdGate';
 interface Player {
   id: string;
   name: string;
-  position: string;
-  playstyle: string;
+  position?: string;
+  playstyle?: string;
 }
 
 interface FormationRecommendation {
@@ -51,8 +51,8 @@ export default function FormationAdvisor({ currentFormation, players, onFormatio
         physicalState,
         players.map(p => ({
           name: p.name,
-          position: p.position,
-          playstyle: p.playstyle,
+          position: p.position ?? 'Desconocida',
+          playstyle: p.playstyle ?? 'Equilibrado',
         }))
       );
       setRecommendation(result);

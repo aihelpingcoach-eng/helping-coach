@@ -5,7 +5,7 @@ import { useCoachProfile } from '../hooks/useCoachProfile';
 import { useXP } from '../hooks/useXP';
 import { useAuth } from '../contexts/AuthContext';
 import LevelUpModal from './LevelUpModal';
-import { TrainingCategory } from '../constants/training';
+import { TrainingCategory, IllustrationType } from '../constants/training';
 import ExerciseIllustration from './ExerciseIllustration';
 import { useExercises, ExerciseRow } from '../hooks/useExercises';
 import { useTrainingSessions, TrainingSession } from '../hooks/useTrainingSessions';
@@ -19,7 +19,7 @@ function ExerciseThumbnail({ exercise }: { exercise: ExerciseRow }) {
   const [imageFailed, setImageFailed] = useState(false);
 
   if (!exercise.image_url || imageFailed) {
-    return <ExerciseIllustration type={exercise.illustration} />;
+    return <ExerciseIllustration type={exercise.illustration as IllustrationType} />;
   }
 
   return (

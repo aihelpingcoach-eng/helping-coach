@@ -129,7 +129,7 @@ function AppContent() {
       {showOnboarding && (
         <OnboardingWizard
           coachName={profile.coach_name}
-          onComplete={updateProfile}
+          onComplete={async (data) => { await updateProfile(data); }}
         />
       )}
     </div>

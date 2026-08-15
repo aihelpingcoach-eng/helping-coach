@@ -99,7 +99,7 @@ function VideoTier({ tierNum, level }: { tierNum: 1|2|3|4|5|6|7; level: Level })
   const shadow = '0 1px 0 rgba(0,0,0,1), 0 2px 8px rgba(0,0,0,1), 0 0 24px rgba(0,0,0,0.9)';
 
   useEffect(() => {
-    navigator.vibrate?.(cfg.haptics as number[]);
+    navigator.vibrate?.([...cfg.haptics]);
     playTierSound(tierNum);
     // Debe sonar/vibrar una sola vez al montar esta pantalla de tier; tierNum
     // no cambia durante la vida de esta instancia (el padre desmonta y monta

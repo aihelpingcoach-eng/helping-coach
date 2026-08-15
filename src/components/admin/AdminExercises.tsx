@@ -14,7 +14,7 @@ export default function AdminExercises() {
     setLoading(true);
     const { data } = await supabase
       .from('exercises')
-      .select('id, name, description, duration, benefit, illustration, category, image_url')
+      .select('id, name, description, duration, benefit, illustration, category, image_url, equipment, muscle')
       .order('category')
       .order('name');
     setExercises(data ?? []);
