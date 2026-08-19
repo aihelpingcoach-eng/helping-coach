@@ -6,6 +6,8 @@ import { supabase } from '../lib/supabase';
 import { XP_REWARDS } from '../constants/progression';
 import { getDecayedXP } from '../constants/levels';
 import { useCoachProfile } from '../hooks/useCoachProfile';
+import { useAdGate } from '../hooks/useAdGate';
+import AdGate from './AdGate';
 import PlayerHistoryPanel from './progress/PlayerHistoryPanel';
 import EmptyState from './EmptyState';
 import playerPlaceholder from '../assets/illustrations/player-placeholder.png';
@@ -106,6 +108,7 @@ export default function ProgressMode() {
   const [showDaySettings, setShowDaySettings] = useState(false);
   const { giveCustomXP, currentLevel } = useXP();
   const { profile, updateProfile } = useCoachProfile();
+  const { isPro, withAdGate, showAdGate, featureName, handleAdComplete, handleAdCancel } = useAdGate();
 
   useEffect(() => {
     loadPlayers();
@@ -182,10 +185,14 @@ export default function ProgressMode() {
   const allowedDays = profile?.progress_swipe_days ?? [0, 1, 2, 3, 4, 5, 6];
   const todayAllowed = allowedDays.includes(new Date().getDay());
   const doneToday = profile?.last_swipe_session_date === todayISO();
-  const roundLocked = !todayAllowed || doneToday;
+  // Free: una ronda al día. Pro: rondas ilimitadas (el candado por "ya
+  // evaluado hoy" no le aplica). El día de la semana sí sigue aplicando a
+  // todos, es una preferencia del entrenador, no una limitación de plan.
+  const roundLocked = !todayAllowed || (doneToday && !isPro);
 
   if (roundLocked) {
     const nextDay = nextAllowedDayLabel(allowedDays);
+    const extraRoundAvailable = todayAllowed && doneToday && !isPro;
     return (
       <div className="relative w-full h-full flex flex-col items-center justify-center px-6 text-center gap-4">
         <div className="bg-purple-900/30 border border-purple-500/40 rounded-full p-4">
@@ -196,11 +203,26 @@ export default function ProgressMode() {
             {doneToday ? 'Ya evaluaste hoy' : 'Hoy no toca evaluar'}
           </h1>
           <p className="text-gray-400 text-sm">
-            {nextDay
-              ? `Vuelve el próximo ${nextDay} para tu ronda de progreso.`
-              : 'Configura tus días de evaluación para empezar.'}
+            {extraRoundAvailable
+              ? 'Mira un anuncio para hacer otra ronda de progreso hoy, o hazte Pro para evaluar sin límites.'
+              : nextDay
+                ? `Vuelve el próximo ${nextDay} para tu ronda de progreso.`
+                : 'Configura tus días de evaluación para empezar.'}
           </p>
         </div>
+
+        {extraRoundAvailable && (
+          <button
+            onClick={() => withAdGate(
+              () => updateProfile({ last_swipe_session_date: null }),
+              'otra ronda de evaluación'
+            )}
+            className="bg-purple-600 hover:bg-purple-500 text-white font-bold px-5 py-2.5 rounded-xl transition-colors text-sm"
+          >
+            Ver anuncio y evaluar de nuevo
+          </button>
+        )}
+
         <button
           onClick={() => setShowDaySettings(true)}
           className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold px-4 py-2 rounded-xl transition-colors text-sm"
@@ -214,6 +236,16 @@ export default function ProgressMode() {
             selectedDays={allowedDays}
             onSave={(days) => updateProfile({ progress_swipe_days: days })}
             onClose={() => setShowDaySettings(false)}
+          />
+        )}
+
+        {showAdGate && (
+          <AdGate
+            featureName={featureName}
+            title="Ronda extra"
+            description="Con el plan Free, mira un breve anuncio para desbloquear otra ronda de evaluación hoy."
+            onComplete={handleAdComplete}
+            onCancel={handleAdCancel}
           />
         )}
       </div>

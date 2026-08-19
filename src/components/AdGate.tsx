@@ -7,9 +7,17 @@ interface AdGateProps {
   onComplete: () => void;
   onCancel: () => void;
   featureName?: string;
+  title?: string;
+  description?: string;
 }
 
-export default function AdGate({ onComplete, onCancel, featureName = 'esta función' }: AdGateProps) {
+export default function AdGate({
+  onComplete,
+  onCancel,
+  featureName = 'esta función',
+  title = 'Función IA',
+  description = 'Con el plan Free, visualiza un breve anuncio para acceder a las funciones de IA.',
+}: AdGateProps) {
   const [countdown, setCountdown] = useState(5);
   const [ready, setReady] = useState(false);
 
@@ -32,7 +40,7 @@ export default function AdGate({ onComplete, onCancel, featureName = 'esta funci
             <div className="w-8 h-8 bg-purple-600/30 rounded-lg flex items-center justify-center">
               <Zap size={16} className="text-purple-400" />
             </div>
-            <span className="text-white font-bold text-sm">Función IA</span>
+            <span className="text-white font-bold text-sm">{title}</span>
           </div>
           <button
             onClick={onCancel}
@@ -48,9 +56,7 @@ export default function AdGate({ onComplete, onCancel, featureName = 'esta funci
             <Play size={28} className="text-purple-400 fill-purple-400" />
           </div>
           <h3 className="text-white font-bold text-lg mb-2">Desbloquea {featureName}</h3>
-          <p className="text-slate-400 text-sm leading-relaxed">
-            Con el plan <span className="text-slate-300 font-medium">Free</span>, visualiza un breve anuncio para acceder a las funciones de IA.
-          </p>
+          <p className="text-slate-400 text-sm leading-relaxed">{description}</p>
         </div>
 
         {/* Anuncio real de AdSense (si la cuenta ya está configurada y aprobada) */}
