@@ -1,0 +1,52 @@
+-- Elimina ejercicios duplicados por nombre (mismo nombre traducido, animaciones
+-- distintas del dataset de origen). Por cada nombre repetido se conserva la
+-- fila con mas metadata completa (musculo + material) y se borran el resto.
+-- 40 grupos, 44 filas eliminadas. IDs calculados a partir del estado real de
+-- la tabla en producción (ver conversación del 19/08/2026).
+
+DELETE FROM exercises WHERE id IN (
+  '5a48f3fd-0184-4229-b3ef-9b309acef7fe',
+  '5786e3a1-e312-4c50-9fbe-d8da57552846',
+  'e2b338fd-3d9d-43ff-8092-afaf50cc9b24',
+  'eb10fad9-edef-4f26-892b-6a0d5203a4fb',
+  'a0366e5f-aa1f-44ca-a9ce-564857591463',
+  '39bc79d7-0e3d-4e48-b904-e3a1679433c7',
+  'fe91307f-fe90-4461-83f4-bb6a9c0933fc',
+  '20f16725-0f10-43dc-9a1c-a049dd957684',
+  '32d20d69-8003-49f3-90c5-1ecb5a6431fa',
+  '9d3f9da7-6757-431f-b67c-c572fb9cdf51',
+  'df517b1b-51cf-4a8a-8e78-f0deca00c24e',
+  'df8f90ce-9b33-4234-885c-0f59e34a5bd3',
+  '8ccd809d-fa77-4f35-bdd6-958fd30f8f9c',
+  '6cb3a658-c5fd-463d-a7b5-55733bf818f3',
+  '2f67da22-2a86-49c7-a469-fc34b7d48a02',
+  '036e3827-a2f2-42a5-9e8d-992b775d061c',
+  '4ee3fb20-2519-47a9-9cbb-57fa7baafa1f',
+  '4fdcb903-5053-4021-b0f7-a67d14cb382c',
+  'f52b243d-9a33-41ff-ab83-2af893b03e24',
+  '47ee973e-3e04-4dff-8c98-819ba44f8e58',
+  'b30867ad-6235-4f37-bef7-5d8e31430232',
+  'b386f61e-a5ef-4c0a-aeac-5d8dccb1aade',
+  '5b3f6531-bd06-4129-b6f8-2869af691eed',
+  'ecc85ddb-ab58-403a-b0ec-b1c25c00e29a',
+  'f8a7857c-d7c5-4581-876c-cb3dafe4d30c',
+  '14c70cc3-d4a8-461b-86d8-c148094f583c',
+  'fbf6fc13-8f74-460f-b9e9-64228311d5c8',
+  '22724872-4966-4800-a23b-d9fe795ef528',
+  '3dc2b61d-c366-4be3-beeb-8ce83e225891',
+  '959069a3-b4c5-4dda-ab3f-99094bd8d5d3',
+  '4a540aa1-e72c-4181-97c3-e907d2575b7e',
+  'a78eca16-de09-4243-a780-4834740ee1be',
+  '2713c0dd-b9a7-413d-a7d8-daeefadd4ae4',
+  '20e28e32-ca87-4657-a6cd-31020de64f97',
+  'f6a5a92c-522f-4c98-9016-c183b91b2fab',
+  '5b38f9ec-0703-4c84-9a42-901d8a8416e1',
+  'acfe73e2-89b0-40ef-bad9-30a421f48e22',
+  '2c15b92e-95ef-4528-acb4-04797f234a44',
+  '9fee1db6-8c92-4fcc-afaf-e7c22438166e',
+  '16148e78-b225-478d-998e-16c3cfd54fd7',
+  'f908cf27-405f-4696-9069-1d3b47083ea1',
+  'e2e18760-384c-40cc-bfe3-01d1510d0c36',
+  'dbab78be-5f5b-465d-b704-29572bb5a1fa',
+  'c93ce788-6811-4d9c-bed5-937e9b8e4b91'
+);
