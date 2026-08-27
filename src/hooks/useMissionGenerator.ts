@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Match } from './useMatches';
 import { TrainingSession } from './useTrainingSessions';
 import { MissionType, MissionFrequency } from '../types/advancedSystems';
+import { recordMissionCompletion } from '../utils/missionNotifications';
 
 interface MissionTemplate {
   mission_type: MissionType;
@@ -87,29 +88,33 @@ export function useMissionGenerator(
   coachId: string,
   matches: Match[],
   sessions: TrainingSession[],
-  giveCustomXP: (amount: number) => Promise<void>
+  giveCustomXP: (amount: number) => Promise<void>,
+  onMissionCompleted?: (tmpl: { title: string; reward_xp: number }) => void,
+  // No todo lo que mueve el progreso (p.ej. añadir un jugador) cambia
+  // matches/sessions, así que no dispara el efecto por sí solo. refreshKey
+  // deja que quien llama fuerce una recomprobación (p.ej. al cambiar de tab).
+  refreshKey?: string | number
 ) {
-  const ran = useRef(false);
+  const matchesPlayed = matches.length;
+  const matchesWithResult = matches.filter(m => m.result !== null).length;
+  const last7days = new Date();
+  last7days.setDate(last7days.getDate() - 7);
+  const sessionsThisWeek = sessions.filter(
+    s => s.completed && new Date(s.completed_at ?? '') >= last7days
+  ).length;
 
   useEffect(() => {
-    if (!coachId || ran.current) return;
-    ran.current = true;
+    if (!coachId) return;
 
     (async () => {
       const { count: playerCount } = await supabase
         .from('players')
         .select('id', { count: 'exact', head: true });
 
-      const last7days = new Date();
-      last7days.setDate(last7days.getDate() - 7);
-      const sessionsThisWeek = sessions.filter(
-        s => s.completed && new Date(s.completed_at ?? '') >= last7days
-      ).length;
-
       const stats: Stats = {
         playerCount: playerCount ?? 0,
-        matchesPlayed: matches.length,
-        matchesWithResult: matches.filter(m => m.result !== null).length,
+        matchesPlayed,
+        matchesWithResult,
         sessionsThisWeek,
       };
 
@@ -118,6 +123,12 @@ export function useMissionGenerator(
         .select('id, title, progress, target, reward_xp, is_completed')
         .eq('coach_id', coachId);
 
+      const celebrate = async (tmpl: MissionTemplate) => {
+        await giveCustomXP(tmpl.reward_xp);
+        recordMissionCompletion(tmpl.title, tmpl.reward_xp);
+        onMissionCompleted?.(tmpl);
+      };
+
       for (const tmpl of TEMPLATES) {
         const current = existing?.find(m => m.title === tmpl.title && !m.is_completed);
         const progress = tmpl.computeProgress(stats);
@@ -125,11 +136,18 @@ export function useMissionGenerator(
 
         if (current) {
           if (progress !== current.progress || completed || current.reward_xp !== tmpl.reward_xp) {
-            await supabase
+            // El filtro is_completed=false hace la actualización atómica: si
+            // otra ejecución solapada ya la completó primero, esta no
+            // devuelve filas y no se vuelve a dar el XP por duplicado.
+            const { data: updated } = await supabase
               .from('coach_missions')
               .update({ progress, is_completed: completed, reward_xp: tmpl.reward_xp })
-              .eq('id', current.id);
-            if (completed) await giveCustomXP(tmpl.reward_xp);
+              .eq('id', current.id)
+              .eq('is_completed', false)
+              .select('id');
+            if (completed && updated && updated.length > 0) {
+              await celebrate(tmpl);
+            }
           }
         } else {
           const alreadyCompletedBefore = existing?.some(m => m.title === tmpl.title && m.is_completed);
@@ -147,12 +165,11 @@ export function useMissionGenerator(
             reward_description: tmpl.reward_description,
             is_completed: completed,
           });
-          if (completed) await giveCustomXP(tmpl.reward_xp);
+          if (completed) {
+            await celebrate(tmpl);
+          }
         }
       }
     })().catch(() => {});
-    // Se usa .length a proposito, igual que useEventGenerator: matches/sessions
-    // son arrays nuevos en cada fetch y solo nos importa si cambio la cantidad.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [coachId, matches.length, sessions.length]);
+  }, [coachId, matchesPlayed, matchesWithResult, sessionsThisWeek, giveCustomXP, onMissionCompleted, refreshKey]);
 }

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { CalendarDays, Trophy, CheckCircle, Zap, X } from 'lucide-react';
+import { CalendarDays, Trophy, CheckCircle, Zap, X, Award } from 'lucide-react';
 import { SmartReminder } from '../hooks/useNotifications';
 import { AppMode } from './BottomNav';
 
@@ -24,6 +24,7 @@ const URGENCY_DOT = {
 function ReminderIcon({ type }: { type: SmartReminder['type'] }) {
   if (type === 'match')   return <CalendarDays size={16} className="text-cyan-400 flex-shrink-0" />;
   if (type === 'player')  return <Trophy size={16} className="text-yellow-400 flex-shrink-0" />;
+  if (type === 'mission') return <Award size={16} className="text-amber-400 flex-shrink-0" />;
   return <CheckCircle size={16} className="text-green-400 flex-shrink-0" />;
 }
 
@@ -74,14 +75,16 @@ export default function NotificationPanel({ reminders, onClose, onNavigate }: Pr
               <button
                 key={reminder.id}
                 onClick={() => handleReminderClick(reminder)}
-                className={`w-full text-left border rounded-xl px-3 py-2.5 transition-all hover:scale-[1.01] active:scale-[0.99] ${URGENCY_STYLES[reminder.urgency]}`}
+                className={`w-full text-left border rounded-xl px-3 py-2.5 transition-all hover:scale-[1.01] active:scale-[0.99] ${
+                  reminder.type === 'mission' ? 'border-amber-500/40 bg-amber-900/20' : URGENCY_STYLES[reminder.urgency]
+                }`}
               >
                 <div className="flex items-start gap-2.5">
                   <ReminderIcon type={reminder.type} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-white text-xs font-semibold leading-tight">{reminder.title}</p>
-                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${URGENCY_DOT[reminder.urgency]}`} />
+                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${reminder.type === 'mission' ? 'bg-amber-400' : URGENCY_DOT[reminder.urgency]}`} />
                     </div>
                     <p className="text-gray-400 text-xs mt-0.5 leading-tight">{reminder.description}</p>
                   </div>

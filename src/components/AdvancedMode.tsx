@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Target, Zap, Activity, Trophy, Sparkles, FileText, BarChart3, ListOrdered } from 'lucide-react';
+import { Target, Zap, Activity, Trophy, Sparkles, FileText, BarChart3, ListOrdered, Award } from 'lucide-react';
 import TacticalAlerts from './TacticalAlerts';
 import EventCards from './EventCards';
 import WorkloadManager from './WorkloadManager';
@@ -34,8 +34,12 @@ export default function AdvancedMode() {
   const { matches } = useMatches(user?.id);
   const { sessions } = useTrainingSessions(user?.id);
   const { giveCustomXP } = useXP();
+  const [missionToast, setMissionToast] = useState<{ title: string; reward_xp: number } | null>(null);
   useEventGenerator(profile?.id ?? '', matches, sessions);
-  useMissionGenerator(profile?.id ?? '', matches, sessions, giveCustomXP);
+  useMissionGenerator(profile?.id ?? '', matches, sessions, giveCustomXP, (tmpl) => {
+    setMissionToast({ title: tmpl.title, reward_xp: tmpl.reward_xp });
+    setTimeout(() => setMissionToast(null), 3200);
+  }, activeTab);
   const [players, setPlayers] = useState<Player[]>([]);
   const [activeFormation, setActiveFormation] = useState('4-3-3');
   const [teamSlot, setTeamSlot] = useState<1 | 2 | 3>(1);
@@ -94,6 +98,13 @@ export default function AdvancedMode() {
   const teamPlaystyles = players.map(p => p.playstyle).filter(Boolean);
 
   return (
+    <>
+      {missionToast && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[70] flex items-center gap-2 bg-amber-500 text-black font-bold px-5 py-2.5 rounded-full shadow-lg animate-bounce text-sm max-w-[92vw]">
+          <Award size={16} className="flex-shrink-0" />
+          <span className="truncate">¡Misión completada! {missionToast.title} · +{missionToast.reward_xp} XP</span>
+        </div>
+      )}
     <div className="w-full p-4 sm:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
@@ -220,6 +231,7 @@ export default function AdvancedMode() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

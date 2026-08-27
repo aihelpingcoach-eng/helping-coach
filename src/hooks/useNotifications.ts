@@ -1,9 +1,10 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Match } from './useMatches';
+import { getRecentMissionCompletions, MISSION_COMPLETED_EVENT } from '../utils/missionNotifications';
 
 export interface SmartReminder {
   id: string;
-  type: 'match' | 'player' | 'session';
+  type: 'match' | 'player' | 'session' | 'mission';
   title: string;
   description: string;
   urgency: 'high' | 'medium' | 'low';
@@ -22,8 +23,30 @@ export function useSmartReminders(
   matches: Match[],
   playerCount: number
 ): SmartReminder[] {
+  // localStorage no es reactivo: escuchamos el evento que dispara
+  // useMissionGenerator al completar una misión para forzar el recálculo.
+  const [missionTick, setMissionTick] = useState(0);
+
+  useEffect(() => {
+    const bump = () => setMissionTick(t => t + 1);
+    window.addEventListener(MISSION_COMPLETED_EVENT, bump);
+    return () => window.removeEventListener(MISSION_COMPLETED_EVENT, bump);
+  }, []);
+
   return useMemo(() => {
     const reminders: SmartReminder[] = [];
+
+    // Misiones completadas recientemente
+    for (const rec of getRecentMissionCompletions()) {
+      reminders.push({
+        id: `mission-${rec.id}`,
+        type: 'mission',
+        title: '¡Misión completada!',
+        description: `${rec.title} · +${rec.reward_xp} XP`,
+        urgency: 'low',
+        mode: 'advanced',
+      });
+    }
 
     // Upcoming matches
     const upcoming = matches.filter(m => !m.result);
@@ -72,5 +95,8 @@ export function useSmartReminders(
     }
 
     return reminders;
-  }, [matches, playerCount]);
+    // missionTick no se lee dentro del cuerpo: solo fuerza releer
+    // localStorage cuando useMissionGenerator completa una misión.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matches, playerCount, missionTick]);
 }
