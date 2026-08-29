@@ -14,6 +14,9 @@ import GlobalSearch from './components/GlobalSearch';
 import ErrorBoundary from './components/ErrorBoundary';
 import PrivacyPolicy from './components/legal/PrivacyPolicy';
 import TermsOfService from './components/legal/TermsOfService';
+import GuidesIndex from './components/guides/GuidesIndex';
+import GuideArticle from './components/guides/GuideArticle';
+import FAQ from './components/guides/FAQ';
 import { useMatches } from './hooks/useMatches';
 import { useSmartReminders } from './hooks/useNotifications';
 import { useCoachProfile } from './hooks/useCoachProfile';
@@ -147,6 +150,9 @@ function App() {
   const path = window.location.pathname;
   if (path === '/privacidad') return <PrivacyPolicy />;
   if (path === '/terminos') return <TermsOfService />;
+  if (path === '/faq') return <FAQ />;
+  if (path === '/guias') return <GuidesIndex />;
+  if (path.startsWith('/guias/')) return <GuideArticle slug={path.slice('/guias/'.length)} />;
 
   return (
     <ErrorBoundary>

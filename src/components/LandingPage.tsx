@@ -22,6 +22,8 @@ export default function LandingPage() {
           <nav className="hidden sm:flex items-center gap-6 text-sm text-gray-400">
             <a href="#funcionalidades" className="hover:text-white transition-colors">Funcionalidades</a>
             <a href="#como-funciona" className="hover:text-white transition-colors">Cómo funciona</a>
+            <a href="/guias" className="hover:text-white transition-colors">Guías</a>
+            <a href="/faq" className="hover:text-white transition-colors">FAQ</a>
           </nav>
           <button
             onClick={goToApp}
@@ -365,6 +367,8 @@ export default function LandingPage() {
               <span className="text-gray-500 text-sm">Helping Coach</span>
             </div>
             <nav className="flex items-center gap-5 text-sm text-gray-500">
+              <a href="/guias" className="hover:text-gray-300 transition-colors">Guías</a>
+              <a href="/faq" className="hover:text-gray-300 transition-colors">FAQ</a>
               <a href="/privacidad" className="hover:text-gray-300 transition-colors">Privacidad</a>
               <a href="/terminos" className="hover:text-gray-300 transition-colors">Términos</a>
               <a href="mailto:ai.helpingcoach@gmail.com" className="hover:text-gray-300 transition-colors">Contacto</a>

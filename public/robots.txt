@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Allow: /guias
+Allow: /faq
+Allow: /privacidad
+Allow: /terminos
+Disallow: /acceder
+
+Sitemap: https://helping-coach.vercel.app/sitemap.xml
