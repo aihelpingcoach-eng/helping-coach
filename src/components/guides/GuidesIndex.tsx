@@ -8,10 +8,15 @@ export default function GuidesIndex() {
       style={{ WebkitOverflowScrolling: 'touch' }}
     >
       <div className="max-w-3xl mx-auto px-4 py-10 sm:py-14">
-        <a href="/" className="flex items-center gap-3 mb-8 w-fit">
-          <img src={logoImg} alt="Helping Coach" className="w-10 h-10 object-contain" />
-          <span className="text-white font-bold text-lg">Helping Coach</span>
-        </a>
+        <div className="flex items-center justify-between gap-3 mb-8 flex-wrap">
+          <a href="/" className="flex items-center gap-3">
+            <img src={logoImg} alt="Helping Coach" className="w-10 h-10 object-contain" />
+            <span className="text-white font-bold text-lg">Helping Coach</span>
+          </a>
+          <nav className="flex items-center gap-4 text-sm text-gray-400">
+            <a href="/faq" className="hover:text-white transition-colors">FAQ</a>
+          </nav>
+        </div>
 
         <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Guías para entrenadores</h1>
         <p className="text-gray-400 mb-10">
