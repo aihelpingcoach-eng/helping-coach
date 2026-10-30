@@ -49,6 +49,79 @@ vercel --yes --prod
 
 ---
 
+## Recursos de diseño
+
+A partir de ahora, apoyarse en estos recursos gratuitos cada vez que se cree o mejore una pantalla de
+Helping Coach. Contexto del proyecto: React 18 + TypeScript + Vite + Tailwind CSS 3 + Supabase, iconos
+con lucide-react, **sin shadcn** (no hay `components.json`). No actualizar Tailwind a v4 ni ejecutar
+`shadcn init` sin preguntar al usuario primero.
+
+### 1. Awwwards — referencias antes de diseñar (solo inspiración)
+- Antes de diseñar una pantalla o un rediseño, buscar 3–5 referencias en awwwards.com: Sites of the Day
+  (`/websites/sites_of_the_day/`), Collections (`/collections/`) y sobre todo Elements (`/elements/`:
+  menús, formularios, tarjetas, navegación, dashboards, deportes). Mostrárselas al usuario con el enlace
+  y qué se toma de cada una.
+- Los sitios premiados son de sus autores: tomar principios (composición, jerarquía, tipografía,
+  microinteracciones) y crear un diseño propio. Nunca copiar diseño, código, textos ni imágenes.
+- No usar Academy ni Pro (de pago). Del Market, solo productos gratis con licencia comercial explícita.
+- Si WebFetch no carga bien la página (mucho JS), capturar las referencias con Playwright.
+
+### 2. 21st.dev — componentes React + Tailwind (plan gratis)
+- Skills instaladas: `21st-ui-explore` (proponer 3 direcciones), `21st-ui-build` (construir),
+  `21st-ui-review` (revisar UI) y `21st-cli-use` (buscar componentes y logos). Usarlas.
+- Flujo: buscar primero en el catálogo (`npx -y @21st-dev/cli@latest search "<lo que se necesita>"`)
+  antes de escribir un componente desde cero.
+- Gratis y sin cuenta: `search` y `logo <marca>`. Con la cuenta del usuario (`21st login`, lo hace él):
+  `get`/`add` gastan las 2 copias gratis al día; mirar antes `21st usage`.
+- **Prohibido sin que el usuario lo pida explícitamente:** `21st generate`/`iterate` (IA de pago),
+  `publish`, `publish-theme`, `21st-design-sync` y `21st-registry` (publican en abierto). No contratar
+  ni activar nada de pago.
+- Como no se usa shadcn ni Tailwind 4, no instalar con `21st add`: leer el código del componente y
+  reescribirlo con las convenciones del proyecto (TypeScript, Tailwind 3, lucide-react, paleta morada
+  `#7C3AED`). Si depende de `cn()` o de Radix, sustituirlo por código propio o preguntar al usuario.
+- Licencias: el código es de su autor y de 21st Labs; revisar la licencia de cada componente. Si no la
+  indica, usarlo solo como referencia y escribir una versión propia.
+- Los logos de marcas (`21st logo`) solo para mostrar herramientas o integraciones, nunca como clientes.
+- MCP opcional: si el usuario pide conectarlo, el comando lo ejecuta él con su propia clave
+  (`claude mcp add --transport http 21st https://21st.dev/api/mcp --header "x-api-key: <SU_CLAVE>"`).
+  La clave nunca va en el repo ni en `.mcp.json`.
+
+### 3. GetLayers — efectos visuales (solo capas gratis)
+- Consultar getlayers.ai cuando una pantalla necesite un efecto especial: fondo animado (login,
+  bienvenida, pantallas vacías), gradiente interactivo, escena 3D (Three.js), animación de texto o cursor.
+- Solo plan Free (prompt completo, licencia comercial, sin atribución). El MCP de GetLayers, el código
+  fuente (Full Stack) y las capas Premium son de pago: no usarlos.
+- El prompt de cada capa se copia en `getlayers.ai/layer/<nombre>` con la cuenta del usuario; si no se
+  puede leer, pedírselo. Adaptarlo siempre a la paleta propia y a React + Tailwind; nunca entregarlo tal cual.
+- Capas gratis vistas el 2026-10-26 (la lista cambia, revisar en cada uso):
+  - Fondos: Metal Human, Purple Desert, Sea Storm, Moon Walk, Material Hills
+  - Gradientes: Soffit, Soffit 001–004
+  - Escenas 3D: Flow Wave, Tunnel, Starfield Close, Storm, Elliptical Galaxy
+  - Templates: Soda, Kimi, Baseline (deportes/educación), Lumora, Laocoon
+  - Herramientas (`getlayers.ai/tools`: Text Animations, Custom Cursors, Orb Studio, Shader
+    Backgrounds…): confirmar en cada una que sigue siendo gratis antes de usarla.
+
+### 4. Nano Banana — todas las imágenes nuevas
+- Generar las imágenes nuevas (ilustraciones, fondos, imágenes de ejercicios, OG image) con el servidor
+  MCP `nanobanana` de `.mcp.json`, y editar las existentes con su herramienta de edición. Para lotes de
+  ejercicios revisar antes `npm run generate-images` (`scripts/generate-exercise-images.ts`).
+- Estilo coherente con el personaje de `recursos/` y la paleta morada; usar la misma conversación o
+  imágenes de referencia para no perder el estilo.
+- Proporciones según el uso: 16:9 fondos/hero, 4:3 o 3:2 tarjetas, 9:16 móvil, 1:1 avatares.
+- Sin texto ni logos dentro de las imágenes (el texto va en el HTML). Convertir a WebP y usar lazy loading.
+- Seguridad: `.mcp.json` contiene la clave de Gemini. Debe estar en `.gitignore` — comprobar con
+  `git ls-files .mcp.json` que no está subido.
+
+### Reglas comunes
+- Flujo para pantallas nuevas: referencias de Awwwards → `21st-ui-explore` (3 direcciones, el usuario
+  elige) → construir con `frontend-design` + `21st-ui-build` → imágenes con Nano Banana → revisar con
+  `21st-ui-review` (accesibilidad WCAG AA, móvil, teclado, `prefers-reduced-motion`).
+- Mobile-first. Nada de pago sin preguntar al usuario. Nunca claves en el código ni en el repo.
+- No inventar datos: ni testimonios, ni usuarios, ni cifras que el usuario no haya confirmado.
+- Antes de un cambio grande, enseñarlo en una preview de Vercel y esperar el OK del usuario.
+
+---
+
 ## Historial de sesiones
 
 ### Sesión 1 — 2026-04-09
