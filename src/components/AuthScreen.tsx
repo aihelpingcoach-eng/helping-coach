@@ -2,6 +2,26 @@ import { useState } from 'react';
 import { Mail, Lock, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import logoImg from '../assets/logo_new.png';
+import authBgVideo from '../assets/video/auth-background.mp4';
+import authBgPoster from '../assets/video/auth-background-poster.jpg';
+
+// Fondo animado (GetLayers "Purple Desert", capa gratis con licencia
+// comercial). Autoplay silencioso: playsInline + muted son obligatorios
+// para que arranque solo en iOS/Android sin interacción del usuario.
+function AuthBackgroundVideo() {
+  return (
+    <video
+      className="absolute inset-0 w-full h-full object-cover opacity-30 blur-sm"
+      src={authBgVideo}
+      poster={authBgPoster}
+      autoPlay
+      loop
+      muted
+      playsInline
+      aria-hidden="true"
+    />
+  );
+}
 
 export default function AuthScreen() {
   const [isLogin, setIsLogin] = useState(true);
@@ -70,7 +90,7 @@ export default function AuthScreen() {
   if (showReset) {
     return (
       <div className="fixed inset-0 flex flex-col bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900">
-        <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/274506/pexels-photo-274506.jpeg')] bg-cover bg-center opacity-20 blur-sm" />
+        <AuthBackgroundVideo />
         <div className="relative z-10 flex-1 overflow-y-auto flex items-center justify-center p-4">
           <div className="w-full max-w-sm bg-black/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-purple-500/30 p-6">
             <div className="flex justify-center mb-4">
@@ -104,7 +124,7 @@ export default function AuthScreen() {
 
   return (
     <div className="fixed inset-0 flex flex-col bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900">
-      <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/274506/pexels-photo-274506.jpeg')] bg-cover bg-center opacity-20 blur-sm" />
+      <AuthBackgroundVideo />
 
       <div className="relative z-10 flex-1 overflow-y-auto flex items-center justify-center p-4">
         <div className="w-full max-w-sm bg-black/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-purple-500/30 p-6">
