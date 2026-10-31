@@ -1,12 +1,20 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { MessageCircle, ChevronRight, ArrowLeft, Activity, AlertCircle, Shield, Zap, Footprints, Dumbbell, Flame, Radiation, Bone, Cross } from 'lucide-react';
 import CoachChat from './CoachChat';
 import { useCoachProfile } from '../hooks/useCoachProfile';
 import { useXP } from '../hooks/useXP';
 import LevelUpModal from './LevelUpModal';
+import InjuryBodyMap, { ZoneInjury } from './InjuryBodyMap';
 import { useInjuryCategories, InjuryCategoryRow, InjuryRow } from '../hooks/useInjuries';
+import { BodyView, InjuryZoneId } from '../constants/injuryZones';
 
 type ViewLevel = 'categories' | 'injuries' | 'detail';
+type BrowseMode = 'zone' | 'category';
+
+const browseModes: { id: BrowseMode; label: string }[] = [
+  { id: 'zone', label: 'Por zona' },
+  { id: 'category', label: 'Por categoría' },
+];
 
 const iconMap = {
   ankle: Footprints,
@@ -23,9 +31,20 @@ export default function InjuriesMode() {
   const [selectedCategory, setSelectedCategory] = useState<InjuryCategoryRow | null>(null);
   const [selectedInjury, setSelectedInjury] = useState<InjuryRow | null>(null);
   const [showCoachChat, setShowCoachChat] = useState(false);
+  const [browseMode, setBrowseMode] = useState<BrowseMode>('zone');
+  const [bodyView, setBodyView] = useState<BodyView>('front');
+  const [selectedZone, setSelectedZone] = useState<InjuryZoneId | null>(null);
   const { profile: coachProfile } = useCoachProfile();
   const { giveXP, showLevelUpModal, newLevel, closeLevelUpModal } = useXP();
   const { categories, loading } = useInjuryCategories();
+
+  const injuriesBySlug = useMemo(() => {
+    const map = new Map<string, ZoneInjury>();
+    categories.forEach(category =>
+      category.injuries.forEach(injury => map.set(injury.slug, { injury, categoryName: category.name }))
+    );
+    return map;
+  }, [categories]);
 
   const handleCategoryClick = (category: InjuryCategoryRow) => {
     setSelectedCategory(category);
@@ -37,9 +56,16 @@ export default function InjuriesMode() {
     setCurrentView('detail');
   };
 
+  const handleBodyViewChange = (view: BodyView) => {
+    setBodyView(view);
+    setSelectedZone(null);
+  };
+
   const handleBack = () => {
     if (currentView === 'detail') {
-      setCurrentView('injuries');
+      // Desde el mapa corporal no hay lista de categoría intermedia: se vuelve
+      // al mapa, que conserva la zona marcada.
+      setCurrentView(selectedCategory ? 'injuries' : 'categories');
       setSelectedInjury(null);
     } else if (currentView === 'injuries') {
       setCurrentView('categories');
@@ -66,7 +92,7 @@ export default function InjuriesMode() {
               {currentView === 'detail' && selectedInjury?.name}
             </h1>
             <p className="text-gray-400 text-sm">
-              {currentView === 'categories' && 'Categorías de lesiones deportivas'}
+              {currentView === 'categories' && (browseMode === 'zone' ? 'Toca la zona donde duele' : 'Categorías de lesiones deportivas')}
               {currentView === 'injuries' && `${selectedCategory?.injuries.length} lesiones registradas`}
               {currentView === 'detail' && 'Información médica detallada'}
             </p>
@@ -74,6 +100,36 @@ export default function InjuriesMode() {
         </div>
 
         {currentView === 'categories' && (
+          <div className="flex gap-1 p-1 mb-5 max-w-sm rounded-2xl bg-white/5 border border-white/10" role="group" aria-label="Cómo buscar la lesión">
+            {browseModes.map(mode => (
+              <button
+                key={mode.id}
+                type="button"
+                aria-pressed={browseMode === mode.id}
+                onClick={() => setBrowseMode(mode.id)}
+                className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                  browseMode === mode.id ? 'bg-red-500/20 text-red-200' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                {mode.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {currentView === 'categories' && browseMode === 'zone' && (
+          <InjuryBodyMap
+            view={bodyView}
+            onViewChange={handleBodyViewChange}
+            selectedZone={selectedZone}
+            onSelectZone={setSelectedZone}
+            injuriesBySlug={injuriesBySlug}
+            loading={loading}
+            onOpenInjury={handleInjuryClick}
+          />
+        )}
+
+        {currentView === 'categories' && browseMode === 'category' && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {loading ? (
               Array.from({ length: 6 }).map((_, i) => (
