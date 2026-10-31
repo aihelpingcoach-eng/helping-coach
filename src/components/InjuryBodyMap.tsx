@@ -46,19 +46,25 @@ function BodySvg({
   view,
   selectedZone,
   onSelectZone,
+  isZoneAvailable,
   svgRef,
 }: {
   view: BodyView;
   selectedZone: InjuryZoneId | null;
   onSelectZone: (zone: InjuryZoneId) => void;
+  isZoneAvailable: (zone: InjuryZoneId) => boolean;
   svgRef: RefObject<SVGSVGElement>;
 }) {
   const parts = view === 'front' ? BODY_FRONT : BODY_BACK;
   const vb = BODY_VIEWBOX[view];
   const zoneOf = ZONE_BY_MUSCLE[view];
-  const neutralParts = parts.filter(p => !zoneOf[p.slug]);
+  const activeZoneOf = (slug: string) => {
+    const zone = zoneOf[slug];
+    return zone && isZoneAvailable(zone) ? zone : undefined;
+  };
+  const neutralParts = parts.filter(p => !activeZoneOf(p.slug));
   const zones = INJURY_ZONES
-    .map(zone => ({ zone, parts: parts.filter(p => zoneOf[p.slug] === zone.id) }))
+    .map(zone => ({ zone, parts: parts.filter(p => activeZoneOf(p.slug) === zone.id) }))
     .filter(z => z.parts.length > 0);
 
   const handleKeyDown = (e: KeyboardEvent, zone: InjuryZoneId) => {
@@ -88,9 +94,11 @@ function BodySvg({
 
       <path d={BODY_OUTLINE[view]} fill="none" stroke="#6b5b8a" strokeWidth={2} vectorEffect="non-scaling-stroke" />
 
-      {/* Músculos sin lesiones asociadas: más oscuros y sin interacción */}
+      {/* Músculos sin lesiones registradas en la BD: más oscuros y sin interacción */}
       <g fill="#2e2639" aria-hidden="true">
-        {neutralParts.flatMap(p => p.paths.map((d, i) => <path key={`${p.slug}-${i}`} d={d} />))}
+        {neutralParts.flatMap(p =>
+          p.paths.map((d, i) => <path key={`${p.slug}-${i}`} d={d} fill={p.slug === 'hair' ? '#1a1422' : undefined} />)
+        )}
       </g>
 
       {zones.map(({ zone, parts: zoneParts }) => {
@@ -208,6 +216,10 @@ export default function InjuryBodyMap({
   const itemsFor = (z: InjuryZone | null) =>
     z ? z.injurySlugs.map(slug => injuriesBySlug.get(slug)).filter((i): i is ZoneInjury => !!i) : [];
   const items = itemsFor(shownZone);
+  // Una zona solo se puede tocar si la BD tiene alguna de sus lesiones
+  // (mientras carga se dan todas por disponibles para que no parpadee).
+  const isZoneAvailable = (id: InjuryZoneId) =>
+    loading || itemsFor(INJURY_ZONES.find(z => z.id === id) ?? null).length > 0;
 
   // En móvil la hoja tapa la mitad inferior: se desplaza el cuerpo (como al
   // centrar un punto en un mapa) para que la zona marcada siga a la vista.
@@ -280,7 +292,13 @@ export default function InjuryBodyMap({
           className="absolute inset-x-0 top-16 bottom-9 transition-transform duration-300 ease-out motion-reduce:transition-none"
           style={{ transform: `translateY(${shift}px)` }}
         >
-          <BodySvg view={view} selectedZone={selectedZone} onSelectZone={onSelectZone} svgRef={svgRef} />
+          <BodySvg
+            view={view}
+            selectedZone={selectedZone}
+            onSelectZone={onSelectZone}
+            isZoneAvailable={isZoneAvailable}
+            svgRef={svgRef}
+          />
         </div>
 
         {!zone && (

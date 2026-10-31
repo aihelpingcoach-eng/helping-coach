@@ -26,7 +26,7 @@ vercel --yes --prod
 
 ### Modos funcionales
 - **Táctica** — Formaciones, sinergias con IA, asesor de formaciones (FormationAdvisor integrado)
-- **Lesiones** — Base de datos completa con categorías, tratamiento y prevención
+- **Lesiones** — Mapa corporal interactivo (frente/espalda, pestaña "Por zona") y base de datos completa con categorías, tratamiento y prevención
 - **Entrenamiento** — Biblioteca de ejercicios por categoría (fuerza, táctico, resistencia)
 - **Progresión** — Swipe para avance/retroceso de jugadores (escala 1-99)
 - **Avanzado** — Alertas, eventos, carga de trabajo, misiones, carrera, ADN del equipo, informe de partido
@@ -37,7 +37,8 @@ vercel --yes --prod
 |---|---|
 | AuthScreen | Funcional |
 | TacticsMode | Funcional — incluye FormationAdvisor |
-| InjuriesMode | Funcional |
+| InjuriesMode | Funcional — incluye InjuryBodyMap |
+| InjuryBodyMap | Integrado en InjuriesMode (pestaña Por zona) |
 | TrainingMode | Funcional |
 | ProgressMode | Funcional |
 | ProfileMode | Funcional |
@@ -182,6 +183,32 @@ con lucide-react, **sin shadcn** (no hay `components.json`). No actualizar Tailw
 - Resistencia (20 ejercicios) — Bangsbo, Kirka Athletic, Grupo Ekipo. Añadidos: Protocolo 10-10 Bangsbo, Intermitente con balón 4 m/s, 30-15 IFT, Series 200m técnicas, Hill Sprints, API noruego, Circuito 5×5, Umbral con cambios dirección
 - **Pliometría** (11 ejercicios, NUEVA) — Living4Football/Altamirano, Bosco. Hurdles, Depth Jump, Saltos laterales, Triple salto horizontal, Drop Jump+sprint, Skipping, Bounds, CMJ, Reactive Agility, Escalera, Salto largo
 - **Prevención** (11 ejercicios, NUEVA) — Forum Sport/BOSU, FIFA F-MARC, Adolfo Madrid. BOSU propiocepción, Nordic Curl, Estiramientos dinámicos, Activación glúteo medio, Equilibrio monopodal, Copenhagen Adductor, Foam rolling, Movilidad cadera, Activación pie/tobillo, FIFA 11+, Crioterapia
+
+### Sesión — 2026-11-01
+
+**Objetivo:** Mapa corporal en Lesiones: tocar la zona donde duele y ver las lesiones probables.
+
+**Cambios realizados:**
+
+- Diseño: 3 direcciones propuestas (artifact "Mapa de dolor"); el usuario eligió la A "Toca y mira" y pidió un
+  dibujo más realista → cuerpo anatómico por grupos musculares.
+- `src/constants/bodyMapPaths.ts` — trazados SVG de frente y espalda tomados de `react-native-body-highlighter`
+  v3.2.0 (licencia MIT, aviso conservado con `@license` para que sobreviva al minificado). Solo los datos; el
+  componente es propio.
+- `src/constants/injuryZones.ts` — 19 zonas (orden = pintado y tabulación; el cuello va antes que la cabeza para
+  que la barbilla quede encima) y su relación músculo → zona → slugs de lesiones.
+- `src/components/InjuryBodyMap.tsx` — zona tocada en rojo con brillo; en móvil sube una hoja inferior no modal y
+  el cuerpo se desplaza para que la zona siga visible; en escritorio (≥768px) panel lateral. Zonas pequeñas con
+  trazo transparente para ampliar el área de toque. Una zona solo se puede tocar si la BD tiene alguna de sus
+  lesiones. Teclado, `aria-live` y `prefers-reduced-motion`.
+- `src/components/InjuriesMode.tsx` — pestañas "Por zona" (por defecto) / "Por categoría"; al volver de una ficha
+  abierta desde el mapa se regresa al mapa con la zona marcada.
+- `supabase/migrations/20261101000000_add_more_injuries.sql` — 22 lesiones nuevas (35 → 57), idempotente. La
+  escritura en `injuries` es solo del admin: el usuario la ejecuta en el SQL Editor de Supabase.
+- `src/constants/injuryZones.test.ts` — comprueba que todo el dibujo tiene zona y que cada slug de las zonas
+  existe en las migraciones.
+- Vercel: añadidas `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` al entorno Preview (sin ellas las previews no
+  arrancan y se queda la landing estática).
 
 ---
 
