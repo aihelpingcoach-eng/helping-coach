@@ -1,4 +1,5 @@
 import { X, User, Crown, MapPin, Cake, CalendarClock, Shirt, LayoutGrid, Target } from 'lucide-react';
+import Modal from './Modal';
 
 export interface RankingRow {
   user_id: string;
@@ -38,11 +39,12 @@ export default function CoachProfileModal({ coach, onClose }: { coach: RankingRo
   if (coach.team_objective) facts.push({ icon: <Target size={16} />, label: 'Objetivo del equipo', value: coach.team_objective });
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div
-        className="bg-gradient-to-br from-gray-900 via-purple-900/30 to-gray-900 rounded-2xl max-w-md w-full shadow-2xl border border-purple-500/30"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Modal
+      onClose={onClose}
+      aria-label="Perfil del entrenador"
+      backdropClassName="bg-black/80 backdrop-blur-sm"
+      contentClassName="bg-gradient-to-br from-gray-900 via-purple-900/30 to-gray-900 rounded-2xl max-w-md w-full shadow-2xl border border-purple-500/30"
+    >
         <div className="p-5 border-b border-purple-500/30 flex justify-between items-center">
           <h2 className="text-lg font-bold text-white">Perfil del entrenador</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
@@ -78,7 +80,6 @@ export default function CoachProfileModal({ coach, onClose }: { coach: RankingRo
             <p className="text-gray-500 text-sm text-center py-4">Este entrenador no ha completado su perfil todavía.</p>
           )}
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

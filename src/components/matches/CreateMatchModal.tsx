@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { CreateMatchPayload } from '../../hooks/useMatches';
+import Modal from '../Modal';
 
 interface Props {
   onClose: () => void;
@@ -29,11 +30,11 @@ export default function CreateMatchModal({ onClose, onCreate }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={onClose}>
-      <div
-        className="bg-gray-900 border border-purple-500/40 rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto"
-        onClick={e => e.stopPropagation()}
-      >
+    <Modal
+      onClose={onClose}
+      aria-label="Nuevo partido"
+      contentClassName="bg-gray-900 border border-purple-500/40 rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto"
+    >
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
           <h2 className="text-white font-bold text-lg">Nuevo partido</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
@@ -117,7 +118,6 @@ export default function CreateMatchModal({ onClose, onCreate }: Props) {
             {saving ? 'Guardando...' : 'Guardar partido'}
           </button>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 }

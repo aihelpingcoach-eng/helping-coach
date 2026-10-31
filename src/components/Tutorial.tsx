@@ -40,6 +40,15 @@ export default function Tutorial() {
     return () => window.removeEventListener('resize', updatePosition);
   }, [step, isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') skipTutorial();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, skipTutorial]);
+
   if (!isOpen) return null;
 
   const handleBackdropClick = (e: React.MouseEvent) => {

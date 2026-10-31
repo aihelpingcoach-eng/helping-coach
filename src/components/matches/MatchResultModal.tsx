@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { Match } from '../../hooks/useMatches';
+import Modal from '../Modal';
 
 interface Props {
   match: Match;
@@ -28,11 +29,11 @@ export default function MatchResultModal({ match, onClose, onSave }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={onClose}>
-      <div
-        className="bg-gray-900 border border-purple-500/40 rounded-2xl w-full max-w-sm"
-        onClick={e => e.stopPropagation()}
-      >
+    <Modal
+      onClose={onClose}
+      aria-label="Resultado del partido"
+      contentClassName="bg-gray-900 border border-purple-500/40 rounded-2xl w-full max-w-sm"
+    >
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
           <h2 className="text-white font-bold text-lg">Resultado</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-white transition-colors">
@@ -83,7 +84,6 @@ export default function MatchResultModal({ match, onClose, onSave }: Props) {
             {saving ? 'Guardando...' : 'Guardar resultado'}
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

@@ -1,6 +1,7 @@
 import { X, TrendingUp, TrendingDown, Minus, Trophy } from 'lucide-react';
 import { Player } from '../../constants/playstyles';
 import { usePlayerHistory } from '../../hooks/usePlayerHistory';
+import Modal from '../Modal';
 
 interface Props {
   player: Player;
@@ -108,11 +109,13 @@ export default function PlayerHistoryPanel({ player, onClose }: Props) {
   const regressions = history.filter(h => h.level_change < 0).length;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <div
-        className="bg-gray-900 border-t border-gray-700 rounded-t-2xl w-full max-w-lg max-h-[80vh] flex flex-col"
-        onClick={e => e.stopPropagation()}
-      >
+    <Modal
+      onClose={onClose}
+      align="bottom"
+      aria-label={`Historial de ${player.name}`}
+      backdropClassName="bg-black/60 backdrop-blur-sm"
+      contentClassName="bg-gray-900 border-t border-gray-700 rounded-t-2xl w-full max-w-lg max-h-[80vh] flex flex-col"
+    >
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
           <div className="w-10 h-1 bg-gray-600 rounded-full" />
@@ -199,7 +202,6 @@ export default function PlayerHistoryPanel({ player, onClose }: Props) {
             )}
           </div>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
