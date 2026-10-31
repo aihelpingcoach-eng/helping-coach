@@ -194,6 +194,53 @@
   touch-action: none;
 }
 
+/* Hexágonos de jugador: flotación idle + sombra "de suelo" que respira al
+   contrario que el flote (sube = sombra más pequeña/tenue, como un objeto
+   real elevándose), y giro 3D de verdad (rotateY, con perspectiva) al pasar
+   el cursor o tocar, en vez de una rotación plana que con una forma casi
+   simétrica como el hexágono apenas se nota. */
+@keyframes hex-idle-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes hex-idle-shadow {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.9; }
+  50% { transform: translateX(-50%) scale(0.75); opacity: 0.5; }
+}
+
+.hex-idle-float {
+  animation: hex-idle-float 3s ease-in-out infinite;
+}
+
+.hex-idle-shadow {
+  animation: hex-idle-shadow 3s ease-in-out infinite;
+}
+
+.hex-spin-wrap {
+  perspective: 700px;
+}
+
+.hex-spin {
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  backface-visibility: hidden;
+}
+
+.hex-spin-wrap:hover .hex-spin,
+.hex-spin.is-expanded {
+  transform: scale(1.9) rotateY(360deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hex-idle-float,
+  .hex-idle-shadow {
+    animation: none;
+  }
+  .hex-spin {
+    transition: none;
+  }
+}
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }

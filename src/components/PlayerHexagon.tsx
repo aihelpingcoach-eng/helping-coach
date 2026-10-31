@@ -78,6 +78,10 @@ export default function PlayerHexagon({
     return '';
   };
 
+  // Desfase propio por hexágono para que no floten todos a la vez (delay
+  // negativo: arrancan ya a mitad de ciclo, cada uno en un punto distinto).
+  const floatDelay = -(((position.x * 7 + position.y * 13) % 30) / 10);
+
   return (
     <div
       className={`absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group animate-scale-in ${
@@ -89,11 +93,21 @@ export default function PlayerHexagon({
       }}
       onClick={handleTap}
     >
+      {/* Sombra "de suelo": no flota con el hexágono, respira al revés para
+          simular que el objeto se eleva y cae sobre una superficie. */}
+      <div
+        className={`absolute left-1/2 ${player ? 'top-[76px]' : 'top-[46px]'} w-14 h-4 rounded-full bg-black blur-[4px] hex-idle-shadow pointer-events-none`}
+        style={{ animationDelay: `${floatDelay}s` }}
+        aria-hidden="true"
+      />
+
+      <div className="hex-idle-float" style={{ animationDelay: `${floatDelay}s` }}>
+      <div className="hex-spin-wrap">
       <svg
         width={size}
         height={size}
-        className={`transition-transform duration-500 ease-out motion-reduce:duration-0 group-hover:scale-[1.9] group-hover:rotate-[360deg] group-hover:drop-shadow-2xl ${
-          isExpanded ? 'scale-[1.9] rotate-[360deg] drop-shadow-2xl' : ''
+        className={`hex-spin motion-reduce:!transition-none group-hover:drop-shadow-2xl ${
+          isExpanded ? 'is-expanded drop-shadow-2xl' : ''
         } ${getGlowClass()}`}
       >
         <defs>
@@ -153,6 +167,7 @@ export default function PlayerHexagon({
           </text>
         )}
       </svg>
+      </div>
 
       {player && (
         <div className={`absolute -top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap transition-opacity duration-300 ${
@@ -194,6 +209,7 @@ export default function PlayerHexagon({
           <span className="text-lg">⚠️</span>
         </div>
       )}
+      </div>
     </div>
   );
 }
