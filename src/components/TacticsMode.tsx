@@ -35,6 +35,7 @@ export default function TacticsMode() {
   const [selectedTeamSlot, setSelectedTeamSlot] = useState<TeamSlot>(getStoredTeamSlot);
   const [formationPlayers, setFormationPlayers] = useState<FormationPlayer[]>([]);
   const [selectedPosition, setSelectedPosition] = useState<number | null>(null);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showCoachChat, setShowCoachChat] = useState(false);
   const [players, setPlayers] = useState<Player[]>([]);
@@ -366,7 +367,11 @@ export default function TacticsMode() {
         )}
 
         <div className="flex justify-center items-center flex-1 min-h-0 px-2" data-tutorial="tutorial-field">
-          <div ref={fieldRef} className="relative w-full max-w-2xl h-full">
+          <div
+            ref={fieldRef}
+            className="relative w-full max-w-2xl h-full"
+            onClick={(e) => { if (e.target === e.currentTarget) setExpandedIndex(null); }}
+          >
             {fieldRef.current && synergies.length > 0 && (
               <SynergyLines
                 synergies={synergies}
@@ -384,9 +389,11 @@ export default function TacticsMode() {
                   key={index}
                   position={pos}
                   player={player}
-                  onClick={() => handleHexagonClick(index)}
+                  onClick={() => { handleHexagonClick(index); setExpandedIndex(null); }}
                   onDoubleClick={() => player && setSelectedPlayer(player)}
                   allPlayers={playersInFormation}
+                  isExpanded={expandedIndex === index}
+                  onExpand={() => setExpandedIndex(index)}
                 />
               );
             })}

@@ -10,6 +10,9 @@ interface PlayerHexagonProps {
   isHighlighted?: boolean;
   hasInjuryRisk?: boolean;
   isPerformingWell?: boolean;
+  /** Tarjeta ampliada (imagen grande + nombre + playstyle) activa en táctil */
+  isExpanded?: boolean;
+  onExpand?: () => void;
 }
 
 export default function PlayerHexagon({
@@ -19,7 +22,9 @@ export default function PlayerHexagon({
   onDoubleClick,
   isHighlighted = false,
   hasInjuryRisk = false,
-  isPerformingWell = false
+  isPerformingWell = false,
+  isExpanded = false,
+  onExpand
 }: PlayerHexagonProps) {
   const lastTapTime = useRef<number>(0);
   const tapTimeoutRef = useRef<NodeJS.Timeout>();
@@ -35,7 +40,17 @@ export default function PlayerHexagon({
     } else {
       lastTapTime.current = currentTime;
       tapTimeoutRef.current = setTimeout(() => {
-        onClick();
+        // En pantallas sin hover real (táctil) el primer toque solo
+        // enseña la tarjeta ampliada (como hace el hover en escritorio);
+        // hace falta un segundo toque, ya con la tarjeta abierta, para
+        // cambiar de jugador. En escritorio el hover ya hace de preview,
+        // así que el click sigue actuando igual que siempre.
+        const hasRealHover = window.matchMedia('(hover: hover)').matches;
+        if (player && !hasRealHover && !isExpanded) {
+          onExpand?.();
+        } else {
+          onClick();
+        }
       }, 300);
     }
   };
@@ -67,7 +82,7 @@ export default function PlayerHexagon({
     <div
       className={`absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group animate-scale-in ${
         hasInjuryRisk ? 'animate-shake' : ''
-      }`}
+      } ${isExpanded ? 'z-20' : 'z-0 hover:z-20'}`}
       style={{
         left: `${position.x}%`,
         top: `${position.y}%`,
@@ -77,7 +92,9 @@ export default function PlayerHexagon({
       <svg
         width={size}
         height={size}
-        className={`transition-all duration-300 group-hover:scale-125 group-hover:drop-shadow-2xl ${getGlowClass()}`}
+        className={`transition-transform duration-500 ease-out motion-reduce:duration-0 group-hover:scale-[1.9] group-hover:rotate-[360deg] group-hover:drop-shadow-2xl ${
+          isExpanded ? 'scale-[1.9] rotate-[360deg] drop-shadow-2xl' : ''
+        } ${getGlowClass()}`}
       >
         <defs>
           {player?.image_url && (
@@ -138,7 +155,9 @@ export default function PlayerHexagon({
       </svg>
 
       {player && (
-        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <div className={`absolute -top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap transition-opacity duration-300 ${
+          isExpanded ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+        }`}>
           <div className="bg-gradient-to-r from-purple-900/90 to-pink-900/90 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-lg font-semibold shadow-xl border border-purple-500/30">
             {player.name}
           </div>
