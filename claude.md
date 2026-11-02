@@ -233,6 +233,31 @@ con lucide-react, **sin shadcn** (no hay `components.json`). No actualizar Tailw
   `favicon-96.png` (Google pide múltiplos de 48 px). `public/sw.js` pasa a `CACHE_NAME` v2: los estáticos son
   cache-first y hay que subir la versión cada vez que cambien iconos o manifest.
 
+### Sesión — 2026-11-03
+
+**Objetivo:** Ordenar Avanzado y mejorarlo (plan aprobado por el usuario antes de tocar nada).
+
+**Cambios realizados:**
+
+- `src/components/AdvancedMode.tsx` — de 9 pestañas (en móvil solo se veían 3) a 4: Resumen, Equipo, Retos y
+  Avisos. Fuera Alertas y Carga: nada escribía en `tactical_alerts` ni en `weekly_workload` (siempre vacías).
+  Carga volverá con el registro de acciones del partido (los minutos saldrán de entradas y salidas).
+- `AdvancedSummary.tsx` — Resumen de una pantalla (antes >3.000 px repitiendo las otras pestañas).
+- `src/hooks/useTeamAlerts.ts` + `TeamAlertsList.tsx` — avisos calculados al momento (no se guardan, así no
+  se quedan desfasados): próximo partido ≤3 días, resultados pendientes, alineación a medias, jugador que baja
+  en sus 2 últimas evaluaciones, ≥7 días sin entrenar. Enlazan a la sección con `onNavigate` (App → AdvancedMode).
+  Ojo: `player_progress` no tiene relación declarada con `players` en la BD; el embed `players(name)` da 400.
+- `useEventGenerator.ts` — esperaba a nada: corría con los partidos sin cargar y creaba "Sin historial de
+  partidos"; además solo miraba 7 días y lo duplicaba cada semana. Ahora recibe `ready`, no duplica y retira ese
+  aviso cuando hay partidos. `EventCards.tsx` da el XP anunciado (antes siempre 10) y usa `Modal`.
+- `CareerMode.tsx` — datos reales (partidos, victorias, entrenamientos, misiones); ya no usa `coach_career`.
+  Rangos (progression.ts, 8) y niveles (levels.ts) se mantienen: el usuario prefirió no unificarlos.
+- `MatchReportGenerator.tsx` — elegir un partido registrado rellena el resultado; "Tiros a puerta".
+- Clasificación (`LeaderboardPanel.tsx`, `useRankingPosition.ts`, `RankingPrivacyToggle.tsx` en Perfil):
+  pestaña semanal, puesto real fuera del top 100, opción de no aparecer y la edad deja de ser pública.
+  Migración `20261102000000_ranking_privacy_and_weekly.sql` (ejecutada por el usuario): `show_in_ranking`,
+  `xp_events` rellenada por trigger al subir `total_xp`, vista `coach_rankings_weekly` (lunes, hora de Madrid).
+
 ---
 
 ## Notas técnicas
