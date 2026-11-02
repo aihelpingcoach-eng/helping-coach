@@ -247,7 +247,7 @@ con lucide-react, **sin shadcn** (no hay `components.json`). No actualizar Tailw
   se quedan desfasados): próximo partido ≤3 días, resultados pendientes, alineación a medias, jugador que baja
   en sus 2 últimas evaluaciones, ≥7 días sin entrenar. Enlazan a la sección con `onNavigate` (App → AdvancedMode).
   Ojo: `player_progress` no tiene relación declarada con `players` en la BD; el embed `players(name)` da 400.
-- `useEventGenerator.ts` — esperaba a nada: corría con los partidos sin cargar y creaba "Sin historial de
+- `useEventGenerator.ts` — no esperaba a los datos: corría con los partidos sin cargar y creaba "Sin historial de
   partidos"; además solo miraba 7 días y lo duplicaba cada semana. Ahora recibe `ready`, no duplica y retira ese
   aviso cuando hay partidos. `EventCards.tsx` da el XP anunciado (antes siempre 10) y usa `Modal`.
 - `CareerMode.tsx` — datos reales (partidos, victorias, entrenamientos, misiones); ya no usa `coach_career`.
