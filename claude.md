@@ -227,6 +227,11 @@ con lucide-react, **sin shadcn** (no hay `components.json`). No actualizar Tailw
 - `src/App.tsx` — avatar de Perfil (foto o inicial) junto a la campana; lados de la cabecera con `flex-1` para que
   el logo siga centrado.
 - `src/hooks/useTutorial.ts` — los pasos de Progresión, Avanzado y Perfil dicen dónde están ahora.
+- Iconos: faltaba `apple-touch-icon` (el iPhone ponía una captura de la página al añadirla a inicio) y los
+  iconos eran un balón provisional. Ahora todos salen del logo `src/assets/logo_new.png`: `apple-touch-icon.png`
+  (180, opaco), `icon-192/512.png` (fondo morado, zona segura maskable), `favicon.ico` (16/32/48) y
+  `favicon-96.png` (Google pide múltiplos de 48 px). `public/sw.js` pasa a `CACHE_NAME` v2: los estáticos son
+  cache-first y hay que subir la versión cada vez que cambien iconos o manifest.
 
 ---
 
