@@ -210,6 +210,24 @@ con lucide-react, **sin shadcn** (no hay `components.json`). No actualizar Tailw
 - Vercel: añadidas `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` al entorno Preview (sin ellas las previews no
   arrancan y se queda la landing estática).
 
+### Sesión — 2026-11-02
+
+**Objetivo:** Rehacer la barra inferior de navegación (opción B elegida por el usuario).
+
+**Cambios realizados:**
+
+- `src/components/BottomNav.tsx` — 4 secciones fijas (Lesiones, Entreno, Tácticas en el centro, Partidos) + "Más",
+  que abre una hoja (`Modal` align="bottom") con Progreso, Avanzado, Perfil y Admin. "Más" se resalta cuando la
+  sección activa está dentro. La hoja se renderiza fuera del `<nav>` porque su `backdrop-blur` haría de contenedor
+  de los `fixed`. Un único color activo (morado-200 sobre pastilla morada; inactivo gris-400): antes cada sección
+  tenía su color y el rojo de Lesiones daba contraste 1,8:1. `<nav aria-label>` + `aria-current`. Barra centrada
+  (`max-w-lg`) en escritorio. Icono de Progreso de línea.
+- Motivo: con 7–8 botones la barra no cabía; en 360 px Perfil quedaba fuera de pantalla y en 390 px solo se veía
+  un tercio, sin indicación de que se podía deslizar.
+- `src/App.tsx` — avatar de Perfil (foto o inicial) junto a la campana; lados de la cabecera con `flex-1` para que
+  el logo siga centrado.
+- `src/hooks/useTutorial.ts` — los pasos de Progresión, Avanzado y Perfil dicen dónde están ahora.
+
 ---
 
 ## Notas técnicas
