@@ -1,5 +1,5 @@
 import { useState, Suspense, lazy } from 'react';
-import { Bell, Search } from 'lucide-react';
+import { Bell, Search, User } from 'lucide-react';
 import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './contexts/AuthContext';
 import { MusicProvider } from './contexts/MusicContext';
@@ -66,14 +66,17 @@ function AppContent() {
       <div className="relative z-10 h-screen flex flex-col">
         <header className="flex-shrink-0 bg-black/30 backdrop-blur-md border-b border-purple-500/30">
           <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex justify-between items-center">
-            <button
-              onClick={() => setShowSearch(true)}
-              className="flex items-center justify-center text-gray-400 active:text-white transition-colors touch-manipulation rounded-lg"
-              style={{ minWidth: '44px', minHeight: '44px' }}
-              title="Buscar"
-            >
-              <Search size={20} className="sm:w-6 sm:h-6" />
-            </button>
+            {/* Lados con el mismo ancho para que el logo quede centrado */}
+            <div className="flex-1 flex">
+              <button
+                onClick={() => setShowSearch(true)}
+                className="flex items-center justify-center text-gray-400 active:text-white transition-colors touch-manipulation rounded-lg"
+                style={{ minWidth: '44px', minHeight: '44px' }}
+                title="Buscar"
+              >
+                <Search size={20} className="sm:w-6 sm:h-6" />
+              </button>
+            </div>
             <div className="flex items-center gap-2 sm:gap-3">
               <img
                 src={logoImg}
@@ -82,27 +85,51 @@ function AppContent() {
               />
               <h1 className="text-base sm:text-xl font-bold text-white">Helping Coach</h1>
             </div>
-            <div className="relative">
-              <button
-                onClick={() => setShowNotifications(prev => !prev)}
-                className="relative flex items-center justify-center text-gray-400 active:text-white transition-colors touch-manipulation rounded-lg"
-                style={{ minWidth: '44px', minHeight: '44px' }}
-                title="Notificaciones"
-              >
-                <Bell size={20} className="sm:w-6 sm:h-6" />
-                {totalCount > 0 && (
-                  <span className={`absolute top-1 right-1 min-w-[16px] h-4 rounded-full text-[9px] font-bold flex items-center justify-center px-0.5 ${urgentCount > 0 ? 'bg-red-500' : 'bg-yellow-500'} text-white`}>
-                    {totalCount}
-                  </span>
+            <div className="flex-1 flex justify-end items-center gap-1">
+              <div className="relative">
+                <button
+                  onClick={() => setShowNotifications(prev => !prev)}
+                  className="relative flex items-center justify-center text-gray-400 active:text-white transition-colors touch-manipulation rounded-lg"
+                  style={{ minWidth: '44px', minHeight: '44px' }}
+                  title="Notificaciones"
+                >
+                  <Bell size={20} className="sm:w-6 sm:h-6" />
+                  {totalCount > 0 && (
+                    <span className={`absolute top-1 right-1 min-w-[16px] h-4 rounded-full text-[9px] font-bold flex items-center justify-center px-0.5 ${urgentCount > 0 ? 'bg-red-500' : 'bg-yellow-500'} text-white`}>
+                      {totalCount}
+                    </span>
+                  )}
+                </button>
+                {showNotifications && (
+                  <NotificationPanel
+                    reminders={reminders}
+                    onClose={() => setShowNotifications(false)}
+                    onNavigate={(mode) => { setActiveMode(mode); setShowNotifications(false); }}
+                  />
                 )}
+              </div>
+              <button
+                onClick={() => setActiveMode('profile')}
+                aria-label="Tu perfil"
+                aria-current={activeMode === 'profile' ? 'page' : undefined}
+                className="flex items-center justify-center touch-manipulation rounded-full"
+                style={{ minWidth: '44px', minHeight: '44px' }}
+                title="Perfil"
+              >
+                <span
+                  className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden flex items-center justify-center bg-purple-600/30 text-purple-100 text-sm font-bold ring-2 transition-colors ${
+                    activeMode === 'profile' ? 'ring-purple-300' : 'ring-purple-500/40'
+                  }`}
+                >
+                  {profile?.profile_photo ? (
+                    <img src={profile.profile_photo} alt="" className="w-full h-full object-cover" />
+                  ) : profile?.coach_name?.trim() ? (
+                    profile.coach_name.trim()[0].toUpperCase()
+                  ) : (
+                    <User size={18} />
+                  )}
+                </span>
               </button>
-              {showNotifications && (
-                <NotificationPanel
-                  reminders={reminders}
-                  onClose={() => setShowNotifications(false)}
-                  onNavigate={(mode) => { setActiveMode(mode); setShowNotifications(false); }}
-                />
-              )}
             </div>
           </div>
         </header>

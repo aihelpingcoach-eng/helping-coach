@@ -72,7 +72,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 9,
     title: 'Modo Progresión',
-    description: 'Aquí evalúas el rendimiento de cada jugador. Desliza hacia la derecha para subir su nivel, hacia la izquierda para bajarlo. Cada evaluación queda registrada en el historial de progresión. El sistema escala del nivel 1 al 99 y se refleja en las estadísticas del jugador.',
+    description: 'Está en el botón «Más» de la barra inferior. Aquí evalúas el rendimiento de cada jugador. Desliza hacia la derecha para subir su nivel, hacia la izquierda para bajarlo. Cada evaluación queda registrada en el historial de progresión. El sistema escala del nivel 1 al 99 y se refleja en las estadísticas del jugador.',
     action: 'none',
   },
   {
@@ -90,13 +90,13 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 12,
     title: 'Modo Avanzado: Centro de Mando',
-    description: 'El modo Avanzado agrupa las herramientas de alto nivel: Alertas tácticas, Eventos del equipo, Carga de trabajo, Misiones del coach, Carrera profesional, ADN del equipo e Informe de partido generado con IA. Es donde tomas las grandes decisiones estratégicas.',
+    description: 'El modo Avanzado, dentro de «Más» en la barra inferior, agrupa las herramientas de alto nivel: Alertas tácticas, Eventos del equipo, Carga de trabajo, Misiones del coach, Carrera profesional, ADN del equipo e Informe de partido generado con IA. Es donde tomas las grandes decisiones estratégicas.',
     action: 'none',
   },
   {
     id: 13,
     title: 'Tu Perfil de Entrenador',
-    description: 'Cada acción en la app te da XP: añadir jugadores, consultar la IA, registrar partidos, completar sesiones de entrenamiento. Sube de rango desde Entrenador Amateur hasta Leyenda. Tu perfil muestra estadísticas completas de tu actividad como coach.',
+    description: 'Toca tu avatar, arriba a la derecha, para abrir tu perfil. Cada acción en la app te da XP: añadir jugadores, consultar la IA, registrar partidos, completar sesiones de entrenamiento. Sube de rango desde Entrenador Amateur hasta Leyenda. Tu perfil muestra estadísticas completas de tu actividad como coach.',
     action: 'none',
   },
   {
