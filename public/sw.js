@@ -1,10 +1,12 @@
-const CACHE_NAME = 'helpin-coach-v1';
+// Subir la versión al cambiar iconos o manifest: los estáticos van cache-first,
+// así que sin esto los móviles que ya tenían la app seguirían con los antiguos.
+const CACHE_NAME = 'helpin-coach-v2';
 
 // App shell files to cache on install
 const APP_SHELL = [
   '/',
   '/manifest.json',
-  '/icon.svg',
+  '/icon-192.png',
 ];
 
 self.addEventListener('install', (event) => {
