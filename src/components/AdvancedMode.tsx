@@ -1,24 +1,29 @@
-import { useState, useEffect } from 'react';
-import { Target, Zap, Activity, Trophy, Sparkles, FileText, BarChart3, ListOrdered, Award } from 'lucide-react';
-import TacticalAlerts from './TacticalAlerts';
+import { useState, useEffect, useMemo, ReactNode } from 'react';
+import { LayoutDashboard, Users, Trophy, Bell, Award, Sparkles, FileText, Target, ListOrdered, Zap } from 'lucide-react';
 import EventCards from './EventCards';
-import WorkloadManager from './WorkloadManager';
 import MissionsPanel from './MissionsPanel';
 import CareerMode from './CareerMode';
 import TeamDNAAnalysis from './TeamDNAAnalysis';
 import MatchReportGenerator from './MatchReportGenerator';
 import TeamStatsPanel from './TeamStatsPanel';
 import LeaderboardPanel from './LeaderboardPanel';
+import AdvancedSummary from './AdvancedSummary';
+import TeamAlertsList from './TeamAlertsList';
+import type { AppMode } from './BottomNav';
 import { useCoachProfile } from '../hooks/useCoachProfile';
 import { useAuth } from '../contexts/AuthContext';
 import { useMatches } from '../hooks/useMatches';
 import { useTrainingSessions } from '../hooks/useTrainingSessions';
 import { useEventGenerator } from '../hooks/useEventGenerator';
 import { useMissionGenerator } from '../hooks/useMissionGenerator';
+import { useTeamAlerts } from '../hooks/useTeamAlerts';
 import { useXP } from '../hooks/useXP';
+import { computeTeamDNA } from '../constants/teamDNA';
 import { supabase } from '../lib/supabase';
 
-type AdvancedTab = 'overview' | 'alerts' | 'events' | 'workload' | 'missions' | 'career' | 'report' | 'stats' | 'ranking';
+// Antes eran 9 pestañas (en el móvil solo se veían 3) y dos de ellas, Alertas
+// y Carga, siempre vacías: nada generaba sus datos. Ahora 4 que caben enteras.
+export type AdvancedTab = 'overview' | 'team' | 'challenges' | 'alerts';
 
 interface Player {
   id: string;
@@ -27,19 +32,40 @@ interface Player {
   playstyle: string;
 }
 
-export default function AdvancedMode() {
+interface AdvancedModeProps {
+  /** Lleva a otra sección de la app (los avisos enlazan con Tácticas, Partidos…) */
+  onNavigate?: (mode: AppMode) => void;
+}
+
+function Section({ title, icon: Icon, action, children }: { title: string; icon: typeof Users; action?: ReactNode; children: ReactNode }) {
+  return (
+    <section className="rounded-3xl border border-white/10 bg-gray-900/60 backdrop-blur-sm p-4 sm:p-6">
+      <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
+        <h2 className="flex items-center gap-2 text-lg font-bold text-white">
+          <Icon size={20} className="text-purple-300" />
+          {title}
+        </h2>
+        {action}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+export default function AdvancedMode({ onNavigate }: AdvancedModeProps) {
   const [activeTab, setActiveTab] = useState<AdvancedTab>('overview');
   const { profile } = useCoachProfile();
   const { user } = useAuth();
-  const { matches } = useMatches(user?.id);
-  const { sessions } = useTrainingSessions(user?.id);
+  const { matches, loading: matchesLoading } = useMatches(user?.id);
+  const { sessions, loading: sessionsLoading } = useTrainingSessions(user?.id);
   const { giveCustomXP } = useXP();
   const [missionToast, setMissionToast] = useState<{ title: string; reward_xp: number } | null>(null);
-  useEventGenerator(profile?.id ?? '', matches, sessions);
+  useEventGenerator(profile?.id ?? '', matches, sessions, !matchesLoading && !sessionsLoading);
   useMissionGenerator(profile?.id ?? '', matches, sessions, giveCustomXP, (tmpl) => {
     setMissionToast({ title: tmpl.title, reward_xp: tmpl.reward_xp });
     setTimeout(() => setMissionToast(null), 3200);
   }, activeTab);
+  const { alerts, loading: alertsLoading } = useTeamAlerts(user?.id, matches, sessions);
   const [players, setPlayers] = useState<Player[]>([]);
   const [activeFormation, setActiveFormation] = useState('4-3-3');
   const [teamSlot, setTeamSlot] = useState<1 | 2 | 3>(1);
@@ -75,6 +101,12 @@ export default function AdvancedMode() {
     }
   };
 
+  const dna = useMemo(() => {
+    if (players.length === 0) return null;
+    const result = computeTeamDNA(activeFormation, players);
+    return { slot: teamSlot, name: result.name, style: result.style };
+  }, [players, activeFormation, teamSlot]);
+
   if (!profile) {
     return (
       <div className="w-full h-full flex items-center justify-center p-8">
@@ -83,16 +115,11 @@ export default function AdvancedMode() {
     );
   }
 
-  const tabs = [
-    { id: 'overview' as AdvancedTab, label: 'Resumen', icon: Trophy },
-    { id: 'alerts' as AdvancedTab, label: 'Alertas', icon: Zap },
-    { id: 'events' as AdvancedTab, label: 'Eventos', icon: Target },
-    { id: 'workload' as AdvancedTab, label: 'Carga', icon: Activity },
-    { id: 'missions' as AdvancedTab, label: 'Misiones', icon: Target },
-    { id: 'career' as AdvancedTab, label: 'Carrera', icon: Trophy },
-    { id: 'report' as AdvancedTab, label: 'Informe', icon: FileText },
-    { id: 'stats' as AdvancedTab, label: 'Estadísticas', icon: BarChart3 },
-    { id: 'ranking' as AdvancedTab, label: 'Clasificación', icon: ListOrdered },
+  const tabs: { id: AdvancedTab; label: string; icon: typeof Users; badge?: number }[] = [
+    { id: 'overview', label: 'Resumen', icon: LayoutDashboard },
+    { id: 'team', label: 'Equipo', icon: Users },
+    { id: 'challenges', label: 'Retos', icon: Trophy },
+    { id: 'alerts', label: 'Avisos', icon: Bell, badge: alerts.length },
   ];
 
   const teamPlaystyles = players.map(p => p.playstyle).filter(Boolean);
@@ -106,127 +133,91 @@ export default function AdvancedMode() {
         </div>
       )}
     <div className="w-full p-4 sm:p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Sistemas Avanzados</h1>
-          <p className="text-gray-400 text-sm sm:text-base">
-            Gestión completa de tu carrera como entrenador
-          </p>
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-5">
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-1">Avanzado</h1>
+          <p className="text-gray-400 text-sm">Tu equipo, tus retos y lo que necesita tu atención</p>
         </div>
 
-        <div className="relative mb-6">
-          <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all ${
-                    activeTab === tab.id
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg scale-105'
-                      : 'bg-gray-800/50 text-gray-400 hover:bg-gray-800 hover:text-white'
-                  }`}
-                >
-                  <Icon size={18} />
-                  <span className="text-sm">{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
-          <div className="pointer-events-none absolute top-0 right-0 h-full w-10 bg-gradient-to-l from-black to-transparent" />
+        <div className="flex gap-1 p-1 mb-5 rounded-2xl bg-white/5 border border-white/10" role="group" aria-label="Secciones de Avanzado">
+          {tabs.map(tab => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                aria-pressed={isActive}
+                onClick={() => setActiveTab(tab.id)}
+                className={`relative flex-1 min-w-0 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors ${
+                  isActive ? 'bg-purple-600/30 text-purple-100' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <Icon size={18} />
+                <span className="truncate">{tab.label}</span>
+                {!!tab.badge && (
+                  <span
+                    className="absolute top-1 right-1 sm:static min-w-[18px] h-[18px] px-1 rounded-full bg-orange-500 text-white text-[10px] font-bold flex items-center justify-center"
+                    aria-label={`${tab.badge} pendientes`}
+                  >
+                    {tab.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           {activeTab === 'overview' && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
-                  <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                    <Zap className="text-yellow-400" />
-                    Alertas Tácticas Recientes
-                  </h3>
-                  <TacticalAlerts coachId={profile.id} />
-                </div>
+            <AdvancedSummary coachId={profile.id} userId={user?.id} alerts={alerts} dna={dna} onGoTo={setActiveTab} />
+          )}
 
-                <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
-                  <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                    <Target className="text-blue-400" />
-                    Misiones Activas
-                  </h3>
-                  <MissionsPanel coachId={profile.id} />
-                </div>
+          {activeTab === 'team' && (
+            <>
+              <TeamStatsPanel userId={user?.id ?? ''} />
+
+              <div className="flex items-center justify-between gap-3 flex-wrap pt-2">
+                <p className="text-sm text-gray-400">Análisis por equipo</p>
+                <TeamSlotSelector value={teamSlot} onChange={setTeamSlot} />
               </div>
 
-              <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
-                <h3 className="text-xl font-bold text-white mb-4">Eventos Destacados</h3>
-                <EventCards coachId={profile.id} />
-              </div>
-
-              <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
-                <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
-                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                    <Sparkles className="text-purple-400" />
-                    ADN del Equipo
-                  </h3>
-                  <TeamSlotSelector value={teamSlot} onChange={setTeamSlot} />
-                </div>
+              <Section title="ADN del equipo" icon={Sparkles}>
                 <TeamDNAAnalysis key={teamSlot} formation={activeFormation} players={players} />
-              </div>
-            </div>
+              </Section>
+
+              <Section title="Informe de partido" icon={FileText}>
+                <MatchReportGenerator key={teamSlot} teamPlaystyles={teamPlaystyles} matches={matches} />
+              </Section>
+            </>
+          )}
+
+          {activeTab === 'challenges' && (
+            <>
+              <Section title="Misiones" icon={Target}>
+                <MissionsPanel coachId={profile.id} />
+              </Section>
+
+              <Section title="Carrera" icon={Trophy}>
+                <CareerMode coachId={profile.id} matches={matches} sessions={sessions} />
+              </Section>
+
+              <Section title="Clasificación" icon={ListOrdered}>
+                <LeaderboardPanel onOpenProfile={onNavigate ? () => onNavigate('profile') : undefined} />
+              </Section>
+            </>
           )}
 
           {activeTab === 'alerts' && (
-            <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
-              <TacticalAlerts coachId={profile.id} />
-            </div>
-          )}
+            <>
+              <Section title="Ahora mismo" icon={Bell}>
+                <TeamAlertsList alerts={alerts} loading={alertsLoading} onNavigate={onNavigate} />
+              </Section>
 
-          {activeTab === 'events' && (
-            <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
-              <EventCards coachId={profile.id} />
-            </div>
-          )}
-
-          {activeTab === 'workload' && (
-            <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
-              <WorkloadManager coachId={profile.id} players={[]} />
-            </div>
-          )}
-
-          {activeTab === 'missions' && (
-            <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
-              <MissionsPanel coachId={profile.id} />
-            </div>
-          )}
-
-          {activeTab === 'career' && (
-            <div>
-              <CareerMode coachId={profile.id} />
-            </div>
-          )}
-
-          {activeTab === 'report' && (
-            <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
-              <div className="flex items-center justify-end mb-4">
-                <TeamSlotSelector value={teamSlot} onChange={setTeamSlot} />
-              </div>
-              <MatchReportGenerator key={teamSlot} teamPlaystyles={teamPlaystyles} />
-            </div>
-          )}
-
-          {activeTab === 'stats' && (
-            <TeamStatsPanel userId={user?.id ?? ''} />
-          )}
-
-          {activeTab === 'ranking' && (
-            <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <ListOrdered className="text-purple-400" />
-                Clasificación de Entrenadores
-              </h3>
-              <LeaderboardPanel />
-            </div>
+              <Section title="Eventos" icon={Zap}>
+                <EventCards coachId={profile.id} />
+              </Section>
+            </>
           )}
         </div>
       </div>
@@ -237,12 +228,14 @@ export default function AdvancedMode() {
 
 function TeamSlotSelector({ value, onChange }: { value: 1 | 2 | 3; onChange: (slot: 1 | 2 | 3) => void }) {
   return (
-    <div className="flex items-center gap-1 bg-gray-800/70 rounded-lg p-1">
+    <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-xl p-1" role="group" aria-label="Equipo">
       {([1, 2, 3] as const).map(slot => (
         <button
           key={slot}
+          type="button"
+          aria-pressed={value === slot}
           onClick={() => onChange(slot)}
-          className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
             value === slot ? 'bg-purple-600 text-white' : 'text-gray-400 hover:text-white'
           }`}
         >

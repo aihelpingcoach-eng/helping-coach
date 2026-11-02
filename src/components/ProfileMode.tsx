@@ -9,6 +9,7 @@ import { supabase } from '../lib/supabase';
 import XPProgressBar from './XPProgressBar';
 import LevelUpModal from './LevelUpModal';
 import MusicControls from './MusicControls';
+import RankingPrivacyToggle from './RankingPrivacyToggle';
 import ProfileEditor from './ProfileEditor';
 import { isAdmin } from '../utils/isAdmin';
 
@@ -184,6 +185,7 @@ export default function ProfileMode() {
         </button>
 
         <MusicControls />
+        <RankingPrivacyToggle />
 
         {/* Plan section */}
         <div className="mb-4">

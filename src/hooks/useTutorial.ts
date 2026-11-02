@@ -90,7 +90,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 12,
     title: 'Modo Avanzado: Centro de Mando',
-    description: 'El modo Avanzado, dentro de «Más» en la barra inferior, agrupa las herramientas de alto nivel: Alertas tácticas, Eventos del equipo, Carga de trabajo, Misiones del coach, Carrera profesional, ADN del equipo e Informe de partido generado con IA. Es donde tomas las grandes decisiones estratégicas.',
+    description: 'El modo Avanzado, dentro de «Más» en la barra inferior, tiene cuatro pestañas: Resumen (lo esencial de un vistazo), Equipo (estadísticas, ADN e informe de partido con IA), Retos (misiones, carrera y clasificación semanal y global) y Avisos (lo que necesita tu atención: próximos partidos, alineaciones a medias, resultados pendientes…).',
     action: 'none',
   },
   {

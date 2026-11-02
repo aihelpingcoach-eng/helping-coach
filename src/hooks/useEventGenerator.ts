@@ -11,16 +11,15 @@ interface EventSeed {
   requires_decision: boolean;
 }
 
+// Antes solo miraba los últimos 7 días: si el aviso seguía sin resolver, se
+// volvía a crear cada semana (la cuenta demo acumulaba 4 copias).
 async function alreadyExists(coachId: string, cardType: string): Promise<boolean> {
-  const since = new Date();
-  since.setDate(since.getDate() - 7);
   const { data } = await supabase
     .from('event_cards')
     .select('id')
     .eq('coach_id', coachId)
     .eq('card_type', cardType)
     .eq('is_resolved', false)
-    .gte('created_at', since.toISOString())
     .limit(1);
   return (data?.length ?? 0) > 0;
 }
@@ -30,16 +29,35 @@ async function insertEvent(coachId: string, seed: EventSeed) {
   await supabase.from('event_cards').insert({ coach_id: coachId, ...seed });
 }
 
+const NO_MATCHES_TITLE = 'Sin historial de partidos';
+
+/**
+ * @param ready  true cuando partidos y sesiones ya han cargado. Antes se
+ *               ejecutaba con las listas aún vacías y creaba "Sin historial de
+ *               partidos" a entrenadores que sí tenían partidos.
+ */
 export function useEventGenerator(
   coachId: string,
   matches: Match[],
-  sessions: TrainingSession[]
+  sessions: TrainingSession[],
+  ready: boolean
 ) {
   const ran = useRef(false);
 
   useEffect(() => {
-    if (!coachId || ran.current) return;
+    if (!coachId || !ready || ran.current) return;
     ran.current = true;
+
+    // Si ya hay partidos, el aviso de "sin historial" sobra: se da por resuelto
+    if (matches.length > 0) {
+      supabase
+        .from('event_cards')
+        .update({ is_resolved: true })
+        .eq('coach_id', coachId)
+        .eq('title', NO_MATCHES_TITLE)
+        .eq('is_resolved', false)
+        .then(() => {});
+    }
 
     const played = matches.filter(m => m.result !== null);
     const recent = played.slice(-10);
@@ -91,7 +109,7 @@ export function useEventGenerator(
     if (matches.length === 0) {
       events.push({
         card_type: 'tactical_conflict',
-        title: 'Sin historial de partidos',
+        title: NO_MATCHES_TITLE,
         narrative: 'Aún no has registrado ningún partido. Llevar el historial te permitirá analizar el rendimiento del equipo.',
         effect: 'Registra tus partidos para desbloquear estadísticas y análisis tácticos.',
         requires_decision: false,
@@ -104,5 +122,5 @@ export function useEventGenerator(
     // son objetos nuevos en cada fetch, así que depender de la referencia
     // completa dispararía el efecto en cada render aunque el contenido no cambie.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [coachId, matches.length, sessions.length]);
+  }, [coachId, ready, matches.length, sessions.length]);
 }

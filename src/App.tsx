@@ -139,7 +139,7 @@ function AppContent() {
           <Suspense fallback={<TabLoadingFallback />}>
             {activeMode === 'injuries' && <InjuriesMode />}
             {activeMode === 'training' && <TrainingMode />}
-            {activeMode === 'advanced' && <AdvancedMode />}
+            {activeMode === 'advanced' && <AdvancedMode onNavigate={setActiveMode} />}
             {activeMode === 'progress' && <ProgressMode />}
             {activeMode === 'calendar' && <MatchCalendarMode />}
             {activeMode === 'profile' && <ProfileMode />}

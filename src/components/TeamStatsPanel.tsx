@@ -94,7 +94,7 @@ export default function TeamStatsPanel({ userId }: TeamStatsPanelProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <BarChart3 className="text-yellow-400" size={24} />
+          <BarChart3 className="text-purple-300" size={22} />
           <h2 className="text-xl font-bold text-white">Estadísticas del Equipo</h2>
         </div>
         <button
@@ -112,7 +112,7 @@ export default function TeamStatsPanel({ userId }: TeamStatsPanelProps) {
             });
             downloadTextFile(text, `estadisticas-equipo-${new Date().toISOString().slice(0, 10)}.txt`);
           }}
-          className="flex items-center gap-2 px-3 py-1.5 bg-yellow-600/20 border border-yellow-600/40 hover:bg-yellow-600/30 text-yellow-400 rounded-lg text-sm font-medium transition-colors"
+          className="flex items-center gap-2 px-3 py-1.5 bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 text-purple-200 rounded-xl text-sm font-medium transition-colors"
         >
           <Download size={14} />
           Exportar
@@ -120,9 +120,9 @@ export default function TeamStatsPanel({ userId }: TeamStatsPanelProps) {
       </div>
 
       {/* Match stats */}
-      <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
+      <div className="rounded-3xl border border-white/10 bg-gray-900/60 backdrop-blur-sm p-4 sm:p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Trophy className="text-yellow-400" size={20} />
+          <Trophy className="text-purple-300" size={20} />
           <h3 className="text-lg font-bold text-white">Rendimiento en Partidos</h3>
         </div>
 
@@ -146,15 +146,15 @@ export default function TeamStatsPanel({ userId }: TeamStatsPanelProps) {
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-              <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+              <div className="bg-white/5 rounded-xl p-3 text-center">
                 <p className="text-2xl font-bold text-white">{matchStats.goalsFor}</p>
                 <p className="text-xs text-gray-400 mt-1">Goles a favor</p>
               </div>
-              <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+              <div className="bg-white/5 rounded-xl p-3 text-center">
                 <p className="text-2xl font-bold text-white">{matchStats.goalsAgainst}</p>
                 <p className="text-xs text-gray-400 mt-1">Goles en contra</p>
               </div>
-              <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+              <div className="bg-white/5 rounded-xl p-3 text-center">
                 <p className={`text-2xl font-bold ${matchStats.winRate >= 50 ? 'text-green-400' : 'text-red-400'}`}>
                   {matchStats.winRate}%
                 </p>
@@ -166,9 +166,9 @@ export default function TeamStatsPanel({ userId }: TeamStatsPanelProps) {
       </div>
 
       {/* Player stats */}
-      <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
+      <div className="rounded-3xl border border-white/10 bg-gray-900/60 backdrop-blur-sm p-4 sm:p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Users className="text-blue-400" size={20} />
+          <Users className="text-purple-300" size={20} />
           <h3 className="text-lg font-bold text-white">Plantilla</h3>
         </div>
 
@@ -177,11 +177,11 @@ export default function TeamStatsPanel({ userId }: TeamStatsPanelProps) {
         ) : (
           <>
             <div className="grid grid-cols-2 gap-3 mb-4">
-              <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+              <div className="bg-white/5 rounded-xl p-3 text-center">
                 <p className="text-3xl font-bold text-white">{playerStats.total}</p>
                 <p className="text-xs text-gray-400 mt-1">Jugadores</p>
               </div>
-              <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+              <div className="bg-white/5 rounded-xl p-3 text-center">
                 <p className="text-3xl font-bold text-purple-400">{playerStats.avgLevel}</p>
                 <p className="text-xs text-gray-400 mt-1">Nivel promedio</p>
               </div>
@@ -192,9 +192,9 @@ export default function TeamStatsPanel({ userId }: TeamStatsPanelProps) {
               {Object.entries(playerStats.byPosition).map(([pos, count]) => (
                 <div key={pos} className="flex items-center gap-3">
                   <span className="text-sm text-gray-300 w-32 truncate">{pos}</span>
-                  <div className="flex-1 bg-gray-800 rounded-full h-2 overflow-hidden">
+                  <div className="flex-1 bg-black/40 rounded-full h-2 overflow-hidden">
                     <div
-                      className="bg-blue-500 h-full rounded-full transition-all duration-500"
+                      className="bg-purple-400 h-full rounded-full transition-all duration-500"
                       style={{ width: `${(count / maxPositionCount) * 100}%` }}
                     />
                   </div>
@@ -207,9 +207,9 @@ export default function TeamStatsPanel({ userId }: TeamStatsPanelProps) {
       </div>
 
       {/* Training stats */}
-      <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
+      <div className="rounded-3xl border border-white/10 bg-gray-900/60 backdrop-blur-sm p-4 sm:p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Dumbbell className="text-orange-400" size={20} />
+          <Dumbbell className="text-purple-300" size={20} />
           <h3 className="text-lg font-bold text-white">Entrenamiento</h3>
         </div>
 
@@ -218,7 +218,7 @@ export default function TeamStatsPanel({ userId }: TeamStatsPanelProps) {
         ) : (
           <>
             <div className="grid grid-cols-3 gap-3 mb-4">
-              <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+              <div className="bg-white/5 rounded-xl p-3 text-center">
                 <p className="text-2xl font-bold text-white">{trainingStats.total}</p>
                 <p className="text-xs text-gray-400 mt-1">Total sesiones</p>
               </div>
@@ -249,9 +249,9 @@ export default function TeamStatsPanel({ userId }: TeamStatsPanelProps) {
       </div>
 
       {/* Progression stats */}
-      <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
+      <div className="rounded-3xl border border-white/10 bg-gray-900/60 backdrop-blur-sm p-4 sm:p-6">
         <div className="flex items-center gap-2 mb-4">
-          <TrendingUp className="text-green-400" size={20} />
+          <TrendingUp className="text-purple-300" size={20} />
           <h3 className="text-lg font-bold text-white">Progresión de Jugadores</h3>
         </div>
 
@@ -260,7 +260,7 @@ export default function TeamStatsPanel({ userId }: TeamStatsPanelProps) {
         ) : (
           <>
             <div className="grid grid-cols-3 gap-3 mb-4">
-              <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+              <div className="bg-white/5 rounded-xl p-3 text-center">
                 <p className="text-2xl font-bold text-white">{progressStats.total}</p>
                 <p className="text-xs text-gray-400 mt-1">Evaluaciones</p>
               </div>

@@ -18,6 +18,8 @@ interface CoachProfile {
   language: string;
   theme: string;
   plan: 'free' | 'pro';
+  /** Aparecer en la clasificación de Avanzado (por defecto sí) */
+  show_in_ranking?: boolean;
   stripe_customer_id: string | null;
   plan_expires_at: string | null;
   progress_swipe_days: number[];

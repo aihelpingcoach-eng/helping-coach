@@ -1,4 +1,4 @@
-import { X, User, Crown, MapPin, Cake, CalendarClock, Shirt, LayoutGrid, Target } from 'lucide-react';
+import { X, User, Crown, MapPin, CalendarClock, Shirt, LayoutGrid, Target } from 'lucide-react';
 import Modal from './Modal';
 
 export interface RankingRow {
@@ -8,7 +8,8 @@ export interface RankingRow {
   profile_photo: string;
   total_xp: number;
   rank: string;
-  age: number | null;
+  /** Solo en la clasificación semanal (vista coach_rankings_weekly) */
+  weekly_xp?: number;
   country: string | null;
   years_experience: number | null;
   coaching_style: string | null;
@@ -32,7 +33,6 @@ function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string;
 export default function CoachProfileModal({ coach, onClose }: { coach: RankingRow; onClose: () => void }) {
   const facts: { icon: React.ReactNode; label: string; value: string }[] = [];
   if (coach.country) facts.push({ icon: <MapPin size={16} />, label: 'País', value: coach.country });
-  if (coach.age) facts.push({ icon: <Cake size={16} />, label: 'Edad', value: `${coach.age} años` });
   if (coach.years_experience != null) facts.push({ icon: <CalendarClock size={16} />, label: 'Experiencia', value: `${coach.years_experience} años` });
   if (coach.coaching_style) facts.push({ icon: <Shirt size={16} />, label: 'Estilo de entrenador', value: coach.coaching_style });
   if (coach.favorite_formation) facts.push({ icon: <LayoutGrid size={16} />, label: 'Formación favorita', value: coach.favorite_formation });

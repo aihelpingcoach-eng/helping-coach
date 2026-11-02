@@ -4,9 +4,12 @@ import { generateMatchReport } from '../utils/ai';
 import { downloadTextFile, buildMatchReportText } from '../utils/exportReport';
 import AdGate from './AdGate';
 import { useAdGate } from '../hooks/useAdGate';
+import { Match } from '../hooks/useMatches';
 
 interface MatchReportGeneratorProps {
   teamPlaystyles: string[];
+  /** Partidos registrados en Partidos: los que tienen resultado se pueden elegir */
+  matches: Match[];
 }
 
 interface MatchReport {
@@ -16,10 +19,21 @@ interface MatchReport {
   recommendations: string[];
 }
 
-export default function MatchReportGenerator({ teamPlaystyles }: MatchReportGeneratorProps) {
+const RESULT_LABEL = { win: 'Victoria', draw: 'Empate', loss: 'Derrota' } as const;
+
+const inputClass =
+  'w-full px-4 py-2.5 bg-black/40 border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500';
+
+function matchLabel(m: Match) {
+  const date = new Date(`${m.date}T00:00:00`).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+  return `${date} · ${m.opponent} · ${m.score_for}-${m.score_against}`;
+}
+
+export default function MatchReportGenerator({ teamPlaystyles, matches }: MatchReportGeneratorProps) {
   const [generating, setGenerating] = useState(false);
   const [report, setReport] = useState<MatchReport | null>(null);
   const [error, setError] = useState('');
+  const [selectedMatchId, setSelectedMatchId] = useState('');
   const { withAdGate, showAdGate, featureName, handleAdComplete, handleAdCancel } = useAdGate();
 
   const [matchData, setMatchData] = useState({
@@ -28,9 +42,24 @@ export default function MatchReportGenerator({ teamPlaystyles }: MatchReportGene
     shots: 10,
   });
 
+  const playedMatches = matches
+    .filter(m => m.result !== null && m.score_for !== null && m.score_against !== null)
+    .sort((a, b) => b.date.localeCompare(a.date));
+
+  const pickMatch = (id: string) => {
+    setSelectedMatchId(id);
+    const match = playedMatches.find(m => m.id === id);
+    setMatchData(data => ({
+      ...data,
+      result: match?.result
+        ? `${match.score_for}-${match.score_against} ${RESULT_LABEL[match.result]} contra ${match.opponent}`
+        : '',
+    }));
+  };
+
   const handleGenerate = async () => {
     if (!matchData.result) {
-      setError('Ingresa el resultado del partido');
+      setError('Elige un partido o escribe el resultado');
       return;
     }
 
@@ -53,45 +82,64 @@ export default function MatchReportGenerator({ teamPlaystyles }: MatchReportGene
   };
 
   return (
-    <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-6 border border-slate-700">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
-          <FileText className="w-5 h-5 text-blue-400" />
-        </div>
-        <div>
-          <h3 className="text-xl font-bold text-white">Informe de Partido</h3>
-          <p className="text-sm text-slate-400">Análisis táctico post-partido</p>
-        </div>
-      </div>
-
+    <div>
       {!report && (
-        <div className="space-y-4 mb-6">
+        <div className="space-y-4 mb-5">
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
+            <label htmlFor="report-match" className="block text-sm font-medium text-gray-300 mb-2">
+              Partido
+            </label>
+            <select
+              id="report-match"
+              value={selectedMatchId}
+              onChange={e => pickMatch(e.target.value)}
+              className={inputClass}
+            >
+              <option value="">Escribir el resultado a mano</option>
+              {playedMatches.map(m => (
+                <option key={m.id} value={m.id}>
+                  {matchLabel(m)}
+                </option>
+              ))}
+            </select>
+            {playedMatches.length === 0 && (
+              <p className="text-xs text-gray-500 mt-1.5">
+                Cuando añadas resultados en Partidos podrás elegirlos aquí.
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="report-result" className="block text-sm font-medium text-gray-300 mb-2">
               Resultado
             </label>
             <input
+              id="report-result"
               type="text"
               value={matchData.result}
-              onChange={(e) => setMatchData({ ...matchData, result: e.target.value })}
-              placeholder="Ej: 3-1 Victoria"
-              className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              onChange={e => {
+                setSelectedMatchId('');
+                setMatchData({ ...matchData, result: e.target.value });
+              }}
+              placeholder="Ej.: 3-1 Victoria"
+              className={inputClass}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
-              Posesión (%)
+            <label htmlFor="report-possession" className="block text-sm font-medium text-gray-300 mb-2">
+              Posesión
             </label>
             <input
+              id="report-possession"
               type="range"
               min="0"
               max="100"
               value={matchData.possession}
-              onChange={(e) => setMatchData({ ...matchData, possession: parseInt(e.target.value) })}
-              className="w-full"
+              onChange={e => setMatchData({ ...matchData, possession: parseInt(e.target.value, 10) })}
+              className="w-full accent-purple-500"
             />
-            <div className="flex justify-between text-sm text-slate-400 mt-1">
+            <div className="flex justify-between text-sm text-gray-400 mt-1">
               <span>0%</span>
               <span className="font-bold text-white">{matchData.possession}%</span>
               <span>100%</span>
@@ -99,30 +147,34 @@ export default function MatchReportGenerator({ teamPlaystyles }: MatchReportGene
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
-              Tiros al arco
+            <label htmlFor="report-shots" className="block text-sm font-medium text-gray-300 mb-2">
+              Tiros a puerta
             </label>
             <input
+              id="report-shots"
               type="number"
+              min="0"
+              inputMode="numeric"
               value={matchData.shots}
-              onChange={(e) => setMatchData({ ...matchData, shots: parseInt(e.target.value) })}
-              className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              onChange={e => setMatchData({ ...matchData, shots: Math.max(0, parseInt(e.target.value, 10) || 0) })}
+              className={inputClass}
             />
           </div>
         </div>
       )}
 
       {error && (
-        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-4">
+        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3 mb-4">
           <p className="text-red-400 text-sm">{error}</p>
         </div>
       )}
 
       {!report && (
         <button
+          type="button"
           onClick={() => withAdGate(handleGenerate, 'informe de partido')}
           disabled={generating || !matchData.result}
-          className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {generating ? (
             <>
@@ -132,59 +184,61 @@ export default function MatchReportGenerator({ teamPlaystyles }: MatchReportGene
           ) : (
             <>
               <FileText className="w-5 h-5" />
-              Generar Informe
+              Generar informe
             </>
           )}
         </button>
       )}
 
       {report && (
-        <div className="space-y-4">
-          <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-            <h5 className="font-bold text-white mb-2">Resumen</h5>
-            <p className="text-slate-300 text-sm leading-relaxed">{report.summary}</p>
+        <div className="space-y-3">
+          <p className="text-xs text-gray-400">{matchData.result}</p>
+
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <h4 className="font-bold text-white text-sm mb-2">Resumen</h4>
+            <p className="text-gray-300 text-sm leading-relaxed">{report.summary}</p>
           </div>
 
-          <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-            <div className="flex items-center gap-2 mb-3">
-              <Users className="w-5 h-5 text-yellow-400" />
-              <h5 className="font-bold text-white">Jugadores Destacados</h5>
-            </div>
-            <ul className="space-y-2">
-              {report.key_players.map((player: string, idx: number) => (
-                <li key={idx} className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
-                  <span className="text-slate-300 text-sm">{player}</span>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <h4 className="flex items-center gap-2 font-bold text-white text-sm mb-2">
+              <Users className="w-4 h-4 text-yellow-300" />
+              Jugadores destacados
+            </h4>
+            <ul className="space-y-1.5">
+              {report.key_players.map((player, idx) => (
+                <li key={idx} className="flex items-start gap-2 text-gray-300 text-sm">
+                  <CheckCircle className="w-4 h-4 text-yellow-300 mt-0.5 flex-shrink-0" />
+                  {player}
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-            <div className="flex items-center gap-2 mb-3">
-              <AlertCircle className="w-5 h-5 text-orange-400" />
-              <h5 className="font-bold text-white">Problemas Detectados</h5>
-            </div>
-            <ul className="space-y-2">
-              {report.issues.map((issue: string, idx: number) => (
-                <li key={idx} className="flex items-start gap-2">
-                  <span className="text-orange-400 mt-1">•</span>
-                  <span className="text-slate-300 text-sm">{issue}</span>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <h4 className="flex items-center gap-2 font-bold text-white text-sm mb-2">
+              <AlertCircle className="w-4 h-4 text-orange-400" />
+              Problemas detectados
+            </h4>
+            <ul className="space-y-1.5">
+              {report.issues.map((issue, idx) => (
+                <li key={idx} className="flex items-start gap-2 text-gray-300 text-sm">
+                  <span className="text-orange-400" aria-hidden="true">•</span>
+                  {issue}
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded-lg p-4 border border-green-500/20">
-            <div className="flex items-center gap-2 mb-3">
-              <TrendingUp className="w-5 h-5 text-green-400" />
-              <h5 className="font-bold text-white">Recomendaciones</h5>
-            </div>
-            <ul className="space-y-2">
-              {report.recommendations.map((rec: string, idx: number) => (
-                <li key={idx} className="flex items-start gap-2">
-                  <span className="text-green-400 mt-1">•</span>
-                  <span className="text-slate-300 text-sm">{rec}</span>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <h4 className="flex items-center gap-2 font-bold text-white text-sm mb-2">
+              <TrendingUp className="w-4 h-4 text-green-400" />
+              Recomendaciones
+            </h4>
+            <ul className="space-y-1.5">
+              {report.recommendations.map((rec, idx) => (
+                <li key={idx} className="flex items-start gap-2 text-gray-300 text-sm">
+                  <span className="text-green-400" aria-hidden="true">•</span>
+                  {rec}
                 </li>
               ))}
             </ul>
@@ -192,18 +246,20 @@ export default function MatchReportGenerator({ teamPlaystyles }: MatchReportGene
 
           <div className="flex gap-2">
             <button
+              type="button"
               onClick={() => {
                 const text = buildMatchReportText({ ...matchData, ...report });
                 downloadTextFile(text, `informe-partido-${new Date().toISOString().slice(0, 10)}.txt`);
               }}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition-colors text-sm font-semibold"
             >
               <Download className="w-4 h-4" />
-              Descargar informe
+              Descargar
             </button>
             <button
+              type="button"
               onClick={() => setReport(null)}
-              className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors text-sm"
+              className="flex-1 px-4 py-2.5 bg-white/10 hover:bg-white/15 text-white rounded-xl transition-colors text-sm font-semibold"
             >
               Nuevo informe
             </button>
@@ -212,11 +268,7 @@ export default function MatchReportGenerator({ teamPlaystyles }: MatchReportGene
       )}
 
       {showAdGate && (
-        <AdGate
-          featureName={featureName}
-          onComplete={handleAdComplete}
-          onCancel={handleAdCancel}
-        />
+        <AdGate featureName={featureName} onComplete={handleAdComplete} onCancel={handleAdCancel} />
       )}
     </div>
   );

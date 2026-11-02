@@ -1,225 +1,137 @@
 import { useState, useEffect } from 'react';
-import { Trophy, TrendingUp, Target, Award, Users, BarChart3 } from 'lucide-react';
-import { CoachCareer } from '../types/advancedSystems';
+import { Trophy, Calendar, Dumbbell, Award, TrendingUp, Info } from 'lucide-react';
 import { RANKS, getXPProgress } from '../constants/progression';
+import { getLevelByXP } from '../constants/levels';
 import { useXP } from '../hooks/useXP';
 import { supabase } from '../lib/supabase';
+import { Match } from '../hooks/useMatches';
+import { TrainingSession } from '../hooks/useTrainingSessions';
 
 interface CareerModeProps {
   coachId: string;
+  matches: Match[];
+  sessions: TrainingSession[];
 }
 
-export default function CareerMode({ coachId }: CareerModeProps) {
-  const [career, setCareer] = useState<CoachCareer | null>(null);
-  const [loading, setLoading] = useState(true);
+// Antes leía reputación, partidos y decisiones de la tabla coach_career, que
+// nada actualizaba (siempre 0). Ahora todo sale de la actividad real.
+export default function CareerMode({ coachId, matches, sessions }: CareerModeProps) {
   const { totalXP } = useXP();
+  const [missionsCompleted, setMissionsCompleted] = useState<number | null>(null);
 
   useEffect(() => {
-    loadCareer();
-    // loadCareer se recrea cada render (no está memoizada); incluirla en las
-    // deps causaría un loop de refetch. Solo debe recargar cuando cambia coachId.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    let cancelled = false;
+    supabase
+      .from('coach_missions')
+      .select('id', { count: 'exact', head: true })
+      .eq('coach_id', coachId)
+      .eq('is_completed', true)
+      .then(({ count }) => {
+        if (!cancelled) setMissionsCompleted(count ?? 0);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [coachId]);
 
-  const loadCareer = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('coach_career')
-        .select('*')
-        .eq('coach_id', coachId)
-        .maybeSingle();
+  const played = matches.filter(m => m.result !== null);
+  const wins = played.filter(m => m.result === 'win').length;
+  const completedSessions = sessions.filter(s => s.completed).length;
+  const { currentRank, nextRank, progress, currentRankXP, xpForNextRank } = getXPProgress(totalXP);
+  const level = getLevelByXP(totalXP);
+  const isNewCareer = totalXP < 100 && played.length === 0 && completedSessions === 0;
 
-      if (error) throw error;
-
-      if (!data) {
-        await createCareer();
-      } else {
-        setCareer(data);
-      }
-    } catch (error) {
-      console.error('Error loading career:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const createCareer = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('coach_career')
-        .insert({
-          coach_id: coachId,
-          coaching_style: 'balanced',
-          reputation: 0,
-          matches_managed: 0,
-          tactical_decisions: 0,
-          missions_completed: 0,
-        })
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-      setCareer(data);
-    } catch (error) {
-      console.error('Error creating career:', error);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-8">
-        <p className="text-gray-400 text-center">Cargando modo carrera...</p>
-      </div>
-    );
-  }
-
-  if (!career) {
-    return (
-      <div className="bg-gray-900/50 border border-gray-700 rounded-lg p-8 text-center">
-        <p className="text-gray-400">No se pudo cargar la información de carrera</p>
-      </div>
-    );
-  }
-
-  const { currentRank, nextRank, progress: xpProgress, currentRankXP, xpForNextRank } = getXPProgress(totalXP);
-  const isNewCareer = career.matches_managed === 0 && career.tactical_decisions === 0 && career.missions_completed === 0;
+  const stats = [
+    { icon: Calendar, label: 'Partidos jugados', value: played.length },
+    { icon: Trophy, label: 'Victorias', value: wins },
+    { icon: Dumbbell, label: 'Entrenamientos', value: completedSessions },
+    { icon: Award, label: 'Misiones completadas', value: missionsCompleted ?? '–' },
+  ];
 
   return (
-    <div className="space-y-6">
-      <div className={`bg-gradient-to-br ${currentRank.color} rounded-2xl p-8 relative overflow-hidden`}>
-        <div className="absolute top-0 right-0 text-9xl opacity-10">
-          <Trophy />
+    <div className="space-y-4">
+      <div className="rounded-2xl border border-purple-500/30 bg-gradient-to-br from-purple-900/50 to-black p-5">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-4xl" aria-hidden="true">{currentRank.icon}</span>
+          <div className="min-w-0">
+            <p className="text-purple-200/80 text-xs font-medium">Rango actual</p>
+            <h3 className="text-2xl font-bold text-white leading-tight">{currentRank.name}</h3>
+            <p className="text-gray-400 text-xs">
+              Nivel {level.level} · {level.name} · {totalXP.toLocaleString('es-ES')} XP
+            </p>
+          </div>
         </div>
 
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-4xl">{currentRank.icon}</span>
-            <div>
-              <p className="text-white/70 text-sm font-medium">Rango Actual</p>
-              <h2 className="text-3xl font-bold text-white">{currentRank.name}</h2>
+        {nextRank ? (
+          <>
+            <div className="flex items-center justify-between text-xs text-gray-300 mb-1.5">
+              <span>Hacia {nextRank.name}</span>
+              <span className="font-bold">
+                {currentRankXP.toLocaleString('es-ES')} / {xpForNextRank.toLocaleString('es-ES')} XP
+              </span>
             </div>
-          </div>
+            <div className="w-full bg-black/40 rounded-full h-2.5 overflow-hidden">
+              <div className="bg-purple-400 h-full rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
+            </div>
+          </>
+        ) : (
+          <p className="text-yellow-200 text-sm font-bold">¡Has alcanzado el rango máximo!</p>
+        )}
 
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-black/20 rounded-lg p-3">
-              <p className="text-white/70 text-xs mb-1">Experiencia Total</p>
-              <p className="text-2xl font-bold text-white">{totalXP} XP</p>
-            </div>
-            <div className="bg-black/20 rounded-lg p-3">
-              <p className="text-white/70 text-xs mb-1">Reputación</p>
-              <p className="text-2xl font-bold text-white">{career.reputation}</p>
-            </div>
-            <div className="bg-black/20 rounded-lg p-3">
-              <p className="text-white/70 text-xs mb-1">Partidos</p>
-              <p className="text-2xl font-bold text-white">{career.matches_managed}</p>
-            </div>
-          </div>
-
-          {nextRank ? (
-            <div>
-              <div className="flex items-center justify-between text-sm text-white/80 mb-2">
-                <span>Progreso al siguiente rango</span>
-                <span className="font-bold">{Math.floor(xpProgress)}%</span>
-              </div>
-              <div className="w-full bg-black/30 rounded-full h-3 overflow-hidden mb-2">
-                <div
-                  className="bg-white/60 h-full rounded-full transition-all duration-500"
-                  style={{ width: `${xpProgress}%` }}
-                />
-              </div>
-              <p className="text-white/70 text-xs">
-                {currentRankXP} / {xpForNextRank} XP — Próximo:{' '}
-                <span className="font-bold">{nextRank.name}</span> {nextRank.icon}
-              </p>
-            </div>
-          ) : (
-            <div className="bg-yellow-500/20 border border-yellow-500 rounded-lg p-3">
-              <p className="text-yellow-200 text-sm font-bold">¡Máximo rango alcanzado!</p>
-              <p className="text-yellow-200/70 text-xs">Eres un Entrenador Legendario</p>
-            </div>
-          )}
-        </div>
+        <p className="flex gap-2 text-[11px] leading-snug text-gray-400 mt-4">
+          <Info size={14} className="flex-shrink-0 mt-px" />
+          El rango marca tu etapa como entrenador (hay {RANKS.length}). El nivel, que también ves en tu perfil, avanza más a
+          menudo dentro de cada etapa.
+        </p>
       </div>
 
       {isNewCareer && (
-        <div className="bg-purple-900/30 border border-purple-500/40 rounded-xl p-5 flex items-start gap-4">
-          <span className="text-3xl">🚀</span>
+        <div className="rounded-2xl border border-purple-500/30 bg-purple-900/20 p-4 flex items-start gap-3">
+          <span className="text-2xl" aria-hidden="true">🚀</span>
           <div>
-            <p className="text-purple-200 font-bold text-sm">¡Carrera recién iniciada!</p>
-            <p className="text-purple-300/70 text-xs mt-1 leading-relaxed">
-              Añade jugadores, analiza tácticas y completa misiones para ganar XP y subir de rango.
-              Cada acción en la app suma puntos a tu carrera.
+            <p className="text-purple-100 font-bold text-sm">¡Tu carrera acaba de empezar!</p>
+            <p className="text-gray-400 text-xs mt-1 leading-relaxed">
+              Registra partidos, completa entrenamientos y misiones para ganar XP y subir de rango.
             </p>
           </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <BarChart3 className="text-blue-400" size={24} />
-            <h3 className="text-lg font-bold text-white">Estadísticas de Carrera</h3>
+      <div className="grid grid-cols-2 gap-3">
+        {stats.map(({ icon: Icon, label, value }) => (
+          <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <Icon size={18} className="text-purple-300 mb-2" />
+            <p className="text-2xl font-bold text-white leading-none">{value}</p>
+            <p className="text-xs text-gray-400 mt-1">{label}</p>
           </div>
+        ))}
+      </div>
 
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Target className="text-yellow-400" size={18} />
-                <span className="text-gray-300">Decisiones Tácticas</span>
-              </div>
-              <span className="text-white font-bold">{career.tactical_decisions}</span>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Award className="text-green-400" size={18} />
-                <span className="text-gray-300">Misiones Completadas</span>
-              </div>
-              <span className="text-white font-bold">{career.missions_completed}</span>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Users className="text-purple-400" size={18} />
-                <span className="text-gray-300">Estilo de Entrenamiento</span>
-              </div>
-              <span className="text-white font-bold capitalize">{career.coaching_style}</span>
-            </div>
-          </div>
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <TrendingUp className="text-purple-300" size={18} />
+          <h4 className="text-sm font-bold text-white">Todos los rangos</h4>
         </div>
-
-        <div className="bg-gray-900/70 border border-gray-700 rounded-xl p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="text-green-400" size={24} />
-            <h3 className="text-lg font-bold text-white">Todos los Rangos</h3>
-          </div>
-
-          <div className="space-y-2">
-            {RANKS.map((rank) => {
-              const isUnlocked = totalXP >= rank.xpRequired;
-              const isCurrent = rank.id === currentRank.id;
-
-              return (
-                <div
-                  key={rank.id}
-                  className={`flex items-center justify-between p-2 rounded-lg ${
-                    isCurrent ? 'bg-blue-900/30 border border-blue-500' : 'bg-gray-800/50'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className={`text-base ${isUnlocked ? 'opacity-100' : 'opacity-30'}`}>
-                      {rank.icon}
-                    </span>
-                    <span className={`text-sm ${isUnlocked ? 'text-white font-medium' : 'text-gray-500'}`}>
-                      {rank.name}
-                    </span>
-                  </div>
-                  <span className="text-xs text-gray-400">{rank.xpRequired} XP</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <ul className="space-y-1.5">
+          {RANKS.map(rank => {
+            const isUnlocked = totalXP >= rank.xpRequired;
+            const isCurrent = rank.id === currentRank.id;
+            return (
+              <li
+                key={rank.id}
+                className={`flex items-center justify-between px-3 py-2 rounded-xl ${
+                  isCurrent ? 'bg-purple-600/25 border border-purple-500/50' : 'bg-white/[0.03]'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <span className={isUnlocked ? '' : 'opacity-30'} aria-hidden="true">{rank.icon}</span>
+                  <span className={`text-sm ${isUnlocked ? 'text-white font-medium' : 'text-gray-500'}`}>{rank.name}</span>
+                </span>
+                <span className="text-xs text-gray-400">{rank.xpRequired.toLocaleString('es-ES')} XP</span>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </div>
   );
