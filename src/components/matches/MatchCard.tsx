@@ -1,10 +1,12 @@
-import { MapPin, Trash2, Edit3 } from 'lucide-react';
+import { MapPin, Trash2, Edit3, Radio, ScrollText } from 'lucide-react';
 import { Match } from '../../hooks/useMatches';
 
 interface Props {
   match: Match;
   onResult: (match: Match) => void;
   onDelete: (matchId: string) => void;
+  /** Abre el directo del partido (registrar acciones o ver su crónica) */
+  onLive?: (match: Match) => void;
 }
 
 const COMPETITION_COLORS: Record<string, string> = {
@@ -34,8 +36,10 @@ function resultBadge(match: Match) {
   );
 }
 
-export default function MatchCard({ match, onResult, onDelete }: Props) {
+export default function MatchCard({ match, onResult, onDelete, onLive }: Props) {
   const hasResult = match.result !== null;
+  const liveStatus = match.live_state?.status;
+  const liveLabel = liveStatus === 'finished' ? 'Crónica' : liveStatus && liveStatus !== 'pre' ? 'Seguir directo' : hasResult ? null : 'En directo';
   const compColor = COMPETITION_COLORS[match.competition] ?? COMPETITION_COLORS['Amistoso'];
 
   const borderColor = !hasResult
@@ -82,6 +86,17 @@ export default function MatchCard({ match, onResult, onDelete }: Props) {
         </div>
 
         <div className="flex items-center gap-2">
+          {onLive && liveLabel && (
+            <button
+              onClick={() => onLive(match)}
+              className={`flex items-center gap-1 text-xs font-semibold transition-colors ${
+                liveStatus === 'finished' ? 'text-purple-300 hover:text-purple-200' : 'text-red-300 hover:text-red-200'
+              }`}
+            >
+              {liveStatus === 'finished' ? <ScrollText size={13} /> : <Radio size={13} />}
+              {liveLabel}
+            </button>
+          )}
           <button
             onClick={() => onResult(match)}
             className="flex items-center gap-1 text-cyan-400 hover:text-cyan-300 text-xs font-semibold transition-colors"

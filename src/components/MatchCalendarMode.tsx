@@ -3,20 +3,24 @@ import { Plus, CalendarDays } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useMatches, Match } from '../hooks/useMatches';
 import { useXP } from '../hooks/useXP';
+import { useCoachProfile } from '../hooks/useCoachProfile';
 import CreateMatchModal from './matches/CreateMatchModal';
 import MatchResultModal from './matches/MatchResultModal';
 import MatchCard from './matches/MatchCard';
+import LiveMatchTracker from './matches/LiveMatchTracker';
 import EmptyState from './EmptyState';
 
 type Tab = 'upcoming' | 'history';
 
 export default function MatchCalendarMode() {
   const { user } = useAuth();
-  const { matches, loading, createMatch, updateMatch, deleteMatch } = useMatches(user?.id);
+  const { matches, loading, createMatch, updateMatch, deleteMatch, refresh } = useMatches(user?.id);
+  const { profile } = useCoachProfile();
   const { giveXP } = useXP();
   const [tab, setTab] = useState<Tab>('upcoming');
   const [showCreate, setShowCreate] = useState(false);
   const [resultMatch, setResultMatch] = useState<Match | null>(null);
+  const [liveMatch, setLiveMatch] = useState<Match | null>(null);
 
   const upcoming = matches.filter(m => !m.result);
   const history = matches.filter(m => m.result !== null);
@@ -30,6 +34,16 @@ export default function MatchCalendarMode() {
     const result = scoreFor > scoreAgainst ? 'win' : scoreFor < scoreAgainst ? 'loss' : 'draw';
     const ok = await updateMatch(resultMatch.id, { result, score_for: scoreFor, score_against: scoreAgainst });
     if (ok) giveXP('REGISTER_MATCH');
+  };
+
+  // El directo guarda el resultado con los goles apuntados; el XP de registrar
+  // resultado solo se da la primera vez, como al añadirlo a mano.
+  const handleLiveFinished = async (scoreFor: number, scoreAgainst: number) => {
+    if (!liveMatch) return;
+    const current = matches.find(m => m.id === liveMatch.id);
+    const result = scoreFor > scoreAgainst ? 'win' : scoreFor < scoreAgainst ? 'loss' : 'draw';
+    const ok = await updateMatch(liveMatch.id, { result, score_for: scoreFor, score_against: scoreAgainst });
+    if (ok && !current?.result) giveXP('REGISTER_MATCH');
   };
 
   const handleDelete = async (matchId: string) => {
@@ -108,6 +122,7 @@ export default function MatchCalendarMode() {
                 match={m}
                 onResult={setResultMatch}
                 onDelete={handleDelete}
+                onLive={setLiveMatch}
               />
             ))
           )
@@ -126,6 +141,7 @@ export default function MatchCalendarMode() {
                 match={m}
                 onResult={setResultMatch}
                 onDelete={handleDelete}
+                onLive={setLiveMatch}
               />
             ))
           )
@@ -136,6 +152,19 @@ export default function MatchCalendarMode() {
         <CreateMatchModal
           onClose={() => setShowCreate(false)}
           onCreate={createMatch}
+        />
+      )}
+
+      {liveMatch && (
+        <LiveMatchTracker
+          match={matches.find(m => m.id === liveMatch.id) ?? liveMatch}
+          teamName={profile?.team_name?.trim() || 'Nosotros'}
+          userId={user?.id}
+          onClose={() => {
+            setLiveMatch(null);
+            refresh();
+          }}
+          onFinished={handleLiveFinished}
         />
       )}
 

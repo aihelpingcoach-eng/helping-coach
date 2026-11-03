@@ -78,7 +78,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 10,
     title: 'Calendario de Partidos',
-    description: 'Registra todos tus partidos: rival, fecha, lugar y competición. Después del partido anota el resultado (goles a favor y en contra) para llevar el historial completo. El sistema calcula automáticamente tu estadística W-D-L y la diferencia de goles de la temporada.',
+    description: 'Registra todos tus partidos: rival, fecha, lugar y competición. Después del partido anota el resultado (goles a favor y en contra) para llevar el historial completo. El sistema calcula automáticamente tu estadística W-D-L y la diferencia de goles de la temporada. Durante el partido, pulsa «En directo» para apuntar las acciones de los dos equipos con cronómetro: al terminar, el resultado se guarda solo y puedes descargar la crónica.',
     action: 'none',
   },
   {

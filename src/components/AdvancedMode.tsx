@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, ReactNode } from 'react';
-import { LayoutDashboard, Users, Trophy, Bell, Award, Sparkles, FileText, Target, ListOrdered, Zap } from 'lucide-react';
+import { LayoutDashboard, Users, Trophy, Bell, Award, Sparkles, FileText, Target, ListOrdered, Zap, Activity } from 'lucide-react';
 import EventCards from './EventCards';
 import MissionsPanel from './MissionsPanel';
 import CareerMode from './CareerMode';
@@ -9,6 +9,7 @@ import TeamStatsPanel from './TeamStatsPanel';
 import LeaderboardPanel from './LeaderboardPanel';
 import AdvancedSummary from './AdvancedSummary';
 import TeamAlertsList from './TeamAlertsList';
+import MinutesPlayedPanel from './MinutesPlayedPanel';
 import type { AppMode } from './BottomNav';
 import { useCoachProfile } from '../hooks/useCoachProfile';
 import { useAuth } from '../contexts/AuthContext';
@@ -22,7 +23,8 @@ import { computeTeamDNA } from '../constants/teamDNA';
 import { supabase } from '../lib/supabase';
 
 // Antes eran 9 pestañas (en el móvil solo se veían 3) y dos de ellas, Alertas
-// y Carga, siempre vacías: nada generaba sus datos. Ahora 4 que caben enteras.
+// y Carga, siempre vacías: nada generaba sus datos. Ahora 4 que caben enteras;
+// Carga ha vuelto dentro de Equipo con los minutos del directo de partido.
 export type AdvancedTab = 'overview' | 'team' | 'challenges' | 'alerts';
 
 interface Player {
@@ -176,6 +178,10 @@ export default function AdvancedMode({ onNavigate }: AdvancedModeProps) {
           {activeTab === 'team' && (
             <>
               <TeamStatsPanel userId={user?.id ?? ''} />
+
+              <Section title="Carga: minutos jugados" icon={Activity}>
+                <MinutesPlayedPanel userId={user?.id ?? ''} onNavigate={onNavigate} />
+              </Section>
 
               <div className="flex items-center justify-between gap-3 flex-wrap pt-2">
                 <p className="text-sm text-gray-400">Análisis por equipo</p>

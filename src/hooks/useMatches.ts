@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
+import type { LiveState } from '../utils/liveMatch';
 
 export interface Match {
   id: string;
@@ -14,6 +15,8 @@ export interface Match {
   score_against: number | null;
   notes: string;
   created_at: string;
+  /** Estado del directo (cronómetro, partes, once inicial); null si no se ha registrado en directo */
+  live_state?: LiveState | null;
 }
 
 export interface CreateMatchPayload {
