@@ -266,6 +266,7 @@ con lucide-react, **sin shadcn** (no hay `components.json`). No actualizar Tailw
   - `src/utils/liveMatch.ts` (+ tests) — reloj, marcador, minutos jugados (cambios, roja y 2ª amarilla) y crónica.
   - `src/hooks/useLiveMatch.ts` — guarda cada cambio en localStorage y lo sube en cola (ids generados en la app +
     upsert: sin duplicados sin conexión); retoma el partido si se cierra la app.
+    Lo que está en vuelo no se anula al deshacer (`enqueue(..., inFlight)`): si no, la acción quedaba en la BD.
   - `src/components/matches/LiveMatchTracker.tsx` — se pinta con `createPortal` en `<body>`: dentro del contenedor
     `relative z-10` de App la barra inferior (fuera, z-50) quedaba por encima aunque el directo tuviera z-[60].
     Descanso/Final con doble toque; wake lock mientras corre el reloj; al terminar guarda el resultado.
