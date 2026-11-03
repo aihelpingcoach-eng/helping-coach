@@ -16,7 +16,7 @@ import {
   toggleClock,
 } from '../utils/liveMatch';
 
-type SyncOp =
+export type SyncOp =
   | { op: 'insert'; event: LiveEvent }
   | { op: 'delete'; id: string }
   | { op: 'state'; state: LiveState | null };
@@ -54,11 +54,17 @@ function clearStored(matchId: string) {
   }
 }
 
-/** Une operaciones pendientes: el último estado gana y borrar algo aún no subido lo anula */
-function enqueue(queue: SyncOp[], op: SyncOp): SyncOp[] {
-  if (op.op === 'state') return [...queue.filter(o => o.op !== 'state'), op];
-  if (op.op === 'delete' && queue.some(o => o.op === 'insert' && o.event.id === op.id)) {
-    return queue.filter(o => !(o.op === 'insert' && o.event.id === op.id));
+/**
+ * Une operaciones pendientes: el último estado gana y borrar algo aún no
+ * subido lo anula. Lo que ya se está enviando (inFlight) no se puede anular:
+ * si se deshace una acción mientras sube, hay que mandar también el borrado
+ * (antes se quedaba en la base de datos).
+ */
+export function enqueue(queue: SyncOp[], op: SyncOp, inFlight: SyncOp | null = null): SyncOp[] {
+  if (op.op === 'state') return [...queue.filter(o => o.op !== 'state' || o === inFlight), op];
+  if (op.op === 'delete') {
+    const pendingInsert = queue.find(o => o.op === 'insert' && o.event.id === op.id && o !== inFlight);
+    if (pendingInsert) return queue.filter(o => o !== pendingInsert);
   }
   return [...queue, op];
 }
@@ -85,6 +91,7 @@ export function useLiveMatch(match: Match, userId: string | undefined) {
   const [loading, setLoading] = useState(true);
   const [pending, setPending] = useState(0);
   const queueRef = useRef<SyncOp[]>([]);
+  const inFlight = useRef<SyncOp | null>(null);
   const flushing = useRef(false);
   // Valores al día para que dos toques seguidos no partan de un estado viejo
   const latest = useRef<{ state: LiveState | null; events: LiveEvent[] }>({ state: null, events: [] });
@@ -99,12 +106,14 @@ export function useLiveMatch(match: Match, userId: string | undefined) {
     try {
       while (queueRef.current.length > 0) {
         const op = queueRef.current[0];
+        inFlight.current = op;
         const { error } =
           op.op === 'insert'
             ? await supabase.from('match_events').upsert(op.event)
             : op.op === 'delete'
               ? await supabase.from('match_events').delete().eq('id', op.id)
               : await supabase.from('matches').update({ live_state: op.state }).eq('id', match.id);
+        inFlight.current = null;
         if (error) break;
         // Por identidad: mientras se subía pudieron llegar o unirse otras operaciones
         queueRef.current = queueRef.current.filter(o => o !== op);
@@ -196,7 +205,7 @@ export function useLiveMatch(match: Match, userId: string | undefined) {
 
   const commit = (nextState: LiveState | null, nextEvents: LiveEvent[], ops: SyncOp[]) => {
     ops.forEach(op => {
-      queueRef.current = enqueue(queueRef.current, op);
+      queueRef.current = enqueue(queueRef.current, op, inFlight.current);
     });
     latest.current = { state: nextState, events: nextEvents };
     setState(nextState);
