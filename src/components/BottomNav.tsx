@@ -131,7 +131,7 @@ export default function BottomNav({ activeMode, onModeChange, showAdmin }: Botto
     <>
       <nav
         aria-label="Secciones"
-        className="fixed bottom-0 left-0 right-0 bg-black/95 backdrop-blur-md border-t border-purple-500/20 z-50 flex-shrink-0"
+        className="fixed bottom-0 left-0 right-0 bg-black/95 backdrop-blur-md border-t border-purple-500/20 z-40 flex-shrink-0"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         data-tutorial="tutorial-modes"
       >

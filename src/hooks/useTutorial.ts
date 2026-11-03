@@ -59,7 +59,7 @@ const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 7,
     title: 'Modo Entrenamiento',
-    description: 'Accede a una biblioteca de 86 ejercicios organizados en 5 categorías: Fuerza, Táctico, Resistencia, Pliometría y Prevención. Cada ejercicio incluye ilustración, duración, beneficio y descripción técnica. Crea sesiones personalizadas seleccionando ejercicios y guárdalas en tu historial.',
+    description: 'Accede a una biblioteca de más de 800 ejercicios organizados en 5 categorías: Fuerza, Táctico, Resistencia, Pliometría y Prevención. Cada ejercicio incluye ilustración, duración, beneficio y descripción técnica. Crea sesiones personalizadas seleccionando ejercicios y guárdalas en tu historial.',
     element: 'tutorial-modes',
     action: 'none',
   },

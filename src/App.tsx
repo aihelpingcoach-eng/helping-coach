@@ -63,7 +63,10 @@ function AppContent() {
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900" />
       )}
 
-      <div className="relative z-10 h-screen flex flex-col">
+      {/* Sin z-index a propósito: con z-10 este contenedor creaba una capa propia y
+          todas las ventanas de las secciones (chat, fichas, modales) quedaban por
+          debajo de la barra inferior, que está fuera. */}
+      <div className="relative h-screen flex flex-col">
         <header className="flex-shrink-0 bg-black/30 backdrop-blur-md border-b border-purple-500/30">
           <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex justify-between items-center">
             {/* Lados con el mismo ancho para que el logo quede centrado */}

@@ -27,7 +27,7 @@ vercel --yes --prod
 ### Modos funcionales
 - **Táctica** — Formaciones, sinergias con IA, asesor de formaciones (FormationAdvisor integrado)
 - **Lesiones** — Mapa corporal interactivo (frente/espalda, pestaña "Por zona") y base de datos completa con categorías, tratamiento y prevención
-- **Entrenamiento** — Biblioteca de ejercicios por categoría (fuerza, táctico, resistencia)
+- **Entrenamiento** — Biblioteca de 885 ejercicios (a 2026-11-03) en 5 categorías: fuerza, prevención, resistencia, pliometría y táctico
 - **Progresión** — Swipe para avance/retroceso de jugadores (escala 1-99)
 - **Partidos** — Calendario, resultados y directo de partido (botonera con cronómetro, crónica descargable)
 - **Avanzado** — 4 pestañas: Resumen, Equipo (estadísticas, Carga de minutos, ADN, informe), Retos (misiones, carrera, clasificación semanal/global) y Avisos
@@ -274,6 +274,14 @@ con lucide-react, **sin shadcn** (no hay `components.json`). No actualizar Tailw
   - `MinutesPlayedPanel.tsx` — vuelve Carga en Avanzado → Equipo (minutos de los últimos 7 días).
   - Migración `20261103000000_match_live_events.sql` (ejecutada por el usuario): `match_events` con RLS y
     `matches.live_state` (jsonb).
+- Arreglos de revisión:
+  - Capas: el contenedor de App tenía `relative z-10`, que creaba un contexto de apilamiento y dejaba TODAS las
+    ventanas de las secciones (Modal, chat IA, ficha de jugador, nueva sesión, anuncio…) por debajo de la barra
+    inferior. Comprobado en producción: en un móvil de 667 px la barra tapaba el botón «Crear» de nuevo partido.
+    Ahora el contenedor no tiene z-index, la barra es `z-40` y las ventanas `z-50` (PlayerProfile subido a z-50).
+  - Tutorial: «86 ejercicios» → «más de 800».
+  - Fuera `TacticalAlerts.tsx`, `WorkloadManager.tsx` y sus tipos. Migración `20261103120000_drop_unused_advanced_tables.sql`
+    (la ejecuta el usuario): borra `tactical_alerts`, `weekly_workload` y `coach_career` solo si no tienen datos útiles.
 
 ---
 

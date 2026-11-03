@@ -79,7 +79,7 @@ export default function PlayerProfile({ player, isOpen, onClose, allPlayers }: P
 
   return (
     <div
-      className={`fixed inset-0 z-40 transition-all duration-300 ${
+      className={`fixed inset-0 z-50 transition-all duration-300 ${
         isOpen ? 'bg-black/60 backdrop-blur-sm' : 'bg-black/0 backdrop-blur-none'
       }`}
       onClick={handleBackdropClick}

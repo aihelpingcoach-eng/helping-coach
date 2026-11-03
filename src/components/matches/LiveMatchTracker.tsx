@@ -75,8 +75,8 @@ function ActionIcon({ type, size = 16 }: { type: LiveEventType; size?: number })
 
 const RESULT_LABEL = { win: 'Victoria', draw: 'Empate', loss: 'Derrota' } as const;
 
-// Se pinta en <body> con un portal: dentro del contenedor de la app (relative
-// z-10) la barra inferior, que está fuera, quedaría por encima del directo.
+// Se pinta en <body> con un portal: así no depende de las capas del contenedor
+// de la app (con z-10 la barra inferior quedaba por encima del directo).
 export default function LiveMatchTracker(props: LiveMatchTrackerProps) {
   return createPortal(<LiveMatchTrackerContent {...props} />, document.body);
 }
