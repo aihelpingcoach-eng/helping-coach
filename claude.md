@@ -29,7 +29,8 @@ vercel --yes --prod
 - **Lesiones** — Mapa corporal interactivo (frente/espalda, pestaña "Por zona") y base de datos completa con categorías, tratamiento y prevención
 - **Entrenamiento** — Biblioteca de ejercicios por categoría (fuerza, táctico, resistencia)
 - **Progresión** — Swipe para avance/retroceso de jugadores (escala 1-99)
-- **Avanzado** — Alertas, eventos, carga de trabajo, misiones, carrera, ADN del equipo, informe de partido
+- **Partidos** — Calendario, resultados y directo de partido (botonera con cronómetro, crónica descargable)
+- **Avanzado** — 4 pestañas: Resumen, Equipo (estadísticas, Carga de minutos, ADN, informe), Retos (misiones, carrera, clasificación semanal/global) y Avisos
 - **Perfil** — XP, rangos (8 niveles), estadísticas del entrenador
 
 ### Componentes principales
@@ -42,11 +43,13 @@ vercel --yes --prod
 | TrainingMode | Funcional |
 | ProgressMode | Funcional |
 | ProfileMode | Funcional |
-| AdvancedMode | Funcional — incluye TeamDNAAnalysis y MatchReportGenerator |
+| AdvancedMode | Funcional — Resumen, Equipo, Retos y Avisos |
+| LiveMatchTracker | Directo de partido, desde cada partido de Partidos |
+| MinutesPlayedPanel | Carga (minutos jugados), en Avanzado → Equipo |
 | CoachChat | Funcional |
 | FormationAdvisor | Integrado en TacticsMode |
-| TeamDNAAnalysis | Integrado en AdvancedMode (tab Resumen) |
-| MatchReportGenerator | Integrado en AdvancedMode (tab Informe) |
+| TeamDNAAnalysis | Integrado en AdvancedMode (tab Equipo) |
+| MatchReportGenerator | Integrado en AdvancedMode (tab Equipo) |
 
 ---
 
@@ -257,6 +260,19 @@ con lucide-react, **sin shadcn** (no hay `components.json`). No actualizar Tailw
   pestaña semanal, puesto real fuera del top 100, opción de no aparecer y la edad deja de ser pública.
   Migración `20261102000000_ranking_privacy_and_weekly.sql` (ejecutada por el usuario): `show_in_ranking`,
   `xp_events` rellenada por trigger al subir `total_xp`, vista `coach_rankings_weekly` (lunes, hora de Madrid).
+- Directo de partido (el usuario eligió la propuesta A "Botonera" + crónica descargable; artifact "Directo de
+  partido" con las 3 propuestas). Decisiones: los dos equipos; jugador solo en gol/tiros/tarjetas/cambios propios;
+  cronómetro con partes (45/40/35/30/25'); dentro de Partidos.
+  - `src/utils/liveMatch.ts` (+ tests) — reloj, marcador, minutos jugados (cambios, roja y 2ª amarilla) y crónica.
+  - `src/hooks/useLiveMatch.ts` — guarda cada cambio en localStorage y lo sube en cola (ids generados en la app +
+    upsert: sin duplicados sin conexión); retoma el partido si se cierra la app.
+  - `src/components/matches/LiveMatchTracker.tsx` — se pinta con `createPortal` en `<body>`: dentro del contenedor
+    `relative z-10` de App la barra inferior (fuera, z-50) quedaba por encima aunque el directo tuviera z-[60].
+    Descanso/Final con doble toque; wake lock mientras corre el reloj; al terminar guarda el resultado.
+  - `MatchCard`: "En directo" en partidos sin resultado, "Seguir directo" a medias y "Crónica" al terminar.
+  - `MinutesPlayedPanel.tsx` — vuelve Carga en Avanzado → Equipo (minutos de los últimos 7 días).
+  - Migración `20261103000000_match_live_events.sql` (ejecutada por el usuario): `match_events` con RLS y
+    `matches.live_state` (jsonb).
 
 ---
 
